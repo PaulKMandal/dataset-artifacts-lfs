@@ -77,6 +77,7 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
     tokenized_examples["start_positions"] = []
     tokenized_examples["end_positions"] = []
     tokenized_examples["idx"] = []
+    tokenized_examples["gold_span_feature"] = []
 
     for i, offsets in enumerate(offset_mapping):
         input_ids = tokenized_examples["input_ids"][i]
@@ -89,6 +90,7 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
         if len(answers["answer_start"]) == 0:
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["gold_span_feature"].append(False)
             continue
 
         start_char = answers["answer_start"][0]
@@ -105,13 +107,16 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
         if token_start_index >= len(offsets) or token_end_index < 0:
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["gold_span_feature"].append(False)
             continue
 
         # If the answer is out of this feature window, train on CLS.
         if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["gold_span_feature"].append(False)
         else:
+            tokenized_examples["gold_span_feature"].append(True)
             while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
                 token_start_index += 1
             tokenized_examples["start_positions"].append(token_start_index - 1)

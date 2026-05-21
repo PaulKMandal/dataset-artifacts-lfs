@@ -244,3 +244,35 @@ def audit_subset_purity(results_dir: Path, out_dir: Path) -> list[str]:
                 )
     pd.DataFrame(rows).to_csv(out_dir / "subset_purity_overlap.csv", index=False)
     return warnings
+
+
+def audit_windowing(results_dir: Path, out_dir: Path) -> list[str]:
+    warnings: list[str] = []
+    scores_path = results_dir / "cartography" / "cartography_scores.csv"
+    if not scores_path.exists():
+        warnings.append("Missing cartography/cartography_scores.csv")
+        return warnings
+    scores = pd.read_csv(scores_path)
+    rows = []
+    if "n_records" in scores:
+        for n_records, count in scores["n_records"].value_counts().sort_index().items():
+            subset = scores[scores["n_records"] == n_records]
+            rows.append(
+                {
+                    "n_records": n_records,
+                    "n_examples": int(count),
+                    "mean_confidence": subset["confidence"].mean() if "confidence" in subset else None,
+                    "mean_variability": subset["variability"].mean() if "variability" in subset else None,
+                    "mean_non_gold_records": subset["n_non_gold_records"].mean()
+                    if "n_non_gold_records" in subset
+                    else None,
+                }
+            )
+        if (scores["n_records"] > 3).any():
+            warnings.append("Some examples have n_records > 3; report QA overflow-window handling.")
+    if "n_non_gold_records" not in scores.columns:
+        warnings.append(
+            "cartography_scores.csv lacks n_non_gold_records; rerun dynamics with gold_span_feature logging for full audit."
+        )
+    pd.DataFrame(rows).to_csv(out_dir / "windowing_audit.csv", index=False)
+    return warnings

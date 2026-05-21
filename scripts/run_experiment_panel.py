@@ -569,6 +569,12 @@ def add_spec(
         save_dynamics=save_dynamics,
     )
 
+
+
+def ranked_name(subset: str) -> str:
+    return f"{subset}_ranked" if subset in {"easy", "ambiguous", "hard"} else subset
+
+
 def add_full_baseline_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> None:
     exp = cfg["experiments"]["full_baseline"]
     if not exp.get("enabled", True):
@@ -612,6 +618,7 @@ def add_named_fraction_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any], e
         return
     primary = cfg["cartography"]["primary"]
     frac = float(exp["fraction"])
+    subset = ranked_name(exp.get("subset", subset))
     for seed in exp["seeds"]:
         add_spec(
             specs,
@@ -627,12 +634,12 @@ def add_named_fraction_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any], e
 def add_tier_a_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> None:
     add_full_baseline_specs(specs, cfg)
     add_random_fraction_specs(specs, cfg, "random_33", "same_epochs")
-    for exp_name, subset in [("easy_33", "easy"), ("ambiguous_33", "ambiguous"), ("hard_33", "hard")]:
+    for exp_name, subset in [("easy_33", "easy_ranked"), ("ambiguous_33", "ambiguous_ranked"), ("hard_33", "hard_ranked")]:
         add_named_fraction_specs(specs, cfg, exp_name, subset, "same_epochs")
 
 def add_same_steps_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any], same_steps: int) -> None:
     add_random_fraction_specs(specs, cfg, "random_33_same_steps", "same_steps", max_steps=same_steps)
-    add_named_fraction_specs(specs, cfg, "hard_33_same_steps", "hard", "same_steps", max_steps=same_steps)
+    add_named_fraction_specs(specs, cfg, "hard_33_same_steps", "hard_ranked", "same_steps", max_steps=same_steps)
 
 def add_budget_curve_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> None:
     primary = cfg["cartography"]["primary"]
@@ -656,14 +663,15 @@ def add_budget_curve_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> 
                             train_data=subset_path(cfg, primary, "random", frac, draw_id),
                         )
                 else:
+                    subset_name = ranked_name(subset)
                     add_spec(
                         specs,
                         cfg,
-                        subset=subset,
+                        subset=subset_name,
                         frac=frac,
                         seed=int(seed),
                         budget="same_epochs",
-                        train_data=subset_path(cfg, primary, subset, frac),
+                        train_data=subset_path(cfg, primary, subset_name, frac),
                     )
 
 def add_confidence_ablation_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> None:
@@ -673,15 +681,16 @@ def add_confidence_ablation_specs(specs: dict[str, TrainSpec], cfg: dict[str, An
     frac = float(exp["fraction"])
     for confidence_definition in exp["definitions"]:
         for subset in exp["subsets"]:
+            subset_name = ranked_name(subset)
             for seed in exp["seeds"]:
                 add_spec(
                     specs,
                     cfg,
-                    subset=subset,
+                    subset=subset_name,
                     frac=frac,
                     seed=int(seed),
                     budget="same_epochs",
-                    train_data=subset_path(cfg, confidence_definition, subset, frac),
+                    train_data=subset_path(cfg, confidence_definition, subset_name, frac),
                     confidence_definition=confidence_definition,
                 )
 

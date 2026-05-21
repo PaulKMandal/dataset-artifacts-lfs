@@ -364,7 +364,7 @@ def build_outputs(args: Namespace) -> tuple[Path, Path]:
             all_indices,
             args,
             frac=frac,
-            selection_rule="ranked_equal_size",
+            selection_rule="region_pure_equal_count",
         )
 
     manifest_path = out_dir / "subset_manifest.csv"

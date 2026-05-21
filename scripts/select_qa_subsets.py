@@ -256,6 +256,7 @@ def assignment_row(
     *,
     frac: float,
     rank: int,
+    selection_rule: str,
 ) -> dict:
     answer_text, answer_start, answer_length = answer_summary(example)
     return {
@@ -275,7 +276,7 @@ def assignment_row(
         "selection_rank": rank,
         "subset_fraction": frac,
         "confidence_definition": args.confidence_definition,
-        "selection_rule": "confidence_variability_rank",
+        "selection_rule": selection_rule,
         "selected_easy": idx in selected_by_name.get("easy", set()),
         "selected_ambiguous": idx in selected_by_name.get("ambiguous", set()),
         "selected_hard": idx in selected_by_name.get("hard", set()),
@@ -296,6 +297,7 @@ def append_assignment_rows(
     args: Namespace,
     *,
     frac: float,
+    selection_rule: str,
 ) -> None:
     for rank, idx in enumerate(all_indices):
         rows.append(
@@ -307,6 +309,7 @@ def append_assignment_rows(
                 args,
                 frac=frac,
                 rank=rank,
+                selection_rule=selection_rule,
             )
         )
 
@@ -332,7 +335,16 @@ def build_outputs(args: Namespace) -> tuple[Path, Path]:
         carto_rows, selected_by_name = select_cartography_subsets(by_idx, scores, out_dir, args, frac=frac, k=k)
         manifest_rows.extend(carto_rows)
         manifest_rows.extend(select_random_subsets(by_idx, all_indices, out_dir, args, frac=frac, k=k))
-        append_assignment_rows(assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac)
+        append_assignment_rows(
+            assignment_rows,
+            by_idx,
+            scores,
+            selected_by_name,
+            all_indices,
+            args,
+            frac=frac,
+            selection_rule="ranked_equal_size",
+        )
 
     min_region_size = min(
         sum(score.get("region") == region for score in scores.values())
@@ -344,7 +356,16 @@ def build_outputs(args: Namespace) -> tuple[Path, Path]:
             by_idx, scores, out_dir, args, frac=frac, k=k
         )
         manifest_rows.extend(region_rows)
-        append_assignment_rows(assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac)
+        append_assignment_rows(
+            assignment_rows,
+            by_idx,
+            scores,
+            selected_by_name,
+            all_indices,
+            args,
+            frac=frac,
+            selection_rule="ranked_equal_size",
+        )
 
     manifest_path = out_dir / "subset_manifest.csv"
     assignments_path = Path(args.assignments_out) if args.assignments_out else out_dir / "subset_assignments.csv"

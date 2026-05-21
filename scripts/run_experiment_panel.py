@@ -725,6 +725,22 @@ def build_specs(cfg: dict[str, Any], same_steps: int) -> list[TrainSpec]:
     add_confidence_ablation_specs(specs, cfg)
     return list(specs.values())
 
+def run_current_results_audit(cfg: dict[str, Any], *, log_path: Path, dry_run: bool) -> None:
+    results_dir = Path(cfg["panel"]["results_dir"])
+    run_cmd(
+        [
+            sys.executable,
+            "scripts/audit_current_results.py",
+            "--results-dir",
+            str(results_dir),
+            "--out-dir",
+            str(results_dir / "audit"),
+        ],
+        log_path=log_path,
+        dry_run=dry_run,
+    )
+
+
 def aggregate_metrics_tables(cfg: dict[str, Any], *, log_path: Path, dry_run: bool) -> None:
     results_dir = Path(cfg["panel"]["results_dir"])
     run_cmd(
@@ -735,6 +751,8 @@ def aggregate_metrics_tables(cfg: dict[str, Any], *, log_path: Path, dry_run: bo
             str(results_dir / "metrics" / "raw"),
             "--out-dir",
             str(results_dir / "metrics"),
+            "--eval-split-metrics",
+            str(results_dir / "audit" / "eval_split_metrics.csv"),
         ],
         log_path=log_path,
         dry_run=dry_run,
@@ -776,9 +794,11 @@ def run_mechanism_analysis(cfg: dict[str, Any], *, log_path: Path, dry_run: bool
 def run_final_audits(cfg: dict[str, Any], *, log_path: Path, dry_run: bool) -> None:
     results_dir = Path(cfg["panel"]["results_dir"])
     run_cmd([sys.executable, "scripts/audit_evalsets.py", "--results-dir", str(results_dir)], log_path=log_path, dry_run=dry_run)
+    run_current_results_audit(cfg, log_path=log_path, dry_run=dry_run)
     run_cmd([sys.executable, "scripts/validate_results_tree.py", "--results-dir", str(results_dir)], log_path=log_path, dry_run=dry_run)
 
 def aggregate(cfg: dict[str, Any], *, log_path: Path, dry_run: bool) -> None:
+    run_current_results_audit(cfg, log_path=log_path, dry_run=dry_run)
     aggregate_metrics_tables(cfg, log_path=log_path, dry_run=dry_run)
     run_mechanism_analysis(cfg, log_path=log_path, dry_run=dry_run)
     run_final_audits(cfg, log_path=log_path, dry_run=dry_run)

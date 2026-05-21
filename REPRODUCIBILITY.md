@@ -84,3 +84,21 @@ The panel writes normalized metrics to `results/panel_electra_small/metrics/raw/
 ## Evalset audit
 
 `results/panel_electra_small/logs/table_audit.md` is generated from metrics files and checks the observed SQuAD dev/AddSent/AddOneSent example counts and hashes. Treat a `CHECK_*` status as a reporting blocker until the dataset path and table label are resolved.
+
+## Round-2 reporting artifacts
+
+Before reporting adversarial robustness, run:
+
+```bash
+scripts/run_round2_audit.sh results/panel_electra_small
+```
+
+Required audit outputs:
+
+- `audit/eval_split_metrics.csv`: all-row, original-only, and adversarial-only EM/F1 from prediction JSONL files.
+- `audit/paired_robustness_metrics.csv`: paired original/adversarial metrics for AddSent/AddOneSent base questions.
+- `audit/subset_purity_overlap.csv`: ranked-subset purity and overlap checks plus region-pure diagnostics.
+- `audit/windowing_audit.csv`: QA overflow-feature counts and non-gold-window availability.
+- `logs/table_audit.md`: manuscript table provenance by run, dataset path, count, hash, and split metric.
+
+Paper tables should prioritize adversarial-only and paired AddSent/AddOneSent metrics. The blended all-row metric is acceptable only when explicitly labeled as a legacy mixed-file number.

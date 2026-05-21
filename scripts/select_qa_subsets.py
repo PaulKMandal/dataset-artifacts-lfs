@@ -271,9 +271,15 @@ def assignment_row(
         "subset_fraction": frac,
         "confidence_definition": args.confidence_definition,
         "selection_rule": "confidence_variability_rank",
-        "selected_easy": idx in selected_by_name["easy"],
-        "selected_ambiguous": idx in selected_by_name["ambiguous"],
-        "selected_hard": idx in selected_by_name["hard"],
+        "selected_easy": idx in selected_by_name.get("easy", set()),
+        "selected_ambiguous": idx in selected_by_name.get("ambiguous", set()),
+        "selected_hard": idx in selected_by_name.get("hard", set()),
+        "selected_easy_ranked": idx in selected_by_name.get("easy_ranked", set()),
+        "selected_ambiguous_ranked": idx in selected_by_name.get("ambiguous_ranked", set()),
+        "selected_hard_ranked": idx in selected_by_name.get("hard_ranked", set()),
+        "selected_easy_region_pure": idx in selected_by_name.get("easy_region_pure", set()),
+        "selected_ambiguous_region_pure": idx in selected_by_name.get("ambiguous_region_pure", set()),
+        "selected_hard_region_pure": idx in selected_by_name.get("hard_region_pure", set()),
     }
 
 def append_assignment_rows(

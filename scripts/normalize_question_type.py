@@ -20,6 +20,8 @@ def normalize_question_type(question: str) -> str:
     second = toks[1] if len(toks) > 1 else ""
     if first == "how" and second in {"many", "long", "much"}:
         return f"how_{second}"
+    if first in {"whom", "whose"}:
+        return "who"
     if first in {"what", "who", "when", "where", "why", "which", "how"}:
         return first
     return "other"

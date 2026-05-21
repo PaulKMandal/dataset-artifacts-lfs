@@ -132,3 +132,58 @@ def _split_metric_row(path: Path, evalset: str, split: str, vals: list[dict[str,
         "exact_match": 100.0 * sum(r["_em"] for r in vals) / len(vals),
         "f1": 100.0 * sum(r["_f1"] for r in vals) / len(vals),
     }
+
+
+def _paired_metric_row(
+    path: Path,
+    evalset: str,
+    paired: list[str],
+    orig_by_base: dict[str, dict[str, Any]],
+    adv_by_base: dict[str, list[dict[str, Any]]],
+) -> dict[str, Any]:
+    n_adv = sum(len(adv_by_base[b]) for b in paired)
+    return {
+        "prediction_file": path.name,
+        "evalset": evalset,
+        "paired_base_questions": len(paired),
+        "adversarial_variants": n_adv,
+        "original_em_on_paired": 100.0 * sum(orig_by_base[b]["_em"] for b in paired) / len(paired),
+        "original_f1_on_paired": 100.0 * sum(orig_by_base[b]["_f1"] for b in paired) / len(paired),
+        "adversarial_variant_em": 100.0 * sum(r["_em"] for b in paired for r in adv_by_base[b]) / n_adv,
+        "adversarial_variant_f1": 100.0 * sum(r["_f1"] for b in paired for r in adv_by_base[b]) / n_adv,
+        "all_adv_variants_correct_rate": 100.0 * sum(all(r["_em"] == 1.0 for r in adv_by_base[b]) for b in paired) / len(paired),
+        "any_adv_variant_correct_rate": 100.0 * sum(any(r["_em"] == 1.0 for r in adv_by_base[b]) for b in paired) / len(paired),
+        "correct_original_but_any_adv_fail_rate": 100.0 * sum(
+            orig_by_base[b]["_em"] == 1.0 and any(r["_em"] == 0.0 for r in adv_by_base[b])
+            for b in paired
+        ) / len(paired),
+    }
+
+
+def audit_prediction_splits(results_dir: Path, out_dir: Path) -> list[str]:
+    warnings: list[str] = []
+    split_rows = []
+    paired_rows = []
+    for path in sorted((results_dir / "predictions").glob("*.jsonl")):
+        evalset = path.stem.rsplit("__", 1)[-1]
+        rows = load_jsonl(path)
+        if not rows:
+            warnings.append(f"Prediction file {path.name} is empty.")
+            continue
+        groups, orig_by_base, adv_by_base = _split_prediction_rows(rows)
+        for split in ["all_rows", "original_rows_only", "adversarial_rows_only"]:
+            vals = groups.get(split, [])
+            if vals:
+                split_rows.append(_split_metric_row(path, evalset, split, vals))
+        if evalset in {"addsent", "addonesent"}:
+            if groups["original_rows_only"] and groups["adversarial_rows_only"]:
+                warnings.append(
+                    f"{path.name}: mixed original ({len(groups['original_rows_only'])}) and "
+                    f"adversarial ({len(groups['adversarial_rows_only'])}) rows."
+                )
+            paired = sorted(set(orig_by_base) & set(adv_by_base))
+            if paired:
+                paired_rows.append(_paired_metric_row(path, evalset, paired, orig_by_base, adv_by_base))
+    pd.DataFrame(split_rows).to_csv(out_dir / "eval_split_metrics.csv", index=False)
+    pd.DataFrame(paired_rows).to_csv(out_dir / "paired_robustness_metrics.csv", index=False)
+    return warnings

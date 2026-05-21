@@ -416,6 +416,8 @@ def cartography_args(cfg: dict[str, Any], source_spec: TrainSpec, out_dir: Path,
         "--seed",
         str(source_spec.seed),
     ]
+    if definition.get("window_policy"):
+        args.extend(["--qa_window_policy", str(definition["window_policy"])])
     if cfg["cartography"].get("limit_scatter_samples"):
         args.extend(["--limit_scatter_samples", str(cfg["cartography"]["limit_scatter_samples"])])
     return args
@@ -447,6 +449,7 @@ def subset_selection_args(
     definition: dict[str, Any],
 ) -> list[str]:
     fractions = sorted({float(x) for x in cfg["cartography"]["subset_fractions"]})
+    region_fractions = sorted({float(x) for x in cfg["cartography"].get("region_pure_fractions", [0.198])})
     return [
         sys.executable,
         "scripts/select_qa_subsets.py",
@@ -466,6 +469,8 @@ def subset_selection_args(
         str(cfg["cartography"].get("random_seed_base", 7300)),
         "--fractions",
         *[str(x) for x in fractions],
+        "--region-pure-fractions",
+        *[str(x) for x in region_fractions],
     ]
 
 def run_subset_selection(

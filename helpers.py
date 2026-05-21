@@ -298,6 +298,7 @@ class DynamicsLogger:
         end_positions: torch.Tensor,
         start_logits: torch.Tensor,
         end_logits: torch.Tensor,
+        gold_span_features: torch.Tensor | None = None,
     ) -> None:
         if idxs is None:
             return
@@ -307,6 +308,10 @@ class DynamicsLogger:
             start_logits_f = start_logits.float()
             end_logits_f = end_logits.float()
             seq_len = start_logits_f.shape[-1]
+            if gold_span_features is None:
+                gold_span_features = torch.ones_like(start_positions, dtype=torch.bool)
+            else:
+                gold_span_features = gold_span_features.bool()
 
             valid = (
                 (start_positions >= 0)
@@ -340,7 +345,9 @@ class DynamicsLogger:
                     pred_end.float(),
                     gold_start_logp,
                     gold_end_logp,
+                    (gold_start_logp + gold_end_logp),
                     valid.float(),
+                    gold_span_features.to(valid.device).float(),
                 ],
                 dim=1,
             ).detach().cpu().tolist()
@@ -358,7 +365,9 @@ class DynamicsLogger:
             pred_end,
             start_logp,
             end_logp,
+            negative_gold_span_loss,
             valid_flag,
+            gold_span_flag,
         ) in payload:
             self._dynamics_rows.append(
                 {
@@ -375,12 +384,15 @@ class DynamicsLogger:
                     "pred_end": int(pred_end),
                     "start_logp": float(start_logp),
                     "end_logp": float(end_logp),
+                    "negative_gold_span_loss": float(negative_gold_span_loss),
                     "valid_span_feature": bool(valid_flag),
+                    "gold_span_feature": bool(gold_span_flag),
                 }
             )
 
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         idxs = inputs.pop("idx", None)
+        gold_span_features = inputs.pop("gold_span_feature", None)
         outputs = model(**inputs)
         loss = outputs.loss
 
@@ -394,6 +406,7 @@ class DynamicsLogger:
                     inputs["end_positions"],
                     outputs.start_logits,
                     outputs.end_logits,
+                    gold_span_features,
                 )
             else:
                 raise ValueError("Could not find labels/start_positions/end_positions in inputs.")

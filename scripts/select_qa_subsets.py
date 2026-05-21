@@ -27,6 +27,11 @@ from scripts.normalize_question_type import normalize_question_type
 
 
 CARTO_SUBSETS = ("easy", "ambiguous", "hard")
+REGION_BY_SUBSET = {
+    "easy": "Easy-to-learn",
+    "ambiguous": "Ambiguous",
+    "hard": "Hard-to-learn",
+}
 
 def parse_args() -> Namespace:
     parser = argparse.ArgumentParser()
@@ -35,6 +40,8 @@ def parse_args() -> Namespace:
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--assignments-out", default=None)
     parser.add_argument("--fractions", nargs="+", type=float, default=[0.333])
+    parser.add_argument("--region-pure-fractions", nargs="+", type=float, default=[0.198])
+    parser.add_argument("--region-pure-seed", type=int, default=9100)
     parser.add_argument("--random-draws", type=int, default=10)
     parser.add_argument("--random-seed-base", type=int, default=7300)
     parser.add_argument("--confidence-definition", default="joint_confidence")
@@ -102,6 +109,18 @@ def select_indices(scores: dict[int, dict], subset: str, k: int) -> list[int]:
     else:
         raise ValueError(f"Unknown cartography subset: {subset}")
     return [int(r["idx"]) for r in rows[:k]]
+
+
+
+def region_pure_indices(scores: dict[int, dict], subset: str, k: int, seed: int) -> list[int]:
+    region = REGION_BY_SUBSET[subset]
+    candidates = [idx for idx, score in scores.items() if score.get("region") == region]
+    candidates = sorted(candidates)
+    rng = random.Random(seed)
+    if k > len(candidates):
+        k = len(candidates)
+    return sorted(rng.sample(candidates, k))
+
 
 def subset_size(n_scores: int, frac: float, rounding: str) -> int:
     if not (0 < frac <= 1):

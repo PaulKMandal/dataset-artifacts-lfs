@@ -92,38 +92,40 @@ def add_paired_metrics(df: pd.DataFrame, paired_metrics_path: Path | None) -> pd
     return out
 
 
-def add_adversarial_drops(df: pd.DataFrame) -> pd.DataFrame:
+def key_helper_frame(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     key_cols = [c for c in KEY_COLS if c in df.columns]
-    work = df[df.get("metric_split", "all_rows") == "all_rows"].copy()
-    helper_cols = []
+    work = df.copy()
+    helpers = []
     for col in key_cols:
         helper = f"__key_{col}"
-        helper_cols.append(helper)
+        helpers.append(helper)
         work[helper] = work[col].astype(object).where(work[col].notna(), "__NONE__")
+    return work, helpers
 
+
+def add_adversarial_drops(df: pd.DataFrame) -> pd.DataFrame:
+    work, helpers = key_helper_frame(df)
+    work["eval_metric_key"] = work["evalset"].astype(str) + "__" + work["metric_split"].astype(str)
     pivot = (
-        work.sort_values("evalset")
-        .drop_duplicates(helper_cols + ["evalset"], keep="first")
-        .set_index(helper_cols + ["evalset"])[["exact_match", "f1"]]
-        .unstack("evalset")
+        work.sort_values("eval_metric_key")
+        .drop_duplicates(helpers + ["eval_metric_key"], keep="first")
+        .set_index(helpers + ["eval_metric_key"])[["exact_match", "f1"]]
+        .unstack("eval_metric_key")
     )
-    pivot.columns = [f"{metric}_{evalset}" for metric, evalset in pivot.columns]
+    pivot.columns = [f"{metric}_{eval_key}" for metric, eval_key in pivot.columns]
     pivot = pivot.reset_index()
-
     for evalset in ["addsent", "addonesent"]:
-        if f"f1_squad_dev" in pivot and f"f1_{evalset}" in pivot:
-            pivot[f"{evalset}_drop_f1"] = pivot["f1_squad_dev"] - pivot[f"f1_{evalset}"]
-        if f"exact_match_squad_dev" in pivot and f"exact_match_{evalset}" in pivot:
-            pivot[f"{evalset}_drop_em"] = pivot["exact_match_squad_dev"] - pivot[f"exact_match_{evalset}"]
-
+        for split in ["all_rows", "adversarial_rows_only"]:
+            src_f1 = "f1_squad_dev__all_rows"
+            adv_f1 = f"f1_{evalset}__{split}"
+            src_em = "exact_match_squad_dev__all_rows"
+            adv_em = f"exact_match_{evalset}__{split}"
+            if src_f1 in pivot and adv_f1 in pivot:
+                pivot[f"{evalset}_{split}_drop_f1"] = pivot[src_f1] - pivot[adv_f1]
+            if src_em in pivot and adv_em in pivot:
+                pivot[f"{evalset}_{split}_drop_em"] = pivot[src_em] - pivot[adv_em]
     drop_cols = [c for c in pivot.columns if c.endswith("_drop_f1") or c.endswith("_drop_em")]
-    drops = work.merge(pivot[helper_cols + drop_cols], on=helper_cols, how="left")
-    drop_only = drops[helper_cols + drop_cols].drop_duplicates(helper_cols)
-    full = df.copy()
-    for col, helper in zip(key_cols, helper_cols):
-        full[helper] = full[col].astype(object).where(full[col].notna(), "__NONE__")
-    full = full.merge(drop_only, on=helper_cols, how="left")
-    return full.drop(columns=helper_cols)
+    return work.merge(pivot[helpers + drop_cols], on=helpers, how="left").drop(columns=helpers)
 
 
 def bootstrap_ci(values: pd.Series, n: int = 10000, seed: int = 12345) -> tuple[float, float]:

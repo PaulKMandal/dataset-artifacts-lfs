@@ -198,3 +198,31 @@ For a smaller deadline-safe panel, run:
 ```bash
 CUDA_VISIBLE_DEVICES=0 scripts/run_full_panel.sh configs/panel.minimum.yaml
 ```
+
+## Round-2 repair panel
+
+The PI flagged five reporting blockers: blended AddSent/AddOneSent metrics, possible table-label swaps, overlapping ranked subsets, QA overflow-window effects, and noisy question-type features. The round-2 repair path is:
+
+```bash
+nix develop .#server
+uv sync --frozen --extra cuda --group dev
+CUDA_VISIBLE_DEVICES=0 scripts/run_full_panel.sh configs/panel.round2_urgent.yaml
+```
+
+The urgent panel is resumable and writes the audit files required before interpreting subset results:
+
+```text
+results/panel_electra_small/audit/eval_split_metrics.csv
+results/panel_electra_small/audit/paired_robustness_metrics.csv
+results/panel_electra_small/audit/subset_purity_overlap.csv
+results/panel_electra_small/audit/windowing_audit.csv
+results/panel_electra_small/logs/table_audit.md
+```
+
+To audit an existing result tree without launching more training:
+
+```bash
+scripts/run_round2_audit.sh results/panel_electra_small
+```
+
+Report AddSent/AddOneSent robustness with adversarial-only and paired metrics. The all-row metric is retained only as a legacy comparison because the evaluation files include both original and adversarial rows.

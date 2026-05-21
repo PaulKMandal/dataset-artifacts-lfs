@@ -27,6 +27,7 @@ KEY_COLS = [
     "subset_draw_id",
     "seed",
     "train_budget_type",
+    "confidence_definition",
 ]
 GROUP_COLS = [
     "model",
@@ -74,6 +75,21 @@ def add_split_metrics(raw: pd.DataFrame, split_metrics_path: Path | None) -> pd.
     split_rows = split_rows[split_rows["metric_split"] != "all_rows"]
     wanted = list(dict.fromkeys(list(raw.columns) + list(split_rows.columns)))
     return pd.concat([raw.reindex(columns=wanted), split_rows.reindex(columns=wanted)], ignore_index=True)
+
+
+def add_paired_metrics(df: pd.DataFrame, paired_metrics_path: Path | None) -> pd.DataFrame:
+    if paired_metrics_path is None or not paired_metrics_path.exists():
+        return df
+    paired = pd.read_csv(paired_metrics_path)
+    if paired.empty:
+        return df
+    paired["train_run_id"] = paired["prediction_file"].map(lambda name: Path(str(name)).stem.rsplit("__", 1)[0])
+    keep = ["train_run_id", "evalset"] + [c for c in PAIRED_COLS if c in paired.columns]
+    out = df.merge(paired[keep], on=["train_run_id", "evalset"], how="left")
+    for col in PAIRED_COLS:
+        if col in out.columns:
+            out.loc[out["metric_split"] != "all_rows", col] = np.nan
+    return out
 
 
 def add_adversarial_drops(df: pd.DataFrame) -> pd.DataFrame:
@@ -186,6 +202,7 @@ def main() -> None:
     parser.add_argument("--metrics-dir", required=True)
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--eval-split-metrics", default=None)
+    parser.add_argument("--paired-metrics", default=None)
     args = parser.parse_args()
 
     metrics_dir = Path(args.metrics_dir)
@@ -194,7 +211,9 @@ def main() -> None:
 
     df = load_metrics(metrics_dir)
     split_path = Path(args.eval_split_metrics) if args.eval_split_metrics else None
+    paired_path = Path(args.paired_metrics) if args.paired_metrics else None
     df = add_split_metrics(df, split_path)
+    df = add_paired_metrics(df, paired_path)
     df = add_adversarial_drops(df)
     df.to_csv(out_dir / "seed_level_metrics.csv", index=False)
 

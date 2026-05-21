@@ -694,10 +694,33 @@ def add_confidence_ablation_specs(specs: dict[str, TrainSpec], cfg: dict[str, An
                     confidence_definition=confidence_definition,
                 )
 
+
+
+def add_region_pure_specs(specs: dict[str, TrainSpec], cfg: dict[str, Any]) -> None:
+    exp = cfg["experiments"].get("region_pure_198", {})
+    if not exp.get("enabled", False):
+        return
+    primary = cfg["cartography"]["primary"]
+    frac = float(exp["fraction"])
+    for subset in exp.get("subsets", ["easy", "ambiguous", "hard"]):
+        subset_name = subset if subset.endswith("_region_pure") else f"{subset}_region_pure"
+        for seed in exp["seeds"]:
+            add_spec(
+                specs,
+                cfg,
+                subset=subset_name,
+                frac=frac,
+                seed=int(seed),
+                budget="same_epochs",
+                train_data=subset_path(cfg, primary, subset_name, frac),
+            )
+
+
 def build_specs(cfg: dict[str, Any], same_steps: int) -> list[TrainSpec]:
     specs: dict[str, TrainSpec] = {}
     add_tier_a_specs(specs, cfg)
     add_same_steps_specs(specs, cfg, same_steps)
+    add_region_pure_specs(specs, cfg)
     add_budget_curve_specs(specs, cfg)
     add_confidence_ablation_specs(specs, cfg)
     return list(specs.values())

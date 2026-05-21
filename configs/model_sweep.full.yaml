@@ -1,0 +1,32 @@
+# Preferred model-family sweep, to run only after ELECTRA-small is interpretable.
+# Use these as model-block substitutions for configs/panel.round2_urgent.yaml.
+
+models:
+  - short_name: bert_base
+    name_or_path: bert-base-uncased
+  - short_name: distilbert_base
+    name_or_path: distilbert-base-uncased
+  - short_name: roberta_base
+    name_or_path: roberta-base
+  - short_name: deberta_v3_base
+    name_or_path: microsoft/deberta-v3-base
+  - short_name: electra_base
+    name_or_path: google/electra-base-discriminator
+
+preferred_experiments:
+  full_baseline:
+    seeds: [13, 21, 42]
+  random_33:
+    fraction: 0.333
+    seeds: [13, 21, 42]
+    random_draws: 5
+  ambiguous_33:
+    fraction: 0.333
+    seeds: [13, 21, 42]
+  hard_33:
+    fraction: 0.333
+    seeds: [13, 21, 42]
+  region_pure_198:
+    fraction: 0.198
+    subsets: [easy, ambiguous, hard]
+    seeds: [42]

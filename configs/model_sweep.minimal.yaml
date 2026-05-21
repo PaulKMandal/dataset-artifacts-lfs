@@ -1,0 +1,26 @@
+# Minimal model-family follow-up after ELECTRA-small round 2 is coherent.
+# Copy configs/panel.round2_urgent.yaml and replace the model block with each entry.
+
+models:
+  - short_name: bert_base
+    name_or_path: bert-base-uncased
+  - short_name: distilbert_base
+    name_or_path: distilbert-base-uncased
+
+minimum_experiments:
+  full_baseline:
+    seeds: [42]
+  random_33:
+    fraction: 0.333
+    seeds: [42]
+    random_draws: 5
+  ambiguous_33:
+    fraction: 0.333
+    seeds: [42]
+  hard_33:
+    fraction: 0.333
+    seeds: [42]
+  region_pure_198:
+    fraction: 0.198
+    subsets: [ambiguous, hard]
+    seeds: [42]

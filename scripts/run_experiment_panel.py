@@ -253,6 +253,20 @@ def eval_args(cfg: dict[str, Any], spec: TrainSpec, eval_path: str, eval_out: Pa
         args.append("--fp16")
     return args
 
+
+
+def subset_protocol(subset: str) -> str:
+    if subset == "full":
+        return "full"
+    if subset == "random":
+        return "uniform_random"
+    if subset.endswith("_region_pure"):
+        return "region_pure_equal_count"
+    if subset.endswith("_ranked") or subset in {"easy", "ambiguous", "hard"}:
+        return "ranked_equal_size"
+    return "custom"
+
+
 def check_eval_outputs(eval_out: Path) -> tuple[Path, Path]:
     metrics_path = eval_out / "eval_metrics.json"
     predictions_path = eval_out / "eval_predictions.jsonl"
@@ -280,6 +294,7 @@ def normalized_eval_metrics(
         "model": spec.model_name,
         "model_short": spec.model_short,
         "train_subset": spec.train_subset,
+        "subset_protocol": subset_protocol(spec.train_subset),
         "subset_size": read_jsonl_count(train_data_path),
         "subset_fraction": spec.subset_fraction,
         "subset_draw_id": spec.subset_draw_id,

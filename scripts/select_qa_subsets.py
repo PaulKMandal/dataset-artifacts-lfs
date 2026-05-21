@@ -23,6 +23,8 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Iterable
 
+from scripts.normalize_question_type import normalize_question_type
+
 
 CARTO_SUBSETS = ("easy", "ambiguous", "hard")
 
@@ -86,10 +88,6 @@ def answer_summary(example: dict) -> tuple[str, str, str]:
     answer_start = starts[0] if starts else ""
     answer_length = len(answer_text.split()) if answer_text else 0
     return answer_text, str(answer_start), str(answer_length)
-
-def question_type(question: str) -> str:
-    stripped = question.strip().lower()
-    return stripped.split(maxsplit=1)[0].rstrip(":?") if stripped else ""
 
 def select_indices(scores: dict[int, dict], subset: str, k: int) -> list[int]:
     rows = list(scores.values())
@@ -205,7 +203,7 @@ def assignment_row(
         "answer_start": answer_start,
         "context_length": len(example.get("context", "").split()),
         "answer_length": answer_length,
-        "question_type": question_type(example.get("question", "")),
+        "question_type": normalize_question_type(example.get("question", "")),
         "confidence": score["confidence"],
         "variability": score["variability"],
         "correctness": score["correctness"],

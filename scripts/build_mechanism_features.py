@@ -18,11 +18,11 @@ import sys
 from argparse import Namespace
 from pathlib import Path
 
-from qa_metrics import normalize_answer
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from qa_metrics import normalize_answer
 from scripts.normalize_question_type import normalize_question_type
 
 def parse_args() -> Namespace:

@@ -17,6 +17,11 @@ REQUIRED = [
     "logs/command_log.txt",
     "logs/environment.txt",
     "logs/git_commit.txt",
+    "logs/table_audit.md",
+    "audit/eval_split_metrics.csv",
+    "audit/paired_robustness_metrics.csv",
+    "audit/subset_purity_overlap.csv",
+    "audit/windowing_audit.csv",
 ]
 
 

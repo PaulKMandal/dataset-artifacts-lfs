@@ -329,6 +329,18 @@ def build_outputs(args: Namespace) -> tuple[Path, Path]:
         manifest_rows.extend(select_random_subsets(by_idx, all_indices, out_dir, args, frac=frac, k=k))
         append_assignment_rows(assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac)
 
+    min_region_size = min(
+        sum(score.get("region") == region for score in scores.values())
+        for region in REGION_BY_SUBSET.values()
+    )
+    for frac in args.region_pure_fractions:
+        k = min(subset_size(len(scores), frac, args.rounding), int(min_region_size))
+        region_rows, selected_by_name = select_region_pure_subsets(
+            by_idx, scores, out_dir, args, frac=frac, k=k
+        )
+        manifest_rows.extend(region_rows)
+        append_assignment_rows(assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac)
+
     manifest_path = out_dir / "subset_manifest.csv"
     assignments_path = Path(args.assignments_out) if args.assignments_out else out_dir / "subset_assignments.csv"
     write_csv(manifest_rows, manifest_path)

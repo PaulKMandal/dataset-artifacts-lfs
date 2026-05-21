@@ -90,13 +90,29 @@ def _metrics_from_record(record, confidence_field="confidence"):
     raise ValueError(f"Unrecognized dynamics row schema: {sorted(record.keys())}")
 
 
-def compute_metrics(dynamics, confidence_field="confidence"):
+def _records_for_window_policy(records, qa_window_policy="all_windows"):
+    """Filter QA overflow features according to the requested policy."""
+    if qa_window_policy == "all_windows":
+        return list(records)
+    if qa_window_policy in {"gold_only", "gold_window_only"}:
+        return [r for r in records if bool(r.get("gold_span_feature", True))]
+    if qa_window_policy == "max_gold_window":
+        gold_records = [r for r in records if bool(r.get("gold_span_feature", True))]
+        if not gold_records:
+            return []
+        return [max(gold_records, key=lambda r: float(r.get("joint_confidence", r.get("confidence", 0.0))))]
+    raise ValueError(f"Unknown QA window policy: {qa_window_policy}")
+
+
+def compute_metrics(dynamics, confidence_field="confidence", qa_window_policy="all_windows"):
     """Compute cartography metrics per example index."""
     metrics = {}
     for idx, records in dynamics.items():
+        source_records = list(records)
+        selected_records = _records_for_window_policy(source_records, qa_window_policy)
         confidences = []
         correctnesses = []
-        for record in records:
+        for record in selected_records:
             try:
                 confidence, correctness = _metrics_from_record(record, confidence_field=confidence_field)
             except (KeyError, ValueError):
@@ -107,8 +123,13 @@ def compute_metrics(dynamics, confidence_field="confidence"):
             confidences.append(confidence)
             correctnesses.append(correctness)
         if confidences:
+            n_gold = sum(bool(r.get("gold_span_feature", True)) for r in source_records)
             metrics[idx] = {
                 "n_records": len(confidences),
+                "n_source_records": len(source_records),
+                "n_gold_records": int(n_gold),
+                "n_non_gold_records": int(len(source_records) - n_gold),
+                "qa_window_policy": qa_window_policy,
                 "avg_confidence": float(mean(confidences)),
                 "variability": float(pstdev(confidences)) if len(confidences) > 1 else 0.0,
                 "correctness": float(mean(correctnesses)),
@@ -138,6 +159,10 @@ def save_cartography_csv(metrics, categories, output_dir):
             fieldnames=[
                 "idx",
                 "n_records",
+                "n_source_records",
+                "n_gold_records",
+                "n_non_gold_records",
+                "qa_window_policy",
                 "confidence",
                 "variability",
                 "correctness",
@@ -151,6 +176,10 @@ def save_cartography_csv(metrics, categories, output_dir):
                 {
                     "idx": idx,
                     "n_records": m["n_records"],
+                    "n_source_records": m.get("n_source_records", m["n_records"]),
+                    "n_gold_records": m.get("n_gold_records", ""),
+                    "n_non_gold_records": m.get("n_non_gold_records", ""),
+                    "qa_window_policy": m.get("qa_window_policy", "all_windows"),
                     "confidence": m["avg_confidence"],
                     "variability": m["variability"],
                     "correctness": m["correctness"],
@@ -233,13 +262,23 @@ def main():
             "confidence, or negative gold-span loss. Negative loss is higher-is-better."
         ),
     )
+    parser.add_argument(
+        "--qa_window_policy",
+        choices=["all_windows", "gold_only", "gold_window_only", "max_gold_window"],
+        default="all_windows",
+        help="How to aggregate SQuAD overflow features for one original example.",
+    )
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     print("Loading training dynamics...")
     dynamics = load_training_dynamics(args.td_dir)
     print("Computing cartography metrics...")
-    metrics = compute_metrics(dynamics, confidence_field=args.confidence_field)
+    metrics = compute_metrics(
+        dynamics,
+        confidence_field=args.confidence_field,
+        qa_window_policy=args.qa_window_policy,
+    )
     if not metrics:
         raise SystemExit("No usable dynamics records found.")
 

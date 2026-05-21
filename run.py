@@ -168,7 +168,7 @@ def main():
             predictions=eval_preds.predictions,
             references=eval_preds.label_ids,
         )
-        label_names = ["start_positions", "end_positions", "idx"]
+        label_names = ["start_positions", "end_positions", "idx", "gold_span_feature"]
     else:
         trainer_class = CustomTrainer
         compute_metrics = compute_accuracy

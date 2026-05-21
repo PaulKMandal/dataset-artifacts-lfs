@@ -442,7 +442,7 @@ class CustomQuestionAnsweringTrainer(DynamicsLogger, Trainer):
     """Trainer with SQuAD-style QA post-processing."""
 
     def __init__(self, *args, eval_examples=None, **kwargs):
-        self.label_names = kwargs.pop("label_names", ["start_positions", "end_positions", "idx"])
+        self.label_names = kwargs.pop("label_names", ["start_positions", "end_positions", "idx", "gold_span_feature"])
         super().__init__(*args, **kwargs)
         self.eval_examples = eval_examples
 

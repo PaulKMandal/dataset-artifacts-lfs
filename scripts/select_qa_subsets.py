@@ -179,6 +179,40 @@ def select_cartography_subsets(
         )
     return manifest_rows, selected_by_name
 
+
+
+def select_region_pure_subsets(
+    by_idx: dict[int, dict],
+    scores: dict[int, dict],
+    out_dir: Path,
+    args: Namespace,
+    *,
+    frac: float,
+    k: int,
+) -> tuple[list[dict], dict[str, set[int]]]:
+    flabel = fraction_label(frac)
+    manifest_rows = []
+    selected_by_name: dict[str, set[int]] = {}
+    for subset in CARTO_SUBSETS:
+        subset_name = f"{subset}_region_pure"
+        indices = region_pure_indices(scores, subset, k, args.region_pure_seed)
+        selected_by_name[subset_name] = set(indices)
+        path = out_dir / f"{subset_name}_frac{flabel}.jsonl"
+        count = write_jsonl((by_idx[idx] for idx in indices), path)
+        manifest_rows.append(
+            {
+                "subset": subset_name,
+                "subset_fraction": frac,
+                "subset_size": count,
+                "subset_draw_id": "",
+                "path": str(path),
+                "confidence_definition": args.confidence_definition,
+                "selection_rule": "region_pure_equal_count",
+            }
+        )
+    return manifest_rows, selected_by_name
+
+
 def select_random_subsets(
     by_idx: dict[int, dict],
     all_indices: list[int],

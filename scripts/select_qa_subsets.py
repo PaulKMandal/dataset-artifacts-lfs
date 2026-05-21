@@ -157,18 +157,24 @@ def select_cartography_subsets(
     selected_by_name: dict[str, set[int]] = {}
     for subset in CARTO_SUBSETS:
         indices = select_indices(scores, subset, k)
+        ranked_name = f"{subset}_ranked"
         selected_by_name[subset] = set(indices)
-        path = out_dir / f"{subset}_frac{flabel}.jsonl"
+        selected_by_name[ranked_name] = set(indices)
+        path = out_dir / f"{ranked_name}_frac{flabel}.jsonl"
         count = write_jsonl((by_idx[idx] for idx in indices), path)
+        # Keep the original file names as compatibility aliases for old configs.
+        legacy_path = out_dir / f"{subset}_frac{flabel}.jsonl"
+        if legacy_path != path:
+            write_jsonl((by_idx[idx] for idx in indices), legacy_path)
         manifest_rows.append(
             {
-                "subset": subset,
+                "subset": ranked_name,
                 "subset_fraction": frac,
                 "subset_size": count,
                 "subset_draw_id": "",
                 "path": str(path),
                 "confidence_definition": args.confidence_definition,
-                "selection_rule": subset,
+                "selection_rule": "ranked_equal_size",
             }
         )
     return manifest_rows, selected_by_name

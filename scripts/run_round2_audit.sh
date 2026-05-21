@@ -11,7 +11,8 @@ python scripts/audit_current_results.py \
 python scripts/aggregate_metrics.py \
   --metrics-dir "$RESULTS_DIR/metrics/raw" \
   --out-dir "$RESULTS_DIR/metrics" \
-  --eval-split-metrics "$AUDIT_DIR/eval_split_metrics.csv"
+  --eval-split-metrics "$AUDIT_DIR/eval_split_metrics.csv" \
+  --paired-metrics "$AUDIT_DIR/paired_robustness_metrics.csv"
 
 python scripts/audit_current_results.py \
   --results-dir "$RESULTS_DIR" \

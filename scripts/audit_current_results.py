@@ -53,3 +53,43 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def _metric(row: dict[str, Any], name: str) -> Any:
     return row.get(name, row.get(f"eval_{name}"))
+
+
+def audit_raw_metrics(results_dir: Path, out_dir: Path) -> list[str]:
+    warnings: list[str] = []
+    rows = []
+    for path in sorted((results_dir / "metrics" / "raw").glob("*.json")):
+        with path.open("r", encoding="utf-8") as f:
+            row = json.load(f)
+        rows.append(
+            {
+                "metrics_file": path.name,
+                "train_run_id": row.get("train_run_id"),
+                "model_short": row.get("model_short"),
+                "model": row.get("model"),
+                "train_subset": row.get("train_subset"),
+                "subset_protocol": row.get("subset_protocol"),
+                "subset_fraction": row.get("subset_fraction"),
+                "subset_draw_id": row.get("subset_draw_id"),
+                "seed": row.get("seed"),
+                "train_budget_type": row.get("train_budget_type"),
+                "evalset": row.get("evalset"),
+                "exact_match": _metric(row, "exact_match"),
+                "f1": _metric(row, "f1"),
+                "num_eval_examples": row.get("num_eval_examples", row.get("eval_samples")),
+                "dataset_path": row.get("dataset_path"),
+                "dataset_hash": row.get("dataset_hash"),
+                "created_at_utc": row.get("created_at_utc"),
+                "predictions_path": row.get("predictions_path"),
+            }
+        )
+    df = pd.DataFrame(rows)
+    df.to_csv(out_dir / "completed_raw_metrics.csv", index=False)
+    if df.empty:
+        warnings.append("No raw metric JSON files found.")
+        return warnings
+    for train_run_id, group in df.groupby("train_run_id", dropna=False):
+        missing = EXPECTED_EVALSETS - set(group["evalset"].dropna())
+        if missing:
+            warnings.append(f"Run {train_run_id} missing evalsets: {sorted(missing)}")
+    return warnings

@@ -65,3 +65,39 @@ def test_joint_confidence_falls_back_for_scalar_nli_rows(tmp_path):
 
     assert metrics[3]["avg_confidence"] == pytest.approx(0.6)
     assert metrics[3]["correctness"] == pytest.approx(1.0)
+
+
+def test_negative_loss_confidence_field_and_gold_only_policy(tmp_path):
+    rows = [
+        {
+            "idx": 4,
+            "task": "qa",
+            "confidence": 0.1,
+            "joint_confidence": 0.01,
+            "negative_gold_span_loss": -4.0,
+            "correctness": 0.0,
+            "gold_span_feature": False,
+        },
+        {
+            "idx": 4,
+            "task": "qa",
+            "confidence": 0.7,
+            "joint_confidence": 0.49,
+            "negative_gold_span_loss": -1.0,
+            "correctness": 1.0,
+            "gold_span_feature": True,
+        },
+    ]
+    write_jsonl(tmp_path / "training_dynamics.jsonl", rows)
+
+    dynamics = load_training_dynamics(tmp_path)
+    metrics = compute_metrics(
+        dynamics,
+        confidence_field="negative_gold_span_loss",
+        qa_window_policy="gold_only",
+    )
+
+    assert metrics[4]["n_records"] == 1
+    assert metrics[4]["n_gold_records"] == 1
+    assert metrics[4]["n_non_gold_records"] == 1
+    assert metrics[4]["avg_confidence"] == pytest.approx(-1.0)

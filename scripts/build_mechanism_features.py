@@ -18,6 +18,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from qa_metrics import normalize_answer
+from scripts.normalize_question_type import normalize_question_type
 
 def parse_args() -> Namespace:
     parser = argparse.ArgumentParser()
@@ -71,10 +72,6 @@ def added_sentences(clean_context: str, adv_context: str) -> list[str]:
     clean = {normalize_answer(sent) for _, _, sent in sentences(clean_context)}
     return [sent for _, _, sent in sentences(adv_context) if normalize_answer(sent) not in clean]
 
-def question_type(question: str) -> str:
-    stripped = question.strip().lower()
-    return stripped.split(maxsplit=1)[0].rstrip(":?") if stripped else ""
-
 def answer_info(row: dict) -> tuple[str, int | None]:
     answers = row.get("answers", {})
     texts = answers.get("text", []) if isinstance(answers, dict) else []
@@ -112,7 +109,7 @@ def mechanism_row(clean: dict, adv: dict, evalset: str, cart: dict) -> dict:
         "context_length": context_length,
         "answer_length": answer_length,
         "answer_position_normalized": answer_position_normalized,
-        "question_type": question_type(q),
+        "question_type": normalize_question_type(q),
         "question_answer_sentence_overlap": overlap(q, ans_sent),
         "question_distractor_overlap": max([overlap(q, sent) for sent in added], default=0.0),
         "num_added_sentences": len(added),

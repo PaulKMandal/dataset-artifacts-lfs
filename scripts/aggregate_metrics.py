@@ -19,8 +19,23 @@ import numpy as np
 import pandas as pd
 
 
-KEY_COLS = ["model", "train_subset", "subset_fraction", "subset_draw_id", "seed", "train_budget_type"]
-GROUP_COLS = ["model", "train_subset", "subset_fraction", "train_budget_type", "confidence_definition"]
+KEY_COLS = [
+    "model",
+    "train_subset",
+    "subset_protocol",
+    "subset_fraction",
+    "subset_draw_id",
+    "seed",
+    "train_budget_type",
+]
+GROUP_COLS = [
+    "model",
+    "train_subset",
+    "subset_protocol",
+    "subset_fraction",
+    "train_budget_type",
+    "confidence_definition",
+]
 
 
 def load_metrics(metrics_dir: Path) -> pd.DataFrame:

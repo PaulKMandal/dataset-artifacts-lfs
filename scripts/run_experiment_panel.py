@@ -753,6 +753,8 @@ def aggregate_metrics_tables(cfg: dict[str, Any], *, log_path: Path, dry_run: bo
             str(results_dir / "metrics"),
             "--eval-split-metrics",
             str(results_dir / "audit" / "eval_split_metrics.csv"),
+            "--paired-metrics",
+            str(results_dir / "audit" / "paired_robustness_metrics.csv"),
         ],
         log_path=log_path,
         dry_run=dry_run,

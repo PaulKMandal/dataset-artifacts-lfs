@@ -1,0 +1,12 @@
+priority,stage,experiment_id,model,subset_protocol,subset,subset_fraction,seeds,random_draws,eval_reporting,purpose
+1,0,audit_current_results,electra-small,na,na,na,na,na,all;original_only;adversarial_only;paired,Audit existing result tree
+2,0,evaluate_existing_source_seed42,electra-small,full,full,1.0,42,0,all;adversarial_only;paired,Evaluate trained source model
+3,1,full_baseline_min,electra-small,full,full,1.0,13;21;42,0,all;adversarial_only;paired,Minimum full baseline variance
+4,1,random_333_min,electra-small,uniform_random,random,0.333,13;21;42,5,all;adversarial_only;paired,Repeated random baseline
+5,1,easy_ranked_333,electra-small,ranked_equal_size,easy_ranked,0.333,13;21;42,0,all;adversarial_only;paired,Current easy top-k protocol
+6,1,ambiguous_ranked_333,electra-small,ranked_equal_size,ambiguous_ranked,0.333,13;21;42,0,all;adversarial_only;paired,Current ambiguous top-k protocol
+7,1,hard_ranked_333,electra-small,ranked_equal_size,hard_ranked,0.333,13;21;42,0,all;adversarial_only;paired,Current hard top-k protocol
+8,1,region_pure_198,electra-small,region_pure_equal_count,easy;ambiguous;hard,0.198,42,0,all;adversarial_only;paired,Disjoint region-pure diagnostic
+9,1,same_steps_control,electra-small,ranked_equal_size,random;hard_ranked,0.333,42,5,all;adversarial_only;paired,Optimization budget control
+10,2,bert_base_min,bert-base-uncased,ranked_equal_size,full;random;ambiguous_ranked;hard_ranked,0.333,42,5,all;adversarial_only;paired,Canonical second model
+11,2,distilbert_min,distilbert-base-uncased,ranked_equal_size,full;random;ambiguous_ranked;hard_ranked,0.333,42,5,all;adversarial_only;paired,Fast architecture check

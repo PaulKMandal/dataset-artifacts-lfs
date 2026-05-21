@@ -187,3 +187,60 @@ def audit_prediction_splits(results_dir: Path, out_dir: Path) -> list[str]:
     pd.DataFrame(split_rows).to_csv(out_dir / "eval_split_metrics.csv", index=False)
     pd.DataFrame(paired_rows).to_csv(out_dir / "paired_robustness_metrics.csv", index=False)
     return warnings
+
+
+def _target_region(selection: str) -> str | None:
+    if selection.startswith("easy"):
+        return "Easy-to-learn"
+    if selection.startswith("ambiguous"):
+        return "Ambiguous"
+    if selection.startswith("hard"):
+        return "Hard-to-learn"
+    return None
+
+
+def audit_subset_purity(results_dir: Path, out_dir: Path) -> list[str]:
+    warnings: list[str] = []
+    path = results_dir / "cartography" / "subset_assignments.csv"
+    if not path.exists():
+        warnings.append("Missing cartography/subset_assignments.csv")
+        return warnings
+    df = pd.read_csv(path)
+    if "subset_fraction" not in df or "region" not in df:
+        warnings.append("subset_assignments.csv must contain subset_fraction and region columns.")
+        return warnings
+    flags = [c for c in df.columns if c.startswith("selected_")]
+    rows = []
+    for frac, group in df.groupby("subset_fraction"):
+        for flag in flags:
+            selected = group[group[flag].astype(bool)]
+            selection = flag.removeprefix("selected_")
+            target_region = _target_region(selection)
+            target_n = int((selected["region"] == target_region).sum()) if target_region else None
+            rows.append(
+                {
+                    "subset_fraction": frac,
+                    "selection": selection,
+                    "n": int(len(selected)),
+                    "target_region": target_region,
+                    "target_region_n": target_n,
+                    "purity": (target_n / len(selected)) if target_region and len(selected) else None,
+                    "mean_confidence": selected["confidence"].mean() if "confidence" in selected else None,
+                    "mean_variability": selected["variability"].mean() if "variability" in selected else None,
+                    "mean_correctness": selected["correctness"].mean() if "correctness" in selected else None,
+                }
+            )
+        for left_i, left in enumerate(flags):
+            for right in flags[left_i + 1 :]:
+                overlap = int((group[left].astype(bool) & group[right].astype(bool)).sum())
+                if overlap:
+                    warnings.append(f"Subset overlap at fraction {frac}: {left} x {right} = {overlap}")
+                rows.append(
+                    {
+                        "subset_fraction": frac,
+                        "selection": f"overlap_{left.removeprefix('selected_')}__{right.removeprefix('selected_')}",
+                        "n": overlap,
+                    }
+                )
+    pd.DataFrame(rows).to_csv(out_dir / "subset_purity_overlap.csv", index=False)
+    return warnings

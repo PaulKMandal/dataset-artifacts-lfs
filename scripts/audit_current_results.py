@@ -93,3 +93,42 @@ def audit_raw_metrics(results_dir: Path, out_dir: Path) -> list[str]:
         if missing:
             warnings.append(f"Run {train_run_id} missing evalsets: {sorted(missing)}")
     return warnings
+
+
+def _prediction_scores(row: dict[str, Any]) -> tuple[float, float]:
+    if "exact_match" in row and "f1" in row:
+        return float(row["exact_match"]), float(row["f1"])
+    if "predicted_answer" not in row or "answers" not in row:
+        return 0.0, 0.0
+    pred = str(row.get("predicted_answer", ""))
+    return squad_exact_match(pred, row["answers"]), squad_f1(pred, row["answers"])
+
+
+def _split_prediction_rows(rows: list[dict[str, Any]]) -> tuple[dict[str, list[dict[str, Any]]], dict[str, dict[str, Any]], dict[str, list[dict[str, Any]]]]:
+    groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    orig_by_base: dict[str, dict[str, Any]] = {}
+    adv_by_base: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        em, f1 = _prediction_scores(row)
+        row["_em"] = em
+        row["_f1"] = f1
+        ex_id = str(row.get("id", ""))
+        groups["all_rows"].append(row)
+        if is_adversarial_id(ex_id):
+            groups["adversarial_rows_only"].append(row)
+            adv_by_base[base_id(ex_id)].append(row)
+        else:
+            groups["original_rows_only"].append(row)
+            orig_by_base[base_id(ex_id)] = row
+    return groups, orig_by_base, adv_by_base
+
+
+def _split_metric_row(path: Path, evalset: str, split: str, vals: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "prediction_file": path.name,
+        "evalset": evalset,
+        "split": split,
+        "n": len(vals),
+        "exact_match": 100.0 * sum(r["_em"] for r in vals) / len(vals),
+        "f1": 100.0 * sum(r["_f1"] for r in vals) / len(vals),
+    }

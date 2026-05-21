@@ -37,6 +37,17 @@ GROUP_COLS = [
     "train_budget_type",
     "confidence_definition",
 ]
+PAIRED_COLS = [
+    "paired_base_questions",
+    "adversarial_variants",
+    "original_em_on_paired",
+    "original_f1_on_paired",
+    "adversarial_variant_em",
+    "adversarial_variant_f1",
+    "all_adv_variants_correct_rate",
+    "any_adv_variant_correct_rate",
+    "correct_original_but_any_adv_fail_rate",
+]
 
 
 def load_metrics(metrics_dir: Path) -> pd.DataFrame:

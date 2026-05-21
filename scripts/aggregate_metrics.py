@@ -176,15 +176,14 @@ def make_main_table(df: pd.DataFrame) -> pd.DataFrame:
                     ci_low, ci_high = bootstrap_ci(vals)
                     row[f"{prefix}__{col}_ci_low"] = ci_low
                     row[f"{prefix}__{col}_ci_high"] = ci_high
-        for drop_col in ["addsent_drop_f1", "addonesent_drop_f1", "addsent_drop_em", "addonesent_drop_em"]:
-            if drop_col in group:
-                vals = group[drop_col].dropna().astype(float)
-                if len(vals):
-                    row[f"{drop_col}_mean"] = vals.mean()
-                    row[f"{drop_col}_std"] = vals.std(ddof=1) if len(vals) > 1 else 0.0
-                    ci_low, ci_high = bootstrap_ci(vals)
-                    row[f"{drop_col}_ci_low"] = ci_low
-                    row[f"{drop_col}_ci_high"] = ci_high
+        for drop_col in [c for c in group.columns if c.endswith("_drop_f1") or c.endswith("_drop_em")]:
+            vals = group[drop_col].dropna().astype(float)
+            if len(vals):
+                row[f"{drop_col}_mean"] = vals.mean()
+                row[f"{drop_col}_std"] = vals.std(ddof=1) if len(vals) > 1 else 0.0
+                ci_low, ci_high = bootstrap_ci(vals)
+                row[f"{drop_col}_ci_low"] = ci_low
+                row[f"{drop_col}_ci_high"] = ci_high
         rows.append(row)
     return pd.DataFrame(rows).sort_values(group_cols)
 

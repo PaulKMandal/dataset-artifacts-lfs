@@ -29,15 +29,41 @@ def load_metrics(metrics_dir: Path) -> pd.DataFrame:
         with path.open("r", encoding="utf-8") as f:
             row = json.load(f)
         row["metrics_path"] = str(path)
+        row["exact_match"] = row.get("exact_match", row.get("eval_exact_match"))
+        row["f1"] = row.get("f1", row.get("eval_f1"))
+        row["metric_split"] = "all_rows"
         rows.append(row)
     if not rows:
         raise SystemExit(f"No JSON metrics found in {metrics_dir}")
     return pd.DataFrame(rows)
 
 
+
+
+def add_split_metrics(raw: pd.DataFrame, split_metrics_path: Path | None) -> pd.DataFrame:
+    if split_metrics_path is None or not split_metrics_path.exists():
+        return raw
+    splits = pd.read_csv(split_metrics_path)
+    if splits.empty:
+        return raw
+    splits["train_run_id"] = splits["prediction_file"].map(
+        lambda name: Path(str(name)).stem.rsplit("__", 1)[0]
+    )
+    meta_cols = [
+        c for c in raw.columns
+        if c not in {"exact_match", "f1", "num_eval_examples", "metric_split"}
+    ]
+    meta = raw[meta_cols].drop_duplicates(["train_run_id", "evalset"])
+    split_rows = splits.merge(meta, on=["train_run_id", "evalset"], how="left")
+    split_rows = split_rows.rename(columns={"split": "metric_split", "n": "num_eval_examples"})
+    split_rows = split_rows[split_rows["metric_split"] != "all_rows"]
+    wanted = list(dict.fromkeys(list(raw.columns) + list(split_rows.columns)))
+    return pd.concat([raw.reindex(columns=wanted), split_rows.reindex(columns=wanted)], ignore_index=True)
+
+
 def add_adversarial_drops(df: pd.DataFrame) -> pd.DataFrame:
     key_cols = [c for c in KEY_COLS if c in df.columns]
-    work = df.copy()
+    work = df[df.get("metric_split", "all_rows") == "all_rows"].copy()
     helper_cols = []
     for col in key_cols:
         helper = f"__key_{col}"
@@ -60,8 +86,13 @@ def add_adversarial_drops(df: pd.DataFrame) -> pd.DataFrame:
             pivot[f"{evalset}_drop_em"] = pivot["exact_match_squad_dev"] - pivot[f"exact_match_{evalset}"]
 
     drop_cols = [c for c in pivot.columns if c.endswith("_drop_f1") or c.endswith("_drop_em")]
-    long = work.merge(pivot[helper_cols + drop_cols], on=helper_cols, how="left")
-    return long.drop(columns=helper_cols)
+    drops = work.merge(pivot[helper_cols + drop_cols], on=helper_cols, how="left")
+    drop_only = drops[helper_cols + drop_cols].drop_duplicates(helper_cols)
+    full = df.copy()
+    for col, helper in zip(key_cols, helper_cols):
+        full[helper] = full[col].astype(object).where(full[col].notna(), "__NONE__")
+    full = full.merge(drop_only, on=helper_cols, how="left")
+    return full.drop(columns=helper_cols)
 
 
 def bootstrap_ci(values: pd.Series, n: int = 10000, seed: int = 12345) -> tuple[float, float]:
@@ -87,16 +118,21 @@ def make_main_table(df: pd.DataFrame) -> pd.DataFrame:
             row["n_random_draws"] = group["subset_draw_id"].dropna().nunique()
         else:
             row["n_random_draws"] = None
-        for evalset in sorted(group["evalset"].dropna().unique()):
-            sub = group[group["evalset"] == evalset]
-            prefix = evalset.lower()
+        split_col = "metric_split" if "metric_split" in group.columns else None
+        split_groups = group.groupby(["evalset", split_col], dropna=False) if split_col else group.groupby("evalset", dropna=False)
+        for keys2, sub in split_groups:
+            if split_col:
+                evalset, metric_split = keys2
+            else:
+                evalset, metric_split = keys2, "all_rows"
+            prefix = f"{str(evalset).lower()}__{str(metric_split).lower()}"
             for metric, suffix in [("exact_match", "em"), ("f1", "f1")]:
                 vals = sub[metric].dropna().astype(float)
-                row[f"{prefix}_{suffix}_mean"] = vals.mean() if len(vals) else np.nan
-                row[f"{prefix}_{suffix}_std"] = vals.std(ddof=1) if len(vals) > 1 else 0.0
+                row[f"{prefix}__{suffix}_mean"] = vals.mean() if len(vals) else np.nan
+                row[f"{prefix}__{suffix}_std"] = vals.std(ddof=1) if len(vals) > 1 else 0.0
                 ci_low, ci_high = bootstrap_ci(vals)
-                row[f"{prefix}_{suffix}_ci_low"] = ci_low
-                row[f"{prefix}_{suffix}_ci_high"] = ci_high
+                row[f"{prefix}__{suffix}_ci_low"] = ci_low
+                row[f"{prefix}__{suffix}_ci_high"] = ci_high
         for drop_col in ["addsent_drop_f1", "addonesent_drop_f1", "addsent_drop_em", "addonesent_drop_em"]:
             if drop_col in group:
                 vals = group[drop_col].dropna().astype(float)
@@ -121,6 +157,7 @@ def make_random_subset_distribution(df: pd.DataFrame) -> pd.DataFrame:
         "evalset",
         "exact_match",
         "f1",
+        "metric_split",
     ]
     available = [c for c in needed if c in df.columns]
     random_df = df[df["train_subset"] == "random"].copy()
@@ -133,6 +170,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--metrics-dir", required=True)
     parser.add_argument("--out-dir", required=True)
+    parser.add_argument("--eval-split-metrics", default=None)
     args = parser.parse_args()
 
     metrics_dir = Path(args.metrics_dir)
@@ -140,6 +178,8 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     df = load_metrics(metrics_dir)
+    split_path = Path(args.eval_split_metrics) if args.eval_split_metrics else None
+    df = add_split_metrics(df, split_path)
     df = add_adversarial_drops(df)
     df.to_csv(out_dir / "seed_level_metrics.csv", index=False)
 

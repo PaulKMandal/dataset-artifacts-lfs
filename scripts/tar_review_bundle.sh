@@ -13,6 +13,7 @@ fi
 
 mkdir -p "$TMP_DIR/results"
 rsync -a --prune-empty-dirs \
+  --include='*/' \
   --include='/audit/***' \
   --include='/metrics/***' \
   --include='/logs/***' \

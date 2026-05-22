@@ -8,6 +8,7 @@ LOCAL_ROOT="${3:-${DATASET_ARTIFACTS_LOCAL_RESULTS_DIR:-server_results/results/r
 mkdir -p "$LOCAL_ROOT"
 
 rsync -aP --prune-empty-dirs \
+  --include='*/' \
   --include='/audit/***' \
   --include='/metrics/***' \
   --include='/logs/***' \

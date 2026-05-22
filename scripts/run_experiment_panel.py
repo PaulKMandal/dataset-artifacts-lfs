@@ -20,6 +20,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -27,6 +28,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+
+LOG_LOCK = threading.Lock()
 
 
 @dataclass
@@ -53,6 +57,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--no-resume", action="store_true")
     parser.add_argument("--limit-runs", type=int, default=None, help="Debugging aid; do not use for final tables.")
+    parser.add_argument("--gpu-ids", default=None, help="Comma-separated GPU ids for independent train/eval specs, e.g. 0,1,2,3.")
+    parser.add_argument("--parallel-workers", type=int, default=None, help="Number of concurrent train/eval workers. Defaults to number of GPU ids.")
     return parser.parse_args()
 
 def now_utc() -> str:
@@ -77,20 +83,39 @@ def read_jsonl_count(path: Path) -> int:
                 count += 1
     return count
 
-def run_cmd(args: list[str], *, log_path: Path, dry_run: bool = False, cwd: Path | None = None) -> None:
+def gpu_env(gpu_id: str | int | None) -> dict[str, str] | None:
+    if gpu_id is None:
+        return None
+    env = os.environ.copy()
+    env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    return env
+
+def run_cmd(
+    args: list[str],
+    *,
+    log_path: Path,
+    dry_run: bool = False,
+    cwd: Path | None = None,
+    env: dict[str, str] | None = None,
+) -> None:
     cwd = cwd or Path.cwd()
-    display = shlex.join(args)
+    env_prefix = ""
+    if env and env.get("CUDA_VISIBLE_DEVICES") is not None:
+        env_prefix = f"CUDA_VISIBLE_DEVICES={env['CUDA_VISIBLE_DEVICES']} "
+    display = env_prefix + shlex.join(args)
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    with log_path.open("a", encoding="utf-8") as f:
-        f.write(f"\n[{now_utc()}] cwd={cwd}\n$ {display}\n")
-    print(f"$ {display}")
+    with LOG_LOCK:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"\n[{now_utc()}] cwd={cwd}\n$ {display}\n")
+        print(f"$ {display}")
     if dry_run:
         return
     start = time.time()
-    subprocess.run(args, cwd=str(cwd), check=True)
+    subprocess.run(args, cwd=str(cwd), check=True, env=env)
     elapsed = time.time() - start
-    with log_path.open("a", encoding="utf-8") as f:
-        f.write(f"[elapsed_seconds] {elapsed:.1f}\n")
+    with LOG_LOCK:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"[elapsed_seconds] {elapsed:.1f}\n")
 
 def capture_cmd(args: list[str]) -> str:
     try:

@@ -5,3 +5,4 @@
 *.safetensors filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
+server_results/** filter=lfs diff=lfs merge=lfs -text

@@ -25,6 +25,7 @@ import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from queue import Empty, Queue
 from typing import Any
 
 import yaml
@@ -122,6 +123,26 @@ def capture_cmd(args: list[str]) -> str:
         return subprocess.check_output(args, stderr=subprocess.STDOUT, text=True).strip()
     except Exception as exc:  # noqa: BLE001 - environment logging should not fail the panel
         return f"FAILED {shlex.join(args)}: {exc}"
+
+def parse_gpu_ids(args: argparse.Namespace, cfg: dict[str, Any]) -> list[str]:
+    raw = args.gpu_ids
+    if raw is None:
+        raw = os.environ.get("DATASET_ARTIFACTS_GPU_IDS")
+    if raw is None:
+        raw = cfg.get("panel", {}).get("gpu_ids")
+    if raw is None:
+        return []
+    if isinstance(raw, (list, tuple)):
+        return [str(x) for x in raw]
+    return [part.strip() for part in str(raw).split(",") if part.strip()]
+
+def parallel_worker_count(args: argparse.Namespace, cfg: dict[str, Any], gpu_ids: list[str]) -> int:
+    if not gpu_ids:
+        return 1
+    raw = args.parallel_workers
+    if raw is None:
+        raw = cfg.get("panel", {}).get("parallel_workers", len(gpu_ids))
+    return max(1, min(int(raw), len(gpu_ids)))
 
 def environment_lines() -> list[str]:
     lines = [
@@ -772,7 +793,22 @@ def prepare_results_dir(cfg: dict[str, Any], config_path: str) -> Path:
     shutil.copy2(config_path, results_dir / "configs" / Path(config_path).name)
     return results_dir
 
-def run_training_and_eval_specs(
+def run_one_train_eval_spec(
+    cfg: dict[str, Any],
+    spec: TrainSpec,
+    *,
+    log_path: Path,
+    dry_run: bool,
+    resume: bool,
+    gpu_id: str | int | None = None,
+) -> None:
+    if gpu_id is not None:
+        print(f"[gpu {gpu_id}] {spec.run_id}")
+    train_model(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+    for evalset, eval_path in cfg["data"]["evalsets"].items():
+        eval_model(cfg, spec, evalset, eval_path, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+
+def run_training_and_eval_specs_serial(
     cfg: dict[str, Any],
     specs: list[TrainSpec],
     *,
@@ -781,9 +817,76 @@ def run_training_and_eval_specs(
     resume: bool,
 ) -> None:
     for spec in specs:
-        train_model(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume)
-        for evalset, eval_path in cfg["data"]["evalsets"].items():
-            eval_model(cfg, spec, evalset, eval_path, log_path=log_path, dry_run=dry_run, resume=resume)
+        run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume)
+
+def run_training_and_eval_specs_parallel(
+    cfg: dict[str, Any],
+    specs: list[TrainSpec],
+    *,
+    log_path: Path,
+    dry_run: bool,
+    resume: bool,
+    gpu_ids: list[str],
+    parallel_workers: int,
+) -> None:
+    work_queue: Queue[TrainSpec] = Queue()
+    for spec in specs:
+        work_queue.put(spec)
+    failures: list[tuple[str, str, str]] = []
+
+    def worker(gpu_id: str) -> None:
+        while True:
+            try:
+                spec = work_queue.get_nowait()
+            except Empty:
+                return
+            try:
+                run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+            except Exception as exc:  # noqa: BLE001 - aggregate failures after independent jobs finish
+                with LOG_LOCK:
+                    failures.append((gpu_id, spec.run_id, repr(exc)))
+                    with log_path.open("a", encoding="utf-8") as f:
+                        f.write(f"[failure] gpu={gpu_id} run_id={spec.run_id} error={exc!r}\n")
+            finally:
+                work_queue.task_done()
+
+    threads = []
+    for gpu_id in gpu_ids[:parallel_workers]:
+        thread = threading.Thread(target=worker, args=(gpu_id,), daemon=False)
+        thread.start()
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
+    if failures:
+        formatted = "; ".join(f"gpu {gpu}: {run_id}: {error}" for gpu, run_id, error in failures[:10])
+        raise RuntimeError(f"{len(failures)} train/eval specs failed: {formatted}")
+
+def run_training_and_eval_specs(
+    cfg: dict[str, Any],
+    specs: list[TrainSpec],
+    *,
+    log_path: Path,
+    dry_run: bool,
+    resume: bool,
+    gpu_ids: list[str] | None = None,
+    parallel_workers: int = 1,
+) -> None:
+    gpu_ids = gpu_ids or []
+    if len(gpu_ids) <= 1 or parallel_workers <= 1:
+        gpu_id = gpu_ids[0] if gpu_ids else None
+        for spec in specs:
+            run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+        return
+    print(f"[parallel] running train/eval specs on GPUs {','.join(gpu_ids[:parallel_workers])}")
+    run_training_and_eval_specs_parallel(
+        cfg,
+        specs,
+        log_path=log_path,
+        dry_run=dry_run,
+        resume=resume,
+        gpu_ids=gpu_ids,
+        parallel_workers=parallel_workers,
+    )
 
 def main() -> None:
     args = parse_args()
@@ -791,13 +894,16 @@ def main() -> None:
     results_dir = prepare_results_dir(cfg, args.config)
     log_path = results_dir / "logs" / "command_log.txt"
     resume = not args.no_resume and bool(cfg["panel"].get("resume", True))
+    gpu_ids = parse_gpu_ids(args, cfg)
+    parallel_workers = parallel_worker_count(args, cfg, gpu_ids)
+    source_gpu_id = gpu_ids[0] if gpu_ids else None
 
     ensure_data(cfg, log_path=log_path, dry_run=args.dry_run)
     if not args.dry_run:
         write_environment_logs(results_dir)
 
     source_spec = full_seed42_spec(cfg)
-    train_model(cfg, source_spec, log_path=log_path, dry_run=args.dry_run, resume=resume)
+    train_model(cfg, source_spec, log_path=log_path, dry_run=args.dry_run, resume=resume, gpu_id=source_gpu_id)
     run_cartography(cfg, source_spec, log_path=log_path, dry_run=args.dry_run, resume=resume)
 
     same_steps = parse_full_steps(source_spec, int(cfg["training"].get("same_steps_fallback_max_steps", 8214)))
@@ -806,7 +912,15 @@ def main() -> None:
     if args.limit_runs is not None:
         specs = specs[: args.limit_runs]
 
-    run_training_and_eval_specs(cfg, specs, log_path=log_path, dry_run=args.dry_run, resume=resume)
+    run_training_and_eval_specs(
+        cfg,
+        specs,
+        log_path=log_path,
+        dry_run=args.dry_run,
+        resume=resume,
+        gpu_ids=gpu_ids,
+        parallel_workers=parallel_workers,
+    )
     aggregate(cfg, log_path=log_path, dry_run=args.dry_run)
     print(f"Panel complete. Results root: {results_dir}")
 

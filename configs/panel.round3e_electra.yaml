@@ -28,7 +28,7 @@ training:
 
 data:
   data_dir: data/qa
-  subsets_dir: data/subsets
+  subsets_dir: data/subsets/round3e_electra
   squad_train: data/qa/squad_train.jsonl
   evalsets:
     squad_dev: data/qa/squad_dev.jsonl

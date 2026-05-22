@@ -124,6 +124,18 @@ def capture_cmd(args: list[str]) -> str:
     except Exception as exc:  # noqa: BLE001 - environment logging should not fail the panel
         return f"FAILED {shlex.join(args)}: {exc}"
 
+def run_optional_cmd(args: list[str], *, log_path: Path, dry_run: bool = False) -> bool:
+    try:
+        run_cmd(args, log_path=log_path, dry_run=dry_run)
+        return True
+    except subprocess.CalledProcessError as exc:
+        message = f"[optional failure] {shlex.join(args)} exited with {exc.returncode}"
+        with LOG_LOCK:
+            print(message)
+            with log_path.open("a", encoding="utf-8") as f:
+                f.write(message + "\n")
+        return False
+
 def parse_gpu_ids(args: argparse.Namespace, cfg: dict[str, Any]) -> list[str]:
     raw = args.gpu_ids
     if raw is None:
@@ -754,7 +766,7 @@ def run_mechanism_analysis(cfg: dict[str, Any], *, log_path: Path, dry_run: bool
     mechanism_features = results_dir / "metrics" / "mechanism_features.csv"
     if not dry_run and not (clean_pred.exists() and all(p.exists() for p in adv_preds)):
         return
-    run_cmd(
+    run_optional_cmd(
         [
             sys.executable,
             "scripts/build_mechanism_features.py",
@@ -770,7 +782,7 @@ def run_mechanism_analysis(cfg: dict[str, Any], *, log_path: Path, dry_run: bool
         log_path=log_path,
         dry_run=dry_run,
     )
-    run_cmd(
+    run_optional_cmd(
         [sys.executable, "scripts/mechanism_univariate.py", "--features", str(mechanism_features), "--out", str(results_dir / "metrics" / "mechanism_univariate.csv")],
         log_path=log_path,
         dry_run=dry_run,

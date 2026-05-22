@@ -132,14 +132,33 @@ def build_rows(args: Namespace) -> list[dict]:
                 out_rows.append(mechanism_row(clean, adv, evalset, cart_by_id.get(adv["id"], {})))
     return out_rows
 
+FIELDNAMES = [
+    "example_id",
+    "evalset",
+    "baseline_correct",
+    "adversarial_correct",
+    "adversarial_failure",
+    "confidence",
+    "variability",
+    "correctness",
+    "context_length",
+    "answer_length",
+    "answer_position_normalized",
+    "question_type",
+    "question_answer_sentence_overlap",
+    "question_distractor_overlap",
+    "num_added_sentences",
+]
+
 def write_rows(rows: list[dict], out_path: Path) -> None:
-    if not rows:
-        raise SystemExit("No aligned clean/adversarial rows were found")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
-        writer.writerows(rows)
+        if rows:
+            writer.writerows(rows)
+    if not rows:
+        print(f"No aligned clean/adversarial rows; wrote empty diagnostic table to {out_path}")
 
 def main() -> None:
     args = parse_args()

@@ -82,14 +82,26 @@ def build_rows(df: pd.DataFrame) -> list[dict]:
                     rows.append(row)
     return rows
 
+FIELDNAMES = [
+    "evalset",
+    "feature",
+    "n",
+    "positive_rate",
+    "roc_auc",
+    "average_precision",
+    "roc_auc_abs_best_direction",
+    "average_precision_flipped",
+]
+
 def write_rows(rows: list[dict], out: Path) -> None:
-    if not rows:
-        raise SystemExit("No usable univariate mechanism rows")
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
-        writer.writerows(rows)
+        if rows:
+            writer.writerows(rows)
+    if not rows:
+        print(f"No usable univariate mechanism rows; wrote empty diagnostic table to {out}")
 
 def main() -> None:
     parser = argparse.ArgumentParser()

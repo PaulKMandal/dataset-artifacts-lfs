@@ -240,14 +240,22 @@ def write_train_config_copy(cfg: dict[str, Any], spec: TrainSpec) -> None:
     payload = {"train_spec": asdict(spec), "panel_config": cfg}
     config_copy.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
-def train_model(cfg: dict[str, Any], spec: TrainSpec, *, log_path: Path, dry_run: bool, resume: bool) -> None:
+def train_model(
+    cfg: dict[str, Any],
+    spec: TrainSpec,
+    *,
+    log_path: Path,
+    dry_run: bool,
+    resume: bool,
+    gpu_id: str | int | None = None,
+) -> None:
     out_dir = Path(spec.output_dir)
     if resume and train_is_done(out_dir, spec):
         print(f"[skip train] {spec.run_id}")
         return
     out_dir.mkdir(parents=True, exist_ok=True)
     write_train_config_copy(cfg, spec)
-    run_cmd(base_train_args(cfg, spec), log_path=log_path, dry_run=dry_run)
+    run_cmd(base_train_args(cfg, spec), log_path=log_path, dry_run=dry_run, env=gpu_env(gpu_id))
 
 def eval_args(cfg: dict[str, Any], spec: TrainSpec, eval_path: str, eval_out: Path) -> list[str]:
     model = cfg["model"]
@@ -352,6 +360,7 @@ def eval_model(
     log_path: Path,
     dry_run: bool,
     resume: bool,
+    gpu_id: str | int | None = None,
 ) -> None:
     results_dir = Path(cfg["panel"]["results_dir"])
     eval_run_id = f"{spec.run_id}__{evalset}"
@@ -361,7 +370,7 @@ def eval_model(
         print(f"[skip eval] {eval_run_id}")
         return
     eval_out.mkdir(parents=True, exist_ok=True)
-    run_cmd(eval_args(cfg, spec, eval_path, eval_out), log_path=log_path, dry_run=dry_run)
+    run_cmd(eval_args(cfg, spec, eval_path, eval_out), log_path=log_path, dry_run=dry_run, env=gpu_env(gpu_id))
     if not dry_run:
         write_eval_metrics(cfg, spec, evalset, eval_path, eval_out, raw_metrics_path)
 

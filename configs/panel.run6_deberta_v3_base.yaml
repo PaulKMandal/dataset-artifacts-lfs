@@ -1,13 +1,13 @@
 panel:
-  name: run6_distilbert
-  results_dir: results/run6_distilbert
+  name: run6_deberta_v3_base
+  results_dir: results/run6_deberta_v3_base
   resume: true
   gpu_ids: [0]
   parallel_workers: 1
 
 model:
-  short_name: distilbert
-  name_or_path: distilbert-base-uncased
+  short_name: deberta_v3_base
+  name_or_path: microsoft/deberta-v3-base
   max_seq_length: 384
 
 training:
@@ -16,14 +16,14 @@ training:
   learning_rate: 5.0e-5
   warmup_ratio: 0.0
   weight_decay: 0.0
-  per_device_train_batch_size: 32
+  per_device_train_batch_size: 16
   per_device_eval_batch_size: 64
   fp16: true
   fp16_eval: true
 
 data:
   data_dir: data/qa
-  subsets_dir: data/subsets/run6_distilbert
+  subsets_dir: data/subsets/run6_deberta_v3_base
   squad_train: data/qa/squad_train.jsonl
   evalsets:
     squad_dev: data/qa/squad_dev.jsonl
@@ -38,7 +38,7 @@ cartography:
   source_seed: 42
   primary: joint
   random_draws: 5
-  random_seed_base: 9100
+  random_seed_base: 9200
   subset_fractions: [0.333]
   limit_scatter_samples: 20000
   definitions:

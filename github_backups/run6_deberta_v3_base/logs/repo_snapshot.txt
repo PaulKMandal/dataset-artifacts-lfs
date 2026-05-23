@@ -1,0 +1,10 @@
+date_utc=2026-05-23T22:40:13Z
+run_label=run6_deberta_v3_base
+results_dir=/workspace/dataset-artifacts/results/run6_deberta_v3_base
+branch=working
+commit=10fa753cee1b540b9729a5bde6ab9458207ff08e
+
+git_status_short:
+
+last_commit:
+10fa753 (HEAD -> working, origin/working) Use batch size 32 for Run 6 DeBERTa

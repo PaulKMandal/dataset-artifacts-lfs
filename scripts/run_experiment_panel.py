@@ -813,9 +813,13 @@ def run_one_train_eval_spec(
     dry_run: bool,
     resume: bool,
     gpu_id: str | int | None = None,
+    progress: tuple[int, int] | None = None,
 ) -> None:
-    if gpu_id is not None:
-        print(f"[gpu {gpu_id}] {spec.run_id}")
+    progress_text = ""
+    if progress is not None:
+        progress_text = f"[{progress[0]}/{progress[1]}] "
+    gpu_text = f"[gpu {gpu_id}] " if gpu_id is not None else ""
+    print(f"[train/eval] {progress_text}{gpu_text}{spec.run_id}")
     train_model(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
     for evalset, eval_path in cfg["data"]["evalsets"].items():
         eval_model(cfg, spec, evalset, eval_path, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
@@ -828,8 +832,16 @@ def run_training_and_eval_specs_serial(
     dry_run: bool,
     resume: bool,
 ) -> None:
-    for spec in specs:
-        run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume)
+    total = len(specs)
+    for idx, spec in enumerate(specs, start=1):
+        run_one_train_eval_spec(
+            cfg,
+            spec,
+            log_path=log_path,
+            dry_run=dry_run,
+            resume=resume,
+            progress=(idx, total),
+        )
 
 def run_training_and_eval_specs_parallel(
     cfg: dict[str, Any],
@@ -841,19 +853,28 @@ def run_training_and_eval_specs_parallel(
     gpu_ids: list[str],
     parallel_workers: int,
 ) -> None:
-    work_queue: Queue[TrainSpec] = Queue()
-    for spec in specs:
-        work_queue.put(spec)
+    work_queue: Queue[tuple[int, TrainSpec]] = Queue()
+    total = len(specs)
+    for idx, spec in enumerate(specs, start=1):
+        work_queue.put((idx, spec))
     failures: list[tuple[str, str, str]] = []
 
     def worker(gpu_id: str) -> None:
         while True:
             try:
-                spec = work_queue.get_nowait()
+                idx, spec = work_queue.get_nowait()
             except Empty:
                 return
             try:
-                run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+                run_one_train_eval_spec(
+                    cfg,
+                    spec,
+                    log_path=log_path,
+                    dry_run=dry_run,
+                    resume=resume,
+                    gpu_id=gpu_id,
+                    progress=(idx, total),
+                )
             except Exception as exc:  # noqa: BLE001 - aggregate failures after independent jobs finish
                 with LOG_LOCK:
                     failures.append((gpu_id, spec.run_id, repr(exc)))
@@ -886,8 +907,17 @@ def run_training_and_eval_specs(
     gpu_ids = gpu_ids or []
     if len(gpu_ids) <= 1 or parallel_workers <= 1:
         gpu_id = gpu_ids[0] if gpu_ids else None
-        for spec in specs:
-            run_one_train_eval_spec(cfg, spec, log_path=log_path, dry_run=dry_run, resume=resume, gpu_id=gpu_id)
+        total = len(specs)
+        for idx, spec in enumerate(specs, start=1):
+            run_one_train_eval_spec(
+                cfg,
+                spec,
+                log_path=log_path,
+                dry_run=dry_run,
+                resume=resume,
+                gpu_id=gpu_id,
+                progress=(idx, total),
+            )
         return
     print(f"[parallel] running train/eval specs on GPUs {','.join(gpu_ids[:parallel_workers])}")
     run_training_and_eval_specs_parallel(

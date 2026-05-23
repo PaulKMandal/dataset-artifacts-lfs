@@ -1,0 +1,463 @@
+
+[2026-05-23T10:22:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__full__frac1__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16 --save_dynamics
+[elapsed_seconds] 1463.3
+
+[2026-05-23T10:46:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 dynamics.py --td_dir results/run5_roberta_base/runs/roberta_base__full__frac1__seed42__same_epochs --output_dir results/run5_roberta_base/cartography/joint --confidence_field joint_confidence --seed 42 --limit_scatter_samples 20000
+[elapsed_seconds] 14.2
+
+[2026-05-23T10:46:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/select_qa_subsets.py --train-data data/qa/squad_train.jsonl --cartography-scores results/run5_roberta_base/cartography/joint/cartography_scores.csv --out-dir data/subsets/run5_roberta_base/joint --assignments-out results/run5_roberta_base/cartography/subset_assignments.csv --confidence-definition joint_gold_span_probability --random-draws 5 --random-seed-base 7300 --fractions 0.333
+[elapsed_seconds] 4.6
+
+[2026-05-23T10:46:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__full__frac1__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 1461.6
+
+[2026-05-23T11:11:21Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 90.5
+
+[2026-05-23T11:12:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 70.2
+
+[2026-05-23T11:14:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.2
+
+[2026-05-23T11:15:06Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__full__frac1__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 1447.7
+
+[2026-05-23T11:39:14Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 89.8
+
+[2026-05-23T11:40:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 68.9
+
+[2026-05-23T11:41:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 65.4
+
+[2026-05-23T11:42:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 91.8
+
+[2026-05-23T11:44:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.4
+
+[2026-05-23T11:45:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__full__frac1__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__full__frac1__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 68.1
+
+[2026-05-23T11:46:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw00.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 527.2
+
+[2026-05-23T11:55:43Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 102.3
+
+[2026-05-23T11:57:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 82.2
+
+[2026-05-23T11:58:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 77.7
+
+[2026-05-23T12:00:06Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw00.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 537.7
+
+[2026-05-23T12:09:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 109.0
+
+[2026-05-23T12:10:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 79.8
+
+[2026-05-23T12:12:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.3
+
+[2026-05-23T12:13:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw00.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 536.8
+
+[2026-05-23T12:22:27Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 107.9
+
+[2026-05-23T12:24:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 83.6
+
+[2026-05-23T12:25:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw00__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 68.6
+
+[2026-05-23T12:26:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw01.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 528.6
+
+[2026-05-23T12:35:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 94.1
+
+[2026-05-23T12:37:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.9
+
+[2026-05-23T12:38:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 64.2
+
+[2026-05-23T12:39:28Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw01.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 520.9
+
+[2026-05-23T12:48:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 91.9
+
+[2026-05-23T12:49:41Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 70.0
+
+[2026-05-23T12:50:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 64.1
+
+[2026-05-23T12:51:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw01.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 523.6
+
+[2026-05-23T13:00:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 91.7
+
+[2026-05-23T13:02:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 68.1
+
+[2026-05-23T13:03:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw01__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 64.3
+
+[2026-05-23T13:04:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw02.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 532.0
+
+[2026-05-23T13:13:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 91.0
+
+[2026-05-23T13:14:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.5
+
+[2026-05-23T13:16:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 67.1
+
+[2026-05-23T13:17:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw02.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 522.9
+
+[2026-05-23T13:25:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 92.8
+
+[2026-05-23T13:27:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 70.2
+
+[2026-05-23T13:28:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 67.4
+
+[2026-05-23T13:29:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw02.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 531.5
+
+[2026-05-23T13:38:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 94.8
+
+[2026-05-23T13:40:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.1
+
+[2026-05-23T13:41:22Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw02__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 70.6
+
+[2026-05-23T13:42:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw03.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 530.6
+
+[2026-05-23T13:51:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 94.7
+
+[2026-05-23T13:52:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.1
+
+[2026-05-23T13:54:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 69.8
+
+[2026-05-23T13:55:21Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw03.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 525.9
+
+[2026-05-23T14:04:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 96.0
+
+[2026-05-23T14:05:43Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.7
+
+[2026-05-23T14:07:00Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 69.0
+
+[2026-05-23T14:08:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw03.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 527.7
+
+[2026-05-23T14:16:57Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 98.0
+
+[2026-05-23T14:18:35Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.5
+
+[2026-05-23T14:19:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw03__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 68.8
+
+[2026-05-23T14:21:01Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw04.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 531.6
+
+[2026-05-23T14:29:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 99.8
+
+[2026-05-23T14:31:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.6
+
+[2026-05-23T14:32:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 65.8
+
+[2026-05-23T14:33:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw04.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 528.0
+
+[2026-05-23T14:42:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 98.0
+
+[2026-05-23T14:44:22Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 71.0
+
+[2026-05-23T14:45:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 64.4
+
+[2026-05-23T14:46:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/random_frac0p333_draw04.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 521.7
+
+[2026-05-23T14:55:19Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 93.0
+
+[2026-05-23T14:56:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.8
+
+[2026-05-23T14:58:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__random__frac0p333__draw04__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 67.7
+
+[2026-05-23T14:59:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/easy_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 529.3
+
+[2026-05-23T15:08:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 99.4
+
+[2026-05-23T15:09:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 77.7
+
+[2026-05-23T15:11:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.9
+
+[2026-05-23T15:12:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/easy_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 529.9
+
+[2026-05-23T15:21:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 99.2
+
+[2026-05-23T15:22:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.8
+
+[2026-05-23T15:24:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 77.1
+
+[2026-05-23T15:25:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/easy_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 524.1
+
+[2026-05-23T15:34:08Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 94.2
+
+[2026-05-23T15:35:43Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 69.0
+
+[2026-05-23T15:36:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__easy__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__easy__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 65.4
+
+[2026-05-23T15:37:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/ambiguous_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 540.1
+
+[2026-05-23T15:46:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 95.3
+
+[2026-05-23T15:48:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 80.3
+
+[2026-05-23T15:49:54Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 66.0
+
+[2026-05-23T15:51:00Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/ambiguous_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 531.2
+
+[2026-05-23T15:59:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 96.8
+
+[2026-05-23T16:01:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.1
+
+[2026-05-23T16:02:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 68.1
+
+[2026-05-23T16:03:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/ambiguous_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 531.5
+
+[2026-05-23T16:12:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 93.0
+
+[2026-05-23T16:14:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 64.7
+
+[2026-05-23T16:15:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__ambiguous__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 62.6
+
+[2026-05-23T16:16:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/hard_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 528.1
+
+[2026-05-23T16:25:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 95.5
+
+[2026-05-23T16:26:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 69.2
+
+[2026-05-23T16:27:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed13__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.7
+
+[2026-05-23T16:29:00Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/hard_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 518.7
+
+[2026-05-23T16:37:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 92.0
+
+[2026-05-23T16:39:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 68.0
+
+[2026-05-23T16:40:19Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed21__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 62.5
+
+[2026-05-23T16:41:22Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run5_roberta_base/joint/hard_frac0p333.jsonl --model roberta-base --output_dir results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 519.1
+
+[2026-05-23T16:50:01Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 91.6
+
+[2026-05-23T16:51:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.5
+
+[2026-05-23T16:52:45Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run5_roberta_base/runs/roberta_base__hard__frac0p333__seed42__same_epochs --output_dir results/run5_roberta_base/evals/roberta_base__hard__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 65.1
+
+[2026-05-23T16:53:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/aggregate_metrics.py --metrics-dir results/run5_roberta_base/metrics/raw --out-dir results/run5_roberta_base/metrics
+
+[2026-05-23T17:13:58Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/aggregate_metrics.py --metrics-dir results/run5_roberta_base/metrics/raw --out-dir results/run5_roberta_base/metrics
+[elapsed_seconds] 5.0
+
+[2026-05-23T17:14:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__addsent.jsonl results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run5_roberta_base/cartography/subset_assignments.csv --out results/run5_roberta_base/metrics/mechanism_features.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__addsent.jsonl results/run5_roberta_base/predictions/roberta_base__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run5_roberta_base/cartography/subset_assignments.csv --out results/run5_roberta_base/metrics/mechanism_features.csv exited with 1
+
+[2026-05-23T17:14:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run5_roberta_base/metrics/mechanism_features.csv --out results/run5_roberta_base/metrics/mechanism_univariate.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run5_roberta_base/metrics/mechanism_features.csv --out results/run5_roberta_base/metrics/mechanism_univariate.csv exited with 1
+
+[2026-05-23T17:14:07Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/audit_evalsets.py --results-dir results/run5_roberta_base
+[elapsed_seconds] 0.8
+
+[2026-05-23T17:14:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/validate_results_tree.py --results-dir results/run5_roberta_base
+[elapsed_seconds] 0.4

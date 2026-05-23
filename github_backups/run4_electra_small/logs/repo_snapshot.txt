@@ -1,0 +1,21 @@
+run_label=run4_electra_small
+results_dir=results/round3e_electra_small
+date_utc=2026-05-23T09:57:04Z
+
+branch=run4-electra
+commit=42f0a5031b3bffb6ab9a171568bb394b0d0b9eb3
+
+commit 42f0a5031b3bffb6ab9a171568bb394b0d0b9eb3 (HEAD -> run4-electra, origin/working, origin/run4-electra, origin/run4-bert)
+Merge: b548db8 592f18d
+Author: Paul Mandal <40133940+PaulKMandal@users.noreply.github.com>
+Date:   Thu May 21 12:35:59 2026 -0500
+
+    Added git lfs to project
+    
+    Add git-lfs
+
+?? configs/panel.round3e_electra.yaml
+?? data/
+
+origin	https://github.com/PaulKMandal/dataset-artifacts-lfs.git (fetch)
+origin	https://github.com/PaulKMandal/dataset-artifacts-lfs.git (push)

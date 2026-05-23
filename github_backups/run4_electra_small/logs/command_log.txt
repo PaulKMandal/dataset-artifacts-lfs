@@ -1,0 +1,819 @@
+
+[2026-05-23T00:40:04Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/materialize_qa_data.py --out-dir data/qa
+[elapsed_seconds] 51.3
+
+[2026-05-23T00:41:15Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16 --save_dynamics
+[elapsed_seconds] 627.2
+
+[2026-05-23T00:51:42Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 dynamics.py --td_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/round3e_electra_small/cartography/joint --confidence_field joint_confidence --seed 42 --limit_scatter_samples 20000
+[elapsed_seconds] 18.8
+
+[2026-05-23T00:52:01Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/select_qa_subsets.py --train-data data/qa/squad_train.jsonl --cartography-scores results/round3e_electra_small/cartography/joint/cartography_scores.csv --out-dir data/subsets/round3e_electra/joint --assignments-out results/round3e_electra_small/cartography/subset_assignments.csv --confidence-definition joint_gold_span_probability --random-draws 10 --random-seed-base 7300 --fractions 0.333
+[elapsed_seconds] 5.6
+
+[2026-05-23T00:52:07Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 585.6
+
+[2026-05-23T01:01:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 79.7
+
+[2026-05-23T01:03:12Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-23T01:04:12Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 54.7
+
+[2026-05-23T01:05:07Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 560.8
+
+[2026-05-23T01:14:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 80.7
+
+[2026-05-23T01:15:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.3
+
+[2026-05-23T01:16:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.3
+
+[2026-05-23T01:17:48Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 75.0
+
+[2026-05-23T01:19:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 62.4
+
+[2026-05-23T01:20:06Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 54.9
+
+[2026-05-23T01:21:01Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed87__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 87 --report_to none --fp16
+[elapsed_seconds] 547.9
+
+[2026-05-23T01:30:09Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed87__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 77.0
+
+[2026-05-23T01:31:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed87__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 56.6
+
+[2026-05-23T01:32:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed87__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 53.8
+
+[2026-05-23T01:33:17Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__full__frac1__seed100__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 100 --report_to none --fp16
+[elapsed_seconds] 564.0
+
+[2026-05-23T01:42:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed100__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 74.1
+
+[2026-05-23T01:43:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed100__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-23T01:44:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__full__frac1__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__full__frac1__seed100__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 55.2
+
+[2026-05-23T01:45:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 230.2
+
+[2026-05-23T01:49:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 77.0
+
+[2026-05-23T01:50:58Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-23T01:51:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 53.2
+
+[2026-05-23T01:52:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 222.0
+
+[2026-05-23T01:56:32Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 74.4
+
+[2026-05-23T01:57:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.6
+
+[2026-05-23T01:58:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 39.3
+
+[2026-05-23T01:59:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 206.8
+
+[2026-05-23T02:02:53Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 72.7
+
+[2026-05-23T02:04:05Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.9
+
+[2026-05-23T02:05:04Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 53.2
+
+[2026-05-23T02:05:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 226.4
+
+[2026-05-23T02:09:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.5
+
+[2026-05-23T02:10:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.1
+
+[2026-05-23T02:11:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 53.7
+
+[2026-05-23T02:12:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 231.7
+
+[2026-05-23T02:16:42Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.9
+
+[2026-05-23T02:17:59Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.8
+
+[2026-05-23T02:18:59Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 54.8
+
+[2026-05-23T02:19:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 222.5
+
+[2026-05-23T02:23:37Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 75.1
+
+[2026-05-23T02:24:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 61.7
+
+[2026-05-23T02:25:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.2
+
+[2026-05-23T02:26:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 218.5
+
+[2026-05-23T02:30:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.1
+
+[2026-05-23T02:31:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 60.1
+
+[2026-05-23T02:32:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 55.0
+
+[2026-05-23T02:33:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 221.0
+
+[2026-05-23T02:37:22Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 82.0
+
+[2026-05-23T02:38:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.8
+
+[2026-05-23T02:39:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 55.7
+
+[2026-05-23T02:40:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 225.1
+
+[2026-05-23T02:44:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 77.7
+
+[2026-05-23T02:45:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 62.9
+
+[2026-05-23T02:46:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.8
+
+[2026-05-23T02:47:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 228.1
+
+[2026-05-23T02:51:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 77.7
+
+[2026-05-23T02:52:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.5
+
+[2026-05-23T02:53:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.1
+
+[2026-05-23T02:54:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 226.1
+
+[2026-05-23T02:58:35Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 75.8
+
+[2026-05-23T02:59:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.4
+
+[2026-05-23T03:00:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 53.7
+
+[2026-05-23T03:01:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 219.6
+
+[2026-05-23T03:05:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 79.1
+
+[2026-05-23T03:06:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.7
+
+[2026-05-23T03:07:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 53.2
+
+[2026-05-23T03:08:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 224.6
+
+[2026-05-23T03:12:22Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.9
+
+[2026-05-23T03:13:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.5
+
+[2026-05-23T03:14:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 57.9
+
+[2026-05-23T03:15:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 222.6
+
+[2026-05-23T03:19:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 77.2
+
+[2026-05-23T03:20:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.5
+
+[2026-05-23T03:21:42Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.3
+
+[2026-05-23T03:22:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 224.8
+
+[2026-05-23T03:26:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 79.3
+
+[2026-05-23T03:27:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 60.0
+
+[2026-05-23T03:28:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.3
+
+[2026-05-23T03:29:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 227.4
+
+[2026-05-23T03:33:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.2
+
+[2026-05-23T03:34:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 62.0
+
+[2026-05-23T03:35:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.3
+
+[2026-05-23T03:36:47Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 222.2
+
+[2026-05-23T03:40:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 80.9
+
+[2026-05-23T03:41:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 57.8
+
+[2026-05-23T03:42:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 54.0
+
+[2026-05-23T03:43:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 224.9
+
+[2026-05-23T03:47:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 72.8
+
+[2026-05-23T03:48:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.7
+
+[2026-05-23T03:49:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.3
+
+[2026-05-23T03:50:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 229.6
+
+[2026-05-23T03:54:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.4
+
+[2026-05-23T03:55:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 60.7
+
+[2026-05-23T03:56:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 54.2
+
+[2026-05-23T03:57:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 223.9
+
+[2026-05-23T04:01:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 77.6
+
+[2026-05-23T04:02:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 68.0
+
+[2026-05-23T04:03:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.0
+
+[2026-05-23T04:04:53Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 227.9
+
+[2026-05-23T04:08:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 75.9
+
+[2026-05-23T04:09:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.2
+
+[2026-05-23T04:10:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 54.2
+
+[2026-05-23T04:11:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 226.9
+
+[2026-05-23T04:15:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.5
+
+[2026-05-23T04:16:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 57.2
+
+[2026-05-23T04:17:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 53.3
+
+[2026-05-23T04:18:42Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 220.1
+
+[2026-05-23T04:22:22Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.3
+
+[2026-05-23T04:23:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 64.5
+
+[2026-05-23T04:24:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.4
+
+[2026-05-23T04:25:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 225.3
+
+[2026-05-23T04:29:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.6
+
+[2026-05-23T04:30:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-23T04:31:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.1
+
+[2026-05-23T04:32:42Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 227.7
+
+[2026-05-23T04:36:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 81.2
+
+[2026-05-23T04:37:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.1
+
+[2026-05-23T04:38:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.9
+
+[2026-05-23T04:39:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 224.3
+
+[2026-05-23T04:43:34Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 78.8
+
+[2026-05-23T04:44:53Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 62.9
+
+[2026-05-23T04:45:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 55.2
+
+[2026-05-23T04:46:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 216.6
+
+[2026-05-23T04:50:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 75.6
+
+[2026-05-23T04:51:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.8
+
+[2026-05-23T04:52:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 55.2
+
+[2026-05-23T04:53:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 230.7
+
+[2026-05-23T04:57:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.6
+
+[2026-05-23T04:58:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.4
+
+[2026-05-23T04:59:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.5
+
+[2026-05-23T05:00:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 212.4
+
+[2026-05-23T05:04:14Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 79.0
+
+[2026-05-23T05:05:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 71.0
+
+[2026-05-23T05:06:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 60.5
+
+[2026-05-23T05:07:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 224.3
+
+[2026-05-23T05:11:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 77.3
+
+[2026-05-23T05:12:47Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 61.0
+
+[2026-05-23T05:13:48Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 54.8
+
+[2026-05-23T05:14:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 226.5
+
+[2026-05-23T05:18:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.2
+
+[2026-05-23T05:19:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.4
+
+[2026-05-23T05:20:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 52.1
+
+[2026-05-23T05:21:37Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 221.5
+
+[2026-05-23T05:25:19Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.6
+
+[2026-05-23T05:26:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.8
+
+[2026-05-23T05:27:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 39.2
+
+[2026-05-23T05:28:09Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 206.8
+
+[2026-05-23T05:31:36Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 73.8
+
+[2026-05-23T05:32:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.8
+
+[2026-05-23T05:33:47Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 43.6
+
+[2026-05-23T05:34:31Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed87__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 87 --report_to none --fp16
+[elapsed_seconds] 217.2
+
+[2026-05-23T05:38:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed87__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 72.2
+
+[2026-05-23T05:39:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed87__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 55.3
+
+[2026-05-23T05:40:16Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed87__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 51.5
+
+[2026-05-23T05:41:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed100__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 100 --report_to none --fp16
+[elapsed_seconds] 203.7
+
+[2026-05-23T05:44:32Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed100__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 73.0
+
+[2026-05-23T05:45:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed100__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 58.4
+
+[2026-05-23T05:46:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__easy__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__easy__frac0p333__seed100__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 55.5
+
+[2026-05-23T05:47:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 229.4
+
+[2026-05-23T05:51:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.2
+
+[2026-05-23T05:52:43Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 55.3
+
+[2026-05-23T05:53:39Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 50.2
+
+[2026-05-23T05:54:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 207.9
+
+[2026-05-23T05:57:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 70.5
+
+[2026-05-23T05:59:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 57.3
+
+[2026-05-23T06:00:05Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 40.5
+
+[2026-05-23T06:00:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 210.2
+
+[2026-05-23T06:04:16Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 72.3
+
+[2026-05-23T06:05:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.3
+
+[2026-05-23T06:06:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.8
+
+[2026-05-23T06:07:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed87__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 87 --report_to none --fp16
+[elapsed_seconds] 222.9
+
+[2026-05-23T06:11:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed87__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 72.5
+
+[2026-05-23T06:12:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed87__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 54.2
+
+[2026-05-23T06:13:15Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed87__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 38.5
+
+[2026-05-23T06:13:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed100__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 100 --report_to none --fp16
+[elapsed_seconds] 209.4
+
+[2026-05-23T06:17:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed100__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 70.7
+
+[2026-05-23T06:18:34Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed100__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 54.5
+
+[2026-05-23T06:19:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__ambiguous__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__ambiguous__frac0p333__seed100__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 35.4
+
+[2026-05-23T06:20:05Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 213.2
+
+[2026-05-23T06:23:38Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.9
+
+[2026-05-23T06:24:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-23T06:25:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 40.4
+
+[2026-05-23T06:26:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 205.0
+
+[2026-05-23T06:29:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 70.3
+
+[2026-05-23T06:31:06Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 55.3
+
+[2026-05-23T06:32:02Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 52.3
+
+[2026-05-23T06:32:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 206.5
+
+[2026-05-23T06:36:20Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 75.7
+
+[2026-05-23T06:37:36Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-23T06:38:35Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 51.4
+
+[2026-05-23T06:39:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed87__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 87 --report_to none --fp16
+[elapsed_seconds] 206.8
+
+[2026-05-23T06:42:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed87__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 74.1
+
+[2026-05-23T06:44:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed87__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 57.6
+
+[2026-05-23T06:45:06Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed87__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed87__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 53.0
+
+[2026-05-23T06:45:59Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_electra/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed100__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 100 --report_to none --fp16
+[elapsed_seconds] 221.7
+
+[2026-05-23T06:49:41Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed100__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 75.3
+
+[2026-05-23T06:50:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed100__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 59.1
+
+[2026-05-23T06:51:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_electra_small/runs/electra_small__hard__frac0p333__seed100__same_epochs --output_dir results/round3e_electra_small/evals/electra_small__hard__frac0p333__seed100__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 54.5
+
+[2026-05-23T06:52:50Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/aggregate_metrics.py --metrics-dir results/round3e_electra_small/metrics/raw --out-dir results/round3e_electra_small/metrics
+[elapsed_seconds] 6.7
+
+[2026-05-23T06:52:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/round3e_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/round3e_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addsent.jsonl results/round3e_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/round3e_electra_small/cartography/subset_assignments.csv --out results/round3e_electra_small/metrics/mechanism_features.csv

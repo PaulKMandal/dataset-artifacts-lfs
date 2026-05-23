@@ -1,0 +1,367 @@
+
+[2026-05-22T23:54:58Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/materialize_qa_data.py --out-dir data/qa
+[elapsed_seconds] 50.2
+
+[2026-05-22T23:56:06Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16 --save_dynamics
+[elapsed_seconds] 1016.1
+
+[2026-05-23T00:13:02Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 dynamics.py --td_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed42__same_epochs --output_dir results/round3e_bert_base/cartography/joint --confidence_field joint_confidence --seed 42 --limit_scatter_samples 20000
+[elapsed_seconds] 17.6
+
+[2026-05-23T00:13:20Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/select_qa_subsets.py --train-data data/qa/squad_train.jsonl --cartography-scores results/round3e_bert_base/cartography/joint/cartography_scores.csv --out-dir data/subsets/round3e_bert/joint --assignments-out results/round3e_bert_base/cartography/subset_assignments.csv --confidence-definition joint_gold_span_probability --random-draws 10 --random-seed-base 8300 --fractions 0.333
+[elapsed_seconds] 5.8
+
+[2026-05-23T00:13:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 983.2
+
+[2026-05-23T00:29:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 87.9
+
+[2026-05-23T00:31:17Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 66.9
+
+[2026-05-23T00:32:24Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 66.6
+
+[2026-05-23T00:33:31Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 962.2
+
+[2026-05-23T00:49:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 84.7
+
+[2026-05-23T00:50:59Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 66.2
+
+[2026-05-23T00:52:05Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.5
+
+[2026-05-23T00:53:04Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 83.2
+
+[2026-05-23T00:54:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 65.3
+
+[2026-05-23T00:55:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.5
+
+[2026-05-23T00:56:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed87__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 87 --report_to none --fp16
+[elapsed_seconds] 963.0
+
+[2026-05-23T01:12:36Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed87__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed87__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 83.3
+
+[2026-05-23T01:14:00Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed87__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed87__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 63.5
+
+[2026-05-23T01:15:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed87__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed87__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 87 --report_to none --fp16
+[elapsed_seconds] 61.1
+
+[2026-05-23T01:16:05Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__full__frac1__seed100__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 100 --report_to none --fp16
+[elapsed_seconds] 963.3
+
+[2026-05-23T01:32:08Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed100__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed100__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 79.1
+
+[2026-05-23T01:33:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed100__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed100__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 62.1
+
+[2026-05-23T01:34:30Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__full__frac1__seed100__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__full__frac1__seed100__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 100 --report_to none --fp16
+[elapsed_seconds] 57.8
+
+[2026-05-23T01:35:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw00.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 365.1
+
+[2026-05-23T01:41:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 86.5
+
+[2026-05-23T01:43:00Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.3
+
+[2026-05-23T01:44:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 57.9
+
+[2026-05-23T01:45:01Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw00.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 362.1
+
+[2026-05-23T01:51:04Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 82.5
+
+[2026-05-23T01:52:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 62.5
+
+[2026-05-23T01:53:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-23T01:54:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw00.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 357.8
+
+[2026-05-23T02:00:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 81.7
+
+[2026-05-23T02:01:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 62.1
+
+[2026-05-23T02:02:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw00__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.9
+
+[2026-05-23T02:03:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw01.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 364.8
+
+[2026-05-23T02:09:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 79.9
+
+[2026-05-23T02:11:14Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 62.5
+
+[2026-05-23T02:12:17Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.8
+
+[2026-05-23T02:13:16Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw01.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 372.8
+
+[2026-05-23T02:19:29Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 82.7
+
+[2026-05-23T02:20:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.8
+
+[2026-05-23T02:21:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.1
+
+[2026-05-23T02:22:52Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw01.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 364.3
+
+[2026-05-23T02:28:56Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 84.0
+
+[2026-05-23T02:30:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 63.7
+
+[2026-05-23T02:31:24Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw01__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.3
+
+[2026-05-23T02:32:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw02.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 365.3
+
+[2026-05-23T02:38:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 81.0
+
+[2026-05-23T02:39:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.5
+
+[2026-05-23T02:40:53Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 60.3
+
+[2026-05-23T02:41:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw02.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 357.3
+
+[2026-05-23T02:47:51Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 86.8
+
+[2026-05-23T02:49:18Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 67.0
+
+[2026-05-23T02:50:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 60.2
+
+[2026-05-23T02:51:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw02.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 367.3
+
+[2026-05-23T02:57:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 81.5
+
+[2026-05-23T02:58:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 63.7
+
+[2026-05-23T02:59:59Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw02__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.3
+
+[2026-05-23T03:00:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw03.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 366.8
+
+[2026-05-23T03:07:04Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 80.5
+
+[2026-05-23T03:08:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.3
+
+[2026-05-23T03:09:28Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.3
+
+[2026-05-23T03:10:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw03.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 358.1
+
+[2026-05-23T03:16:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 83.8
+
+[2026-05-23T03:17:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.6
+
+[2026-05-23T03:18:53Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.1
+
+[2026-05-23T03:19:54Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw03.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 360.8
+
+[2026-05-23T03:25:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 83.0
+
+[2026-05-23T03:27:18Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 66.5
+
+[2026-05-23T03:28:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw03__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.1
+
+[2026-05-23T03:29:24Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw04.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 362.1
+
+[2026-05-23T03:35:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 90.8
+
+[2026-05-23T03:36:57Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.9
+
+[2026-05-23T03:38:02Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.1
+
+[2026-05-23T03:39:01Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw04.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 359.1
+
+[2026-05-23T03:45:00Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 83.2
+
+[2026-05-23T03:46:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.6
+
+[2026-05-23T03:47:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.7
+
+[2026-05-23T03:48:22Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw04.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 356.0
+
+[2026-05-23T03:54:18Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 82.0
+
+[2026-05-23T03:55:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 65.6
+
+[2026-05-23T03:56:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw04__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.9
+
+[2026-05-23T03:57:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw05.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 360.1
+
+[2026-05-23T04:03:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 90.5
+
+[2026-05-23T04:05:15Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 67.7
+
+[2026-05-23T04:06:23Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed13__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.2
+
+[2026-05-23T04:07:25Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw05.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 357.8
+
+[2026-05-23T04:13:22Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 83.0
+
+[2026-05-23T04:14:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.3
+
+[2026-05-23T04:15:49Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed21__same_epochs --output_dir results/round3e_bert_base/evals/bert_base__random__frac0p333__draw05__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.3
+
+[2026-05-23T04:16:46Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/round3e_bert/joint/random_frac0p333_draw05.jsonl --model bert-base-uncased --output_dir results/round3e_bert_base/runs/bert_base__random__frac0p333__draw05__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16

@@ -1,0 +1,27 @@
+created_at_utc=2026-05-22T23:55:49Z
+python=/workspace/dataset-artifacts/.venv/bin/python3
+Python 3.11.15
+
+uv:
+uv 0.9.30
+
+nix:
+FAILED nix --version: [Errno 2] No such file or directory: 'nix'
+
+nvidia-smi:
+GPU 0: NVIDIA GeForce RTX 4090 (UUID: GPU-012d0d3f-3af4-9231-cdf4-b5e0d903c38a)
+
+torch:
+2.3.1+cu121 12.1 True
+
+environment:
+CUDA_VISIBLE_DEVICES=0
+DATASET_ARTIFACTS_DRIVER_LIB_DIR=/workspace/dataset-artifacts/.nix-driver-libs
+HF_DATASETS_CACHE=/workspace/.cache/huggingface/datasets
+HF_HOME=/workspace/.cache/huggingface
+TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
+UV_CACHE_DIR=/workspace/.cache/uv
+UV_NO_SYNC=1
+UV_PROJECT_ENVIRONMENT=.venv
+UV_PYTHON=/nix/store/fahn9fwxhvkl36kflirl62gr7999ssrd-python3-3.11.15/bin/python
+UV_RUN_RECURSION_DEPTH=1

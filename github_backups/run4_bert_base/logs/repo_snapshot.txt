@@ -1,0 +1,20 @@
+run_label=run4_bert_base
+results_dir=results/round3e_bert_base
+date_utc=2026-05-23T04:58:11Z
+
+branch=run4-bert
+commit=4ded9d6012931a1a089b2ff27bab52156b38b635
+
+commit 4ded9d6012931a1a089b2ff27bab52156b38b635 (HEAD -> run4-bert)
+Author: root <PaulKMandal>
+Date:   Fri May 22 23:54:40 2026 +0000
+
+    Add BERT Round 3E panel config
+
+ configs/panel.round3e_bert.yaml | 78 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
+
+?? data/
+
+origin	https://github.com/PaulKMandal/dataset-artifacts-lfs.git (fetch)
+origin	https://github.com/PaulKMandal/dataset-artifacts-lfs.git (push)

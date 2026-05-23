@@ -1,7 +1,7 @@
 run_label=run4_bert_base
 results_dir=results/round3e_bert_base
 artifact_branch=artifacts/run4_bert_base
-created_utc=2026-05-23T05:00:18Z
+created_utc=2026-05-23T09:50:30Z
 
 included_files:
 ARTIFACT_MANIFEST.txt

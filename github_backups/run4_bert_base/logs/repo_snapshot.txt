@@ -1,6 +1,6 @@
 run_label=run4_bert_base
 results_dir=results/round3e_bert_base
-date_utc=2026-05-23T04:58:11Z
+date_utc=2026-05-23T09:48:09Z
 
 branch=run4-bert
 commit=4ded9d6012931a1a089b2ff27bab52156b38b635

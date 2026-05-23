@@ -88,7 +88,7 @@
     "log_level": "passive",
     "log_level_replica": "warning",
     "log_on_each_node": true,
-    "logging_dir": "results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs/runs/May23_03-11-11_e4640b659f76",
+    "logging_dir": "results/round3e_bert_base/runs/bert_base__random__frac0p333__draw03__seed21__same_epochs/runs/May23_07-43-37_e4640b659f76",
     "logging_first_step": false,
     "logging_nan_inf_filter": true,
     "logging_steps": 500,

@@ -722,6 +722,39 @@ def make_summary(seed_rows: list[dict[str, Any]], paired_rows: list[dict[str, An
 
 
 
+@dataclass
+class RepairState:
+    out_root: Path
+    metrics_dir: Path
+    predictions_dir: Path
+    logs_dir: Path
+    command_log: Path
+    seed_rows: list[dict[str, Any]]
+    prediction_audit_rows: list[dict[str, Any]]
+    paired_rows: list[dict[str, Any]]
+    missing_rows: list[dict[str, Any]]
+    prediction_manifest_rows: list[dict[str, Any]]
+
+
+def initialize_output(args: argparse.Namespace) -> RepairState:
+    out_root = Path(args.out_dir or f"cartography_adversarial_repair_{utc_stamp()}")
+    metrics_dir = out_root / "metrics"
+    predictions_dir = out_root / "predictions"
+    logs_dir = out_root / "logs"
+    for d in (metrics_dir, predictions_dir, logs_dir):
+        d.mkdir(parents=True, exist_ok=True)
+    command_log = logs_dir / "command_log.txt"
+    command_log.write_text("", encoding="utf-8")
+    (logs_dir / "environment.txt").write_text(environment_text(), encoding="utf-8")
+    try:
+        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True)
+    except Exception:
+        git_commit = "git unavailable\n"
+    (logs_dir / "git_commit.txt").write_text(git_commit, encoding="utf-8")
+    return RepairState(out_root, metrics_dir, predictions_dir, logs_dir, command_log, [], [], [], [], [])
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

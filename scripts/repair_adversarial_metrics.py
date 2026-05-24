@@ -569,6 +569,83 @@ def random_draw_distribution(seed_rows: list[dict[str, Any]]) -> list[dict[str, 
 
 
 
+def seed_matched_deltas(seed_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    random_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    selected: list[dict[str, Any]] = []
+    for r in seed_rows:
+        base_key = (r["panel"], r["model"], r["evalset"], r["split_type"], r["train_seed"])
+        if r["condition"] == "random 33%":
+            random_groups[base_key].append(r)
+        elif r["condition"] in {"easy-ranked 33%", "ambiguous-ranked 33%", "hard-ranked 33%"}:
+            selected.append(r)
+
+    per_seed = []
+    for r in selected:
+        key = (r["panel"], r["model"], r["evalset"], r["split_type"], r["train_seed"])
+        rand = random_groups.get(key, [])
+        if not rand:
+            continue
+        rand_em = mean([x["exact_match"] for x in rand])
+        rand_f1 = mean([x["f1"] for x in rand])
+        per_seed.append({
+            "panel": r["panel"],
+            "model": r["model"],
+            "evalset": r["evalset"],
+            "split_type": r["split_type"],
+            "condition": r["condition"],
+            "subset_source": r["subset_source"],
+            "train_seed": r["train_seed"],
+            "cartographic_exact_match": r["exact_match"],
+            "mean_random_exact_match_same_seed": rand_em,
+            "delta_exact_match": r["exact_match"] - rand_em,
+            "cartographic_f1": r["f1"],
+            "mean_random_f1_same_seed": rand_f1,
+            "delta_f1": r["f1"] - rand_f1,
+            "n_random_draws_same_seed": len(rand),
+        })
+
+    summary_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    for r in per_seed:
+        key = (r["panel"], r["model"], r["evalset"], r["split_type"], r["condition"], r["subset_source"])
+        summary_groups[key].append(r)
+    stats = {
+        key: {
+            "mean_delta_exact_match_over_seeds": mean([r["delta_exact_match"] for r in rows]),
+            "std_delta_exact_match_over_seeds": stdev([r["delta_exact_match"] for r in rows]),
+            "mean_delta_f1_over_seeds": mean([r["delta_f1"] for r in rows]),
+            "std_delta_f1_over_seeds": stdev([r["delta_f1"] for r in rows]),
+            "n_training_seeds": len({r["train_seed"] for r in rows}),
+        }
+        for key, rows in summary_groups.items()
+    }
+    for r in per_seed:
+        key = (r["panel"], r["model"], r["evalset"], r["split_type"], r["condition"], r["subset_source"])
+        r.update(stats[key])
+    return sorted(per_seed, key=lambda r: (r["panel"], r["model"], r["evalset"], r["split_type"], r["condition"], r["train_seed"]))
+
+
+def selected_win_counts(seed_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    for r in seed_matched_deltas(seed_rows):
+        groups[(r["panel"], r["model"], r["evalset"], r["split_type"], r["condition"])].append(r)
+    out = []
+    for (panel, model, evalset, split_type, condition), rows in sorted(groups.items()):
+        out.append({
+            "panel": panel,
+            "model": model,
+            "evalset": evalset,
+            "split_type": split_type,
+            "condition": condition,
+            "n_training_seeds": len(rows),
+            "n_seeds_delta_f1_positive": sum(1 for r in rows if r["delta_f1"] > 0),
+            "n_seeds_delta_exact_match_positive": sum(1 for r in rows if r["delta_exact_match"] > 0),
+            "mean_delta_f1": mean([r["delta_f1"] for r in rows]),
+            "mean_delta_exact_match": mean([r["delta_exact_match"] for r in rows]),
+        })
+    return out
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

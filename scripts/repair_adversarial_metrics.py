@@ -243,6 +243,51 @@ def sanitize_example(row: dict[str, Any], prediction: str | None = None) -> dict
 
 
 
+@dataclass(frozen=True)
+class RunInfo:
+    panel: str
+    result_dir: Path
+    run_id: str
+    run_dir: Path
+    model: str
+    condition: str
+    subset_source: str
+    train_seed: int | None
+    random_draw_id: str
+
+
+def parse_run_id(panel: str, result_dir: Path, run_dir: Path) -> RunInfo:
+    rid = run_dir.name
+    m = re.match(r"(?P<model>.+?)__(?P<condition>full|random|easy|ambiguous|hard)__", rid)
+    if not m:
+        model = rid.split("__", 1)[0]
+        condition = "unknown"
+    else:
+        model = m.group("model")
+        condition = m.group("condition")
+    seed_m = re.search(r"__seed(?P<seed>\d+)__", rid)
+    draw_m = re.search(r"__draw(?P<draw>\d+)__", rid)
+    return RunInfo(
+        panel=panel,
+        result_dir=result_dir,
+        run_id=rid,
+        run_dir=run_dir,
+        model=model,
+        condition=condition,
+        subset_source=condition_label(condition),
+        train_seed=int(seed_m.group("seed")) if seed_m else None,
+        random_draw_id=f"draw{int(draw_m.group('draw')):02d}" if draw_m else "",
+    )
+
+
+def iter_run_infos(result_dir: Path) -> Iterable[RunInfo]:
+    runs_dir = result_dir / "runs"
+    if not runs_dir.exists():
+        return []
+    return [parse_run_id(result_dir.name, result_dir, p) for p in sorted(runs_dir.iterdir()) if p.is_dir()]
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

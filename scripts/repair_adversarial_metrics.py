@@ -288,6 +288,46 @@ def iter_run_infos(result_dir: Path) -> Iterable[RunInfo]:
 
 
 
+def find_prediction_path(result_dir: Path, run_id: str, evalset: str) -> Path | None:
+    candidates = [
+        result_dir / "predictions" / f"{run_id}__{evalset}.jsonl",
+        result_dir / "predictions" / f"{run_id}__{evalset}.jsonl.gz",
+        result_dir / "evals" / f"{run_id}__{evalset}" / "eval_predictions.jsonl",
+        result_dir / "evals" / f"{run_id}__{evalset}" / "eval_predictions.jsonl.gz",
+    ]
+    for path in candidates:
+        if path.exists() and path.stat().st_size > 0:
+            return path
+    return None
+
+
+def checkpoint_available(run_dir: Path) -> bool:
+    if not run_dir.exists() or not (run_dir / "config.json").exists():
+        return False
+    for name in ("model.safetensors", "pytorch_model.bin"):
+        if (run_dir / name).exists() and (run_dir / name).stat().st_size > 1024:
+            return True
+    return bool(list(run_dir.glob("*.safetensors")) or list(run_dir.glob("pytorch_model*.bin")))
+
+
+def regenerate_prediction(run_info: RunInfo, evalset: str, dataset_path: Path, fp16: bool, command_log: Path) -> Path | None:
+    out_dir = run_info.result_dir / "evals" / f"{run_info.run_id}__{evalset}"
+    cmd = [
+        sys.executable, "run.py", "--do_eval", "--task", "qa", "--dataset", str(dataset_path),
+        "--model", str(run_info.run_dir), "--output_dir", str(out_dir), "--overwrite_output_dir",
+        "--max_length", "384", "--per_device_eval_batch_size", "64", "--seed", str(run_info.train_seed or 42),
+        "--report_to", "none",
+    ]
+    if fp16:
+        cmd.append("--fp16")
+    with command_log.open("a", encoding="utf-8") as f:
+        f.write("$ " + " ".join(cmd) + "\n")
+    subprocess.run(cmd, check=True)
+    pred = out_dir / "eval_predictions.jsonl"
+    return pred if pred.exists() and pred.stat().st_size > 0 else None
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

@@ -40,6 +40,29 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 
+ARTICLE_RE = re.compile(r"\b(a|an|the)\b", re.UNICODE)
+PUNCT_TABLE = str.maketrans("", "", string.punctuation)
+ADV_MARKER = "-high-conf-"
+
+EVALSETS = {
+    "addsent": "addsent.jsonl",
+    "addonesent": "addonesent.jsonl",
+}
+
+EXPECTED_ROW_COUNTS = {
+    "addsent": {"all": 3560, "original": 1000, "adversarial": 2560},
+    "addonesent": {"all": 1787, "original": 1000, "adversarial": 787},
+}
+
+CONDITION_LABELS = {
+    "full": "full data",
+    "random": "random 33%",
+    "easy": "easy-ranked 33%",
+    "ambiguous": "ambiguous-ranked 33%",
+    "hard": "hard-ranked 33%",
+}
+
+
 
 def main() -> None:
     args = build_parser().parse_args()

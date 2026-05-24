@@ -389,6 +389,84 @@ def load_eval_datasets(dataset_dir: Path, logs_dir: Path) -> tuple[dict[str, tup
 
 
 
+def score_predictions(
+    run_info: RunInfo,
+    evalset: str,
+    dataset_path: Path,
+    dataset_rows: list[dict[str, Any]],
+    dataset_by_id: dict[str, dict[str, Any]],
+    pred_path: Path,
+    out_pred_path: Path,
+) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+    pred_rows = read_jsonl(pred_path)
+    preds: dict[str, str] = {}
+    for row in pred_rows:
+        rid = str(row.get("id"))
+        pred = row.get("predicted_answer", row.get("prediction_text", row.get("prediction", "")))
+        preds[rid] = str(pred)
+
+    joined: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for drow in dataset_rows:
+        rid = str(drow.get("id"))
+        if rid not in preds:
+            missing.append(rid)
+            continue
+        pred = preds[rid]
+        em, f1 = squad_scores(pred, answer_texts(drow))
+        split_raw = split_type_from_id(rid)
+        scored = dict(drow)
+        scored.update({
+            "predicted_answer": pred,
+            "exact_match": em,
+            "f1": f1,
+            "split_type": "adversarial_only" if split_raw == "adversarial" else "original_only",
+            "base_id": base_id_from_id(rid),
+        })
+        joined.append(scored)
+
+    extra = sorted(set(preds) - set(dataset_by_id))
+    prediction_audit = {
+        "run_id": run_info.run_id,
+        "evalset": evalset,
+        "dataset_path": str(dataset_path),
+        "predictions_path": str(out_pred_path),
+        "n_dataset_rows": len(dataset_rows),
+        "n_prediction_rows": len(preds),
+        "n_joined_rows": len(joined),
+        "n_missing_predictions": len(missing),
+        "n_extra_predictions": len(extra),
+        "status": "ok" if not missing and not extra else "join_mismatch",
+    }
+
+    metric_rows = []
+    for split_name, filt in [
+        ("all_row_legacy", lambda r: True),
+        ("original_only", lambda r: r["split_type"] == "original_only"),
+        ("adversarial_only", lambda r: r["split_type"] == "adversarial_only"),
+    ]:
+        part = [r for r in joined if filt(r)]
+        metric_rows.append({
+            "panel": run_info.panel,
+            "model": run_info.model,
+            "condition": condition_label(run_info.condition),
+            "subset_source": run_info.subset_source,
+            "train_seed": run_info.train_seed,
+            "random_draw_id": run_info.random_draw_id,
+            "evalset": evalset,
+            "split_type": split_name,
+            "n": len(part),
+            "exact_match": 100 * mean([r["exact_match"] for r in part]),
+            "f1": 100 * mean([r["f1"] for r in part]),
+            "dataset_path": str(dataset_path),
+            "predictions_path": str(out_pred_path),
+            "run_id": run_info.run_id,
+        })
+
+    return metric_rows, prediction_audit, joined, paired_metrics(run_info, evalset, dataset_path, out_pred_path, joined)
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

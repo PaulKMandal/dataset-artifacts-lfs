@@ -859,7 +859,15 @@ def make_tarball(out_root: Path) -> Path:
 
 def main() -> None:
     args = build_parser().parse_args()
-    raise SystemExit("repair implementation is incomplete; apply the remaining commits")
+    state = initialize_output(args)
+    datasets_by_eval, split_audit_rows, split_details = load_eval_datasets(Path(args.dataset_dir), state.logs_dir)
+    process_result_dirs(args, state, datasets_by_eval)
+    write_repair_tables(state, split_audit_rows, split_details)
+    write_repair_readmes(args, state, split_audit_rows)
+    tar_path = make_tarball(state.out_root)
+    print(tar_path)
+    if state.missing_rows:
+        print(f"WARNING: {len(state.missing_rows)} missing/failed entries. See {state.metrics_dir / 'missing_or_failed_runs.csv'}", file=sys.stderr)
 
 
 if __name__ == "__main__":

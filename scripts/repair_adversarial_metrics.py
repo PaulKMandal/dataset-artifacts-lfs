@@ -646,6 +646,82 @@ def selected_win_counts(seed_rows: list[dict[str, Any]]) -> list[dict[str, Any]]
 
 
 
+def schema_audit_markdown(split_details: dict[str, dict[str, Any]]) -> str:
+    lines = [
+        "# Split schema audit", "",
+        "Classification method: rows whose `id` contains `-high-conf-` are classified as adversarial; all other rows are classified as original. `base_id` is the `id` prefix before `-high-conf-` for adversarial rows and the full `id` for original rows.",
+        "", "Fields used:",
+        "- row ID: `id`",
+        "- base/original ID: prefix of `id` before `-high-conf-`",
+        "- gold answer: `answers.text`",
+        "- predicted answer: `predicted_answer` from row-level prediction JSONL",
+        "- split classification: `id` contains `-high-conf-`", "",
+    ]
+    for evalset, details in split_details.items():
+        lines.extend([f"## {evalset}", "", f"Duplicate original rows after `(base_id, question, context, answers)` deduplication: {details.get('duplicate_original_rows', 0)}"])
+        for split_name, examples in [("original", details.get("original_examples", [])), ("adversarial", details.get("adversarial_examples", []))]:
+            lines.extend(["", f"### {split_name} examples"])
+            for i, row in enumerate(examples[:2], start=1):
+                lines.extend(["", f"Example {i}:", "```json", json.dumps(sanitize_example(row), indent=2, ensure_ascii=False), "```"])
+        lines.append("")
+    return "\n".join(lines)
+
+
+def environment_text() -> str:
+    lines = [f"created_utc={datetime.now(timezone.utc).isoformat()}", f"python={sys.version}", f"cwd={Path.cwd()}"]
+    try:
+        lines.append("git_commit=" + subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip())
+        lines.append("git_branch=" + subprocess.check_output(["git", "branch", "--show-current"], text=True).strip())
+    except Exception as e:
+        lines.append(f"git_unavailable={e}")
+    for key in ["CUDA_VISIBLE_DEVICES", "LD_LIBRARY_PATH", "HF_HOME", "UV_CACHE_DIR"]:
+        lines.append(f"{key}={os.environ.get(key, '')}")
+    return "\n".join(lines) + "\n"
+
+
+def make_summary(seed_rows: list[dict[str, Any]], paired_rows: list[dict[str, Any]], missing_rows: list[dict[str, Any]], split_audit_rows: list[dict[str, Any]]) -> str:
+    lines = [
+        "# Adversarial repair summary", "",
+        "This repair computes split AddSent/AddOneSent metrics and paired robustness metrics from row-level prediction JSONL files. All-row AddSent/AddOneSent metrics are retained only as legacy/comparability metrics.", "",
+    ]
+    if missing_rows:
+        lines.extend(["## Blockers / missing runs", "", f"Missing or failed run/eval entries: {len(missing_rows)}. See `metrics/missing_or_failed_runs.csv`.", ""])
+    else:
+        lines.append("No missing prediction/checkpoint blockers were detected for processed AddSent/AddOneSent evals.\n")
+    lines.extend(["## Split audit", ""])
+    for r in split_audit_rows:
+        lines.append(f"- {r['evalset']}: all={r['all_rows']}, original={r['original_rows']}, adversarial={r['adversarial_rows']}, pairable_base_ids={r['n_pairable_base_ids']}, status={r['status']}")
+    lines.extend(["", "## Ambiguous-ranked 33% vs random 33% on adversarial-only F1", ""])
+    random_groups: dict[tuple[str, str, str], list[float]] = defaultdict(list)
+    amb_groups: dict[tuple[str, str, str], list[float]] = defaultdict(list)
+    for r in seed_rows:
+        if r["split_type"] != "adversarial_only" or r["evalset"] not in {"addsent", "addonesent"}:
+            continue
+        key = (r["model"], r["evalset"], r["split_type"])
+        if r["condition"] == "random 33%":
+            random_groups[key].append(r["f1"])
+        elif r["condition"] == "ambiguous-ranked 33%":
+            amb_groups[key].append(r["f1"])
+    for key in sorted(set(random_groups) | set(amb_groups)):
+        model, evalset, _split = key
+        rmean = mean(random_groups.get(key, []))
+        amean = mean(amb_groups.get(key, []))
+        if math.isnan(rmean) or math.isnan(amean):
+            verdict = "insufficient data"
+        elif amean > rmean:
+            verdict = "ambiguous-ranked 33% is above the random mean"
+        elif amean < rmean:
+            verdict = "ambiguous-ranked 33% is below the random mean"
+        else:
+            verdict = "ambiguous-ranked 33% equals the random mean"
+        lines.append(f"- {model} / {evalset}: ambiguous F1={amean:.3f}, random mean F1={rmean:.3f}; {verdict}.")
+    lines.extend(["", "## Paired robustness", ""])
+    lines.append("Paired robustness rows were computed for pairable original/adversarial base IDs. See `metrics/paired_robustness_table.csv`." if paired_rows else "No paired robustness rows were computed.")
+    lines.extend(["", "## Interpretation constraints", "", "- Do not use all-row AddSent/AddOneSent metrics as primary robustness metrics.", "- Do not treat random draw × training seed as IID; draw-level random means are preserved.", "- Use easy-ranked 33%, ambiguous-ranked 33%, hard-ranked 33%, random 33%, and full data terminology."])
+    return "\n".join(lines) + "\n"
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

@@ -1,0 +1,109 @@
+train_spec:
+  run_id: electra_small__easy__frac0p333__seed21__same_epochs
+  model_short: electra_small
+  model_name: google/electra-small-discriminator
+  train_subset: easy
+  subset_fraction: 0.333
+  subset_draw_id: null
+  seed: 21
+  train_budget_type: same_epochs
+  train_data: data/subsets/run7_electra_small/joint/easy_frac0p333.jsonl
+  output_dir: results/run7_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs
+  confidence_definition: joint
+  num_train_epochs: 3.0
+  max_steps: null
+  save_dynamics: false
+panel_config:
+  panel:
+    name: run7_electra_small
+    results_dir: results/run7_electra_small
+    resume: true
+    gpu_ids:
+    - 0
+    parallel_workers: 1
+  model:
+    short_name: electra_small
+    name_or_path: google/electra-small-discriminator
+    max_seq_length: 384
+  training:
+    num_train_epochs: 3
+    same_steps_fallback_max_steps: 8301
+    learning_rate: 5.0e-05
+    warmup_ratio: 0.0
+    weight_decay: 0.0
+    per_device_train_batch_size: 32
+    per_device_eval_batch_size: 64
+    fp16: true
+    fp16_eval: true
+  data:
+    data_dir: data/qa
+    subsets_dir: data/subsets/run7_electra_small
+    squad_train: data/qa/squad_train.jsonl
+    evalsets:
+      squad_dev: data/qa/squad_dev.jsonl
+      addsent: data/qa/addsent.jsonl
+      addonesent: data/qa/addonesent.jsonl
+    squad_train_json: null
+    squad_dev_json: null
+    addsent_json: null
+    addonesent_json: null
+  cartography:
+    source_seed: 42
+    primary: joint
+    random_draws: 10
+    random_seed_base: 7300
+    subset_fractions:
+    - 0.333
+    limit_scatter_samples: 20000
+    definitions:
+      joint:
+        field: joint_confidence
+        label: joint_gold_span_probability
+  experiments:
+    full_baseline:
+      enabled: true
+      seeds:
+      - 13
+      - 21
+      - 42
+    random_33:
+      enabled: true
+      fraction: 0.333
+      seeds:
+      - 13
+      - 21
+      - 42
+      random_draws: 10
+    easy_33:
+      enabled: true
+      fraction: 0.333
+      seeds:
+      - 13
+      - 21
+      - 42
+    ambiguous_33:
+      enabled: true
+      fraction: 0.333
+      seeds:
+      - 13
+      - 21
+      - 42
+    hard_33:
+      enabled: true
+      fraction: 0.333
+      seeds:
+      - 13
+      - 21
+      - 42
+    random_33_same_steps:
+      enabled: false
+    hard_33_same_steps:
+      enabled: false
+    budget_10:
+      enabled: false
+    budget_20:
+      enabled: false
+    budget_50:
+      enabled: false
+    confidence_ablation:
+      enabled: false

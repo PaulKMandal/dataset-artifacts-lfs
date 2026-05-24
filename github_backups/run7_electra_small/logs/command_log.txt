@@ -1,0 +1,700 @@
+
+[2026-05-23T22:32:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16 --save_dynamics
+[elapsed_seconds] 573.8
+
+[2026-05-23T22:42:03Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 dynamics.py --td_dir results/run7_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/run7_electra_small/cartography/joint --confidence_field joint_confidence --seed 42 --limit_scatter_samples 20000
+[elapsed_seconds] 13.3
+
+[2026-05-23T22:42:16Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/select_qa_subsets.py --train-data data/qa/squad_train.jsonl --cartography-scores results/run7_electra_small/cartography/joint/cartography_scores.csv --out-dir data/subsets/run7_electra_small/joint --assignments-out results/run7_electra_small/cartography/subset_assignments.csv --confidence-definition joint_gold_span_probability --random-draws 10 --random-seed-base 7300 --fractions 0.333
+[elapsed_seconds] 5.4
+
+[2026-05-23T22:42:21Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 532.7
+
+[2026-05-23T22:51:14Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.4
+
+[2026-05-23T22:52:28Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.7
+
+[2026-05-23T22:53:32Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.8
+
+[2026-05-23T22:54:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 529.4
+
+[2026-05-23T23:03:18Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.1
+
+[2026-05-23T23:04:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-23T23:05:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.7
+
+[2026-05-23T23:06:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.1
+
+[2026-05-23T23:07:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.5
+
+[2026-05-23T23:08:41Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__full__frac1__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__full__frac1__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.6
+
+[2026-05-23T23:09:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 214.4
+
+[2026-05-23T23:13:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.7
+
+[2026-05-23T23:14:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 62.5
+
+[2026-05-23T23:15:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 57.1
+
+[2026-05-23T23:16:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 209.2
+
+[2026-05-23T23:19:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 79.1
+
+[2026-05-23T23:21:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.4
+
+[2026-05-23T23:22:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 53.5
+
+[2026-05-23T23:23:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw00.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 207.7
+
+[2026-05-23T23:26:37Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 73.7
+
+[2026-05-23T23:27:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.7
+
+[2026-05-23T23:28:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw00__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 53.6
+
+[2026-05-23T23:29:45Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 218.4
+
+[2026-05-23T23:33:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.3
+
+[2026-05-23T23:34:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 60.2
+
+[2026-05-23T23:35:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 55.1
+
+[2026-05-23T23:36:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 209.7
+
+[2026-05-23T23:40:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 76.2
+
+[2026-05-23T23:41:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.1
+
+[2026-05-23T23:42:19Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.7
+
+[2026-05-23T23:43:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw01.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 210.3
+
+[2026-05-23T23:46:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 74.8
+
+[2026-05-23T23:48:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 61.7
+
+[2026-05-23T23:49:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw01__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 55.1
+
+[2026-05-23T23:49:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 214.5
+
+[2026-05-23T23:53:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.8
+
+[2026-05-23T23:54:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 55.9
+
+[2026-05-23T23:55:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 53.1
+
+[2026-05-23T23:56:40Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 195.5
+
+[2026-05-23T23:59:55Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 89.2
+
+[2026-05-24T00:01:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 65.5
+
+[2026-05-24T00:02:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 57.1
+
+[2026-05-24T00:03:28Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw02.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 213.4
+
+[2026-05-24T00:07:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 74.3
+
+[2026-05-24T00:08:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.3
+
+[2026-05-24T00:09:14Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw02__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 52.9
+
+[2026-05-24T00:10:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 219.0
+
+[2026-05-24T00:13:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 76.0
+
+[2026-05-24T00:15:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.7
+
+[2026-05-24T00:16:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 54.9
+
+[2026-05-24T00:16:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 213.1
+
+[2026-05-24T00:20:32Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.4
+
+[2026-05-24T00:21:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.9
+
+[2026-05-24T00:22:45Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.2
+
+[2026-05-24T00:23:57Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw03.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 212.6
+
+[2026-05-24T00:27:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 72.8
+
+[2026-05-24T00:28:43Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.8
+
+[2026-05-24T00:29:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw03__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 53.3
+
+[2026-05-24T00:30:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 215.1
+
+[2026-05-24T00:34:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.0
+
+[2026-05-24T00:35:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 55.8
+
+[2026-05-24T00:36:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 52.2
+
+[2026-05-24T00:37:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 209.4
+
+[2026-05-24T00:40:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.2
+
+[2026-05-24T00:41:55Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.4
+
+[2026-05-24T00:42:54Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 52.5
+
+[2026-05-24T00:43:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw04.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 209.2
+
+[2026-05-24T00:47:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 73.9
+
+[2026-05-24T00:48:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.1
+
+[2026-05-24T00:49:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw04__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 54.1
+
+[2026-05-24T00:50:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 217.9
+
+[2026-05-24T00:54:01Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.1
+
+[2026-05-24T00:55:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 58.6
+
+[2026-05-24T00:56:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 53.3
+
+[2026-05-24T00:57:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 209.4
+
+[2026-05-24T01:00:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.4
+
+[2026-05-24T01:01:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.9
+
+[2026-05-24T01:02:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 55.5
+
+[2026-05-24T01:03:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw05.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 209.5
+
+[2026-05-24T01:07:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 72.6
+
+[2026-05-24T01:08:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 60.4
+
+[2026-05-24T01:09:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw05__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw05__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.4
+
+[2026-05-24T01:10:27Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 216.7
+
+[2026-05-24T01:14:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.8
+
+[2026-05-24T01:15:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-24T01:16:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.7
+
+[2026-05-24T01:17:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 211.2
+
+[2026-05-24T01:20:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.9
+
+[2026-05-24T01:22:03Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.0
+
+[2026-05-24T01:23:04Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 53.9
+
+[2026-05-24T01:23:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw06.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 207.9
+
+[2026-05-24T01:27:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 77.9
+
+[2026-05-24T01:28:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.8
+
+[2026-05-24T01:29:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw06__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw06__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 54.5
+
+[2026-05-24T01:30:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 212.2
+
+[2026-05-24T01:34:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 77.7
+
+[2026-05-24T01:35:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-24T01:36:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 54.2
+
+[2026-05-24T01:37:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 213.1
+
+[2026-05-24T01:40:57Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 75.7
+
+[2026-05-24T01:42:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.7
+
+[2026-05-24T01:43:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.4
+
+[2026-05-24T01:44:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw07.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 210.2
+
+[2026-05-24T01:47:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 74.0
+
+[2026-05-24T01:48:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 57.2
+
+[2026-05-24T01:49:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw07__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw07__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 55.2
+
+[2026-05-24T01:50:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 214.5
+
+[2026-05-24T01:54:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.2
+
+[2026-05-24T01:55:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.8
+
+[2026-05-24T01:56:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 56.6
+
+[2026-05-24T01:57:32Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 214.1
+
+[2026-05-24T02:01:06Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 84.1
+
+[2026-05-24T02:02:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 71.3
+
+[2026-05-24T02:03:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 64.2
+
+[2026-05-24T02:04:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw08.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 217.4
+
+[2026-05-24T02:08:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 73.8
+
+[2026-05-24T02:09:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.3
+
+[2026-05-24T02:10:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw08__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw08__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 56.1
+
+[2026-05-24T02:11:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 214.9
+
+[2026-05-24T02:15:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 84.9
+
+[2026-05-24T02:16:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 68.9
+
+[2026-05-24T02:17:43Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 64.0
+
+[2026-05-24T02:18:47Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 215.5
+
+[2026-05-24T02:22:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 79.2
+
+[2026-05-24T02:23:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.2
+
+[2026-05-24T02:24:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 56.7
+
+[2026-05-24T02:25:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/random_frac0p333_draw09.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 209.9
+
+[2026-05-24T02:29:08Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.0
+
+[2026-05-24T02:30:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 60.0
+
+[2026-05-24T02:31:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__random__frac0p333__draw09__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__random__frac0p333__draw09__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 55.2
+
+[2026-05-24T02:32:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 218.9
+
+[2026-05-24T02:35:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 75.7
+
+[2026-05-24T02:37:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.5
+
+[2026-05-24T02:38:15Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 54.8
+
+[2026-05-24T02:39:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 205.8
+
+[2026-05-24T02:42:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.6
+
+[2026-05-24T02:43:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 59.6
+
+[2026-05-24T02:44:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 62.0
+
+[2026-05-24T02:45:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/easy_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 218.9
+
+[2026-05-24T02:49:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 78.2
+
+[2026-05-24T02:50:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 61.6
+
+[2026-05-24T02:51:51Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__easy__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__easy__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 59.5
+
+[2026-05-24T02:52:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 219.2
+
+[2026-05-24T02:56:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.2
+
+[2026-05-24T02:57:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 57.4
+
+[2026-05-24T02:58:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 52.0
+
+[2026-05-24T02:59:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 200.9
+
+[2026-05-24T03:02:55Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 74.9
+
+[2026-05-24T03:04:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 58.2
+
+[2026-05-24T03:05:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 53.8
+
+[2026-05-24T03:06:03Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/ambiguous_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 209.5
+
+[2026-05-24T03:09:32Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 80.6
+
+[2026-05-24T03:10:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 64.3
+
+[2026-05-24T03:11:57Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__ambiguous__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 64.7
+
+[2026-05-24T03:13:02Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 224.1
+
+[2026-05-24T03:16:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 82.8
+
+[2026-05-24T03:18:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.7
+
+[2026-05-24T03:19:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed13__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 69.9
+
+[2026-05-24T03:20:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 220.5
+
+[2026-05-24T03:24:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 86.1
+
+[2026-05-24T03:25:40Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.2
+
+[2026-05-24T03:26:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed21__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.8
+
+[2026-05-24T03:27:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run7_electra_small/joint/hard_frac0p333.jsonl --model google/electra-small-discriminator --output_dir results/run7_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 215.5
+
+[2026-05-24T03:31:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 86.2
+
+[2026-05-24T03:32:58Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.3
+
+[2026-05-24T03:34:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run7_electra_small/runs/electra_small__hard__frac0p333__seed42__same_epochs --output_dir results/run7_electra_small/evals/electra_small__hard__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 63.1
+
+[2026-05-24T03:35:13Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/aggregate_metrics.py --metrics-dir results/run7_electra_small/metrics/raw --out-dir results/run7_electra_small/metrics
+[elapsed_seconds] 8.2
+
+[2026-05-24T03:35:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addsent.jsonl results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run7_electra_small/cartography/subset_assignments.csv --out results/run7_electra_small/metrics/mechanism_features.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addsent.jsonl results/run7_electra_small/predictions/electra_small__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run7_electra_small/cartography/subset_assignments.csv --out results/run7_electra_small/metrics/mechanism_features.csv exited with 1
+
+[2026-05-24T03:35:21Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run7_electra_small/metrics/mechanism_features.csv --out results/run7_electra_small/metrics/mechanism_univariate.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run7_electra_small/metrics/mechanism_features.csv --out results/run7_electra_small/metrics/mechanism_univariate.csv exited with 1
+
+[2026-05-24T03:35:26Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/audit_evalsets.py --results-dir results/run7_electra_small
+[elapsed_seconds] 1.1
+
+[2026-05-24T03:35:27Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/validate_results_tree.py --results-dir results/run7_electra_small
+[elapsed_seconds] 0.4

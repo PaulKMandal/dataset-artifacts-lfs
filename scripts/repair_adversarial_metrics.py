@@ -467,6 +467,61 @@ def score_predictions(
 
 
 
+def paired_metrics(
+    run_info: RunInfo,
+    evalset: str,
+    dataset_path: Path,
+    pred_path: Path,
+    scored_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for r in scored_rows:
+        grouped[str(r["base_id"])].append(r)
+
+    pairable: list[dict[str, Any]] = []
+    for base_id, rows in grouped.items():
+        orig = [r for r in rows if r["split_type"] == "original_only"]
+        adv = [r for r in rows if r["split_type"] == "adversarial_only"]
+        if not orig or not adv:
+            continue
+        unique_orig = {}
+        for r in orig:
+            key = (base_id, r.get("question"), r.get("context"), json.dumps(r.get("answers"), sort_keys=True))
+            unique_orig[key] = r
+        orig_em = max(float(r["exact_match"]) for r in unique_orig.values())
+        pairable.append({
+            "base_id": base_id,
+            "original_correct": int(orig_em == 1.0),
+            "adv_ems": [float(r["exact_match"]) for r in adv],
+            "adv_f1s": [float(r["f1"]) for r in adv],
+        })
+
+    orig_correct = [p for p in pairable if p["original_correct"]]
+    adv_rows_pairable = [em for p in pairable for em in p["adv_ems"]]
+    adv_f1_pairable = [f1 for p in pairable for f1 in p["adv_f1s"]]
+    return {
+        "panel": run_info.panel,
+        "evalset": evalset,
+        "model": run_info.model,
+        "condition": condition_label(run_info.condition),
+        "subset_source": run_info.subset_source,
+        "train_seed": run_info.train_seed,
+        "random_draw_id": run_info.random_draw_id,
+        "run_id": run_info.run_id,
+        "dataset_path": str(dataset_path),
+        "predictions_path": str(pred_path),
+        "n_pairable_base_ids": len(pairable),
+        "n_original_correct_base_ids": len(orig_correct),
+        "adversarial_em_over_paired_adv_rows": 100 * mean(adv_rows_pairable),
+        "adversarial_f1_over_paired_adv_rows": 100 * mean(adv_f1_pairable),
+        "any_adv_failure_given_original_correct": mean([int(any(em == 0 for em in p["adv_ems"])) for p in orig_correct]),
+        "all_adv_correct_given_original_correct": mean([int(all(em == 1 for em in p["adv_ems"])) for p in orig_correct]),
+        "mean_adv_em_given_original_correct": 100 * mean([mean(p["adv_ems"]) for p in orig_correct]),
+        "mean_adv_f1_given_original_correct": 100 * mean([mean(p["adv_f1s"]) for p in orig_correct]),
+    }
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

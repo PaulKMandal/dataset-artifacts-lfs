@@ -1,0 +1,460 @@
+
+[2026-05-23T17:39:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__full__frac1__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16 --save_dynamics
+[elapsed_seconds] 2050.1
+
+[2026-05-23T18:13:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 dynamics.py --td_dir results/run6_albert_base/runs/albert_base__full__frac1__seed42__same_epochs --output_dir results/run6_albert_base/cartography/joint --confidence_field joint_confidence --seed 42 --limit_scatter_samples 20000
+[elapsed_seconds] 15.3
+
+[2026-05-23T18:13:55Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/select_qa_subsets.py --train-data data/qa/squad_train.jsonl --cartography-scores results/run6_albert_base/cartography/joint/cartography_scores.csv --out-dir data/subsets/run6_albert_base/joint --assignments-out results/run6_albert_base/cartography/subset_assignments.csv --confidence-definition joint_gold_span_probability --random-draws 5 --random-seed-base 9300 --fractions 0.333
+[elapsed_seconds] 4.6
+
+[2026-05-23T18:14:00Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__full__frac1__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 2069.7
+
+[2026-05-23T18:48:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 105.7
+
+[2026-05-23T18:50:16Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 73.5
+
+[2026-05-23T18:51:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 64.9
+
+[2026-05-23T18:52:35Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/qa/squad_train.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__full__frac1__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 2034.0
+
+[2026-05-23T19:26:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 102.9
+
+[2026-05-23T19:28:12Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 73.8
+
+[2026-05-23T19:29:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 67.0
+
+[2026-05-23T19:30:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 105.7
+
+[2026-05-23T19:32:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 74.5
+
+[2026-05-23T19:33:35Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__full__frac1__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__full__frac1__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 64.8
+
+[2026-05-23T19:34:40Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw00.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 717.9
+
+[2026-05-23T19:46:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 107.9
+
+[2026-05-23T19:48:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 72.8
+
+[2026-05-23T19:49:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 62.4
+
+[2026-05-23T19:50:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw00.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 712.3
+
+[2026-05-23T20:02:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 103.8
+
+[2026-05-23T20:04:18Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 75.4
+
+[2026-05-23T20:05:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 65.0
+
+[2026-05-23T20:06:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw00.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 715.4
+
+[2026-05-23T20:18:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 124.0
+
+[2026-05-23T20:20:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 84.6
+
+[2026-05-23T20:22:03Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw00__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw00__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 76.6
+
+[2026-05-23T20:23:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw01.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 734.2
+
+[2026-05-23T20:35:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 103.1
+
+[2026-05-23T20:37:18Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 70.8
+
+[2026-05-23T20:38:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 63.4
+
+[2026-05-23T20:39:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw01.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 710.1
+
+[2026-05-23T20:51:23Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 110.6
+
+[2026-05-23T20:53:14Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 77.0
+
+[2026-05-23T20:54:31Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 68.9
+
+[2026-05-23T20:55:40Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw01.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 717.8
+
+[2026-05-23T21:07:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 106.8
+
+[2026-05-23T21:09:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 74.0
+
+[2026-05-23T21:10:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw01__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw01__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 65.3
+
+[2026-05-23T21:11:45Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw02.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 723.7
+
+[2026-05-23T21:23:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 103.8
+
+[2026-05-23T21:25:33Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 74.6
+
+[2026-05-23T21:26:48Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 71.3
+
+[2026-05-23T21:27:59Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw02.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 713.1
+
+[2026-05-23T21:39:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 102.6
+
+[2026-05-23T21:41:35Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 71.1
+
+[2026-05-23T21:42:46Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 62.9
+
+[2026-05-23T21:43:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw02.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 712.5
+
+[2026-05-23T21:55:42Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 104.5
+
+[2026-05-23T21:57:27Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.8
+
+[2026-05-23T21:58:39Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw02__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw02__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 61.9
+
+[2026-05-23T21:59:41Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw03.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 716.4
+
+[2026-05-23T22:11:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 101.7
+
+[2026-05-23T22:13:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 69.5
+
+[2026-05-23T22:14:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 64.4
+
+[2026-05-23T22:15:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw03.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 715.3
+
+[2026-05-23T22:27:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 103.1
+
+[2026-05-23T22:29:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 69.1
+
+[2026-05-23T22:30:22Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 61.4
+
+[2026-05-23T22:31:24Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw03.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 723.2
+
+[2026-05-23T22:43:27Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 102.2
+
+[2026-05-23T22:45:09Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.0
+
+[2026-05-23T22:46:21Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw03__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw03__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 58.8
+
+[2026-05-23T22:47:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw04.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 718.7
+
+[2026-05-23T22:59:18Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 97.5
+
+[2026-05-23T23:00:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 68.2
+
+[2026-05-23T23:02:05Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 59.9
+
+[2026-05-23T23:03:05Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw04.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 708.5
+
+[2026-05-23T23:14:53Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 104.5
+
+[2026-05-23T23:16:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 70.4
+
+[2026-05-23T23:17:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.6
+
+[2026-05-23T23:18:52Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/random_frac0p333_draw04.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 711.0
+
+[2026-05-23T23:30:44Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 101.9
+
+[2026-05-23T23:32:26Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 70.6
+
+[2026-05-23T23:33:37Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__random__frac0p333__draw04__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__random__frac0p333__draw04__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 60.5
+
+[2026-05-23T23:34:37Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/easy_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__easy__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 718.8
+
+[2026-05-23T23:46:36Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 102.8
+
+[2026-05-23T23:48:19Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 71.0
+
+[2026-05-23T23:49:30Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.2
+
+[2026-05-23T23:50:32Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/easy_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__easy__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 713.7
+
+[2026-05-24T00:02:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 101.4
+
+[2026-05-24T00:04:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.7
+
+[2026-05-24T00:05:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 64.2
+
+[2026-05-24T00:06:25Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/easy_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__easy__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 713.6
+
+[2026-05-24T00:18:18Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 102.8
+
+[2026-05-24T00:20:01Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 68.9
+
+[2026-05-24T00:21:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__easy__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__easy__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 60.0
+
+[2026-05-24T00:22:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/ambiguous_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 728.9
+
+[2026-05-24T00:34:20Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 102.7
+
+[2026-05-24T00:36:03Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 67.5
+
+[2026-05-24T00:37:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.8
+
+[2026-05-24T00:38:12Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/ambiguous_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 720.8
+
+[2026-05-24T00:50:13Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 103.6
+
+[2026-05-24T00:51:57Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 72.8
+
+[2026-05-24T00:53:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 60.7
+
+[2026-05-24T00:54:11Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/ambiguous_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 725.7
+
+[2026-05-24T01:06:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 103.6
+
+[2026-05-24T01:08:01Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.0
+
+[2026-05-24T01:09:12Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__ambiguous__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__ambiguous__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 62.1
+
+[2026-05-24T01:10:14Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/hard_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__hard__frac0p333__seed13__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 13 --report_to none --fp16
+[elapsed_seconds] 715.4
+
+[2026-05-24T01:22:10Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed13__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 105.8
+
+[2026-05-24T01:23:56Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed13__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 68.8
+
+[2026-05-24T01:25:05Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed13__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed13__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 13 --report_to none --fp16
+[elapsed_seconds] 61.9
+
+[2026-05-24T01:26:07Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/hard_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__hard__frac0p333__seed21__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 21 --report_to none --fp16
+[elapsed_seconds] 703.6
+
+[2026-05-24T01:37:50Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed21__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 102.9
+
+[2026-05-24T01:39:34Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed21__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 71.4
+
+[2026-05-24T01:40:45Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed21__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed21__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 21 --report_to none --fp16
+[elapsed_seconds] 63.8
+
+[2026-05-24T01:41:49Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_train --task qa --dataset data/subsets/run6_albert_base/joint/hard_frac0p333.jsonl --model albert-base-v2 --output_dir results/run6_albert_base/runs/albert_base__hard__frac0p333__seed42__same_epochs --overwrite_output_dir --max_length 384 --per_device_train_batch_size 32 --per_device_eval_batch_size 64 --learning_rate 5e-05 --warmup_ratio 0.0 --weight_decay 0.0 --num_train_epochs 3.0 --save_only_final_model --seed 42 --report_to none --fp16
+[elapsed_seconds] 708.4
+
+[2026-05-24T01:53:38Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/squad_dev.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed42__same_epochs__squad_dev --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 99.3
+
+[2026-05-24T01:55:17Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addsent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed42__same_epochs__addsent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 71.8
+
+[2026-05-24T01:56:29Z] cwd=/workspace/dataset-artifacts
+$ CUDA_VISIBLE_DEVICES=0 /workspace/dataset-artifacts/.venv/bin/python3 run.py --do_eval --task qa --dataset data/qa/addonesent.jsonl --model results/run6_albert_base/runs/albert_base__hard__frac0p333__seed42__same_epochs --output_dir results/run6_albert_base/evals/albert_base__hard__frac0p333__seed42__same_epochs__addonesent --overwrite_output_dir --max_length 384 --per_device_eval_batch_size 64 --seed 42 --report_to none --fp16
+[elapsed_seconds] 63.7
+
+[2026-05-24T01:57:33Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/aggregate_metrics.py --metrics-dir results/run6_albert_base/metrics/raw --out-dir results/run6_albert_base/metrics
+[elapsed_seconds] 6.6
+
+[2026-05-24T01:57:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__addsent.jsonl results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run6_albert_base/cartography/subset_assignments.csv --out results/run6_albert_base/metrics/mechanism_features.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/build_mechanism_features.py --clean-predictions results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__squad_dev.jsonl --adversarial-predictions results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__addsent.jsonl results/run6_albert_base/predictions/albert_base__full__frac1__seed42__same_epochs__addonesent.jsonl --cartography-scores results/run6_albert_base/cartography/subset_assignments.csv --out results/run6_albert_base/metrics/mechanism_features.csv exited with 1
+
+[2026-05-24T01:57:40Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run6_albert_base/metrics/mechanism_features.csv --out results/run6_albert_base/metrics/mechanism_univariate.csv
+[optional failure] /workspace/dataset-artifacts/.venv/bin/python3 scripts/mechanism_univariate.py --features results/run6_albert_base/metrics/mechanism_features.csv --out results/run6_albert_base/metrics/mechanism_univariate.csv exited with 1
+
+[2026-05-24T01:57:44Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/audit_evalsets.py --results-dir results/run6_albert_base
+[elapsed_seconds] 0.7
+
+[2026-05-24T01:57:45Z] cwd=/workspace/dataset-artifacts
+$ /workspace/dataset-artifacts/.venv/bin/python3 scripts/validate_results_tree.py --results-dir results/run6_albert_base
+[elapsed_seconds] 0.3

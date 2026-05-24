@@ -328,6 +328,67 @@ def regenerate_prediction(run_info: RunInfo, evalset: str, dataset_path: Path, f
 
 
 
+def load_dataset_rows(dataset_path: Path) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
+    rows = read_jsonl(dataset_path)
+    by_id = {str(r.get("id")): r for r in rows}
+    return rows, by_id
+
+
+def split_audit_for_dataset(evalset: str, dataset_path: Path, dataset_rows: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any]]:
+    original = [r for r in dataset_rows if split_type_from_id(str(r.get("id"))) == "original"]
+    adv = [r for r in dataset_rows if split_type_from_id(str(r.get("id"))) == "adversarial"]
+    orig_base_ids = {base_id_from_id(str(r.get("id"))) for r in original}
+    adv_base_ids = {base_id_from_id(str(r.get("id"))) for r in adv}
+    expected = EXPECTED_ROW_COUNTS.get(evalset, {})
+    status = "ok"
+    if expected and (
+        len(dataset_rows) != expected["all"] or len(original) != expected["original"] or len(adv) != expected["adversarial"]
+    ):
+        status = "unexpected_counts"
+    duplicate_key_count = len({
+        (base_id_from_id(str(r.get("id"))), r.get("question"), r.get("context"), json.dumps(r.get("answers"), sort_keys=True))
+        for r in original
+    })
+    row = {
+        "evalset": evalset,
+        "dataset_path": str(dataset_path),
+        "all_rows": len(dataset_rows),
+        "original_rows": len(original),
+        "adversarial_rows": len(adv),
+        "n_base_ids_with_original": len(orig_base_ids),
+        "n_base_ids_with_adversarial": len(adv_base_ids),
+        "n_pairable_base_ids": len(orig_base_ids & adv_base_ids),
+        "split_method": "id contains '-high-conf-' => adversarial; otherwise original; base_id is id prefix before '-high-conf-'",
+        "status": status,
+    }
+    details = {
+        "original_examples": original[:2],
+        "adversarial_examples": adv[:2],
+        "duplicate_original_rows": len(original) - duplicate_key_count,
+    }
+    return row, details
+
+
+def load_eval_datasets(dataset_dir: Path, logs_dir: Path) -> tuple[dict[str, tuple[Path, list[dict[str, Any]], dict[str, dict[str, Any]]]], list[dict[str, Any]], dict[str, dict[str, Any]]]:
+    datasets: dict[str, tuple[Path, list[dict[str, Any]], dict[str, dict[str, Any]]]] = {}
+    split_rows: list[dict[str, Any]] = []
+    split_details: dict[str, dict[str, Any]] = {}
+    hash_lines: list[str] = []
+    for evalset, filename in EVALSETS.items():
+        path = dataset_dir / filename
+        if not path.exists():
+            raise SystemExit(f"Missing dataset file required for split metrics: {path}")
+        rows, by_id = load_dataset_rows(path)
+        datasets[evalset] = (path, rows, by_id)
+        audit_row, details = split_audit_for_dataset(evalset, path, rows)
+        split_rows.append(audit_row)
+        split_details[evalset] = details
+        hash_lines.append(f"{evalset}	{path}	{sha256_file(path)}\n")
+    (logs_dir / "dataset_hashes.txt").write_text("".join(hash_lines), encoding="utf-8")
+    return datasets, split_rows, split_details
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

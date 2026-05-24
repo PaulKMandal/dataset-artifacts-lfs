@@ -815,6 +815,48 @@ def process_result_dirs(
 
 
 
+def write_repair_tables(state: RepairState, split_audit_rows: list[dict[str, Any]], split_details: dict[str, dict[str, Any]]) -> None:
+    write_csv(state.metrics_dir / "split_count_audit.csv", split_audit_rows, SPLIT_COUNT_FIELDS)
+    (state.metrics_dir / "split_schema_audit.md").write_text(schema_audit_markdown(split_details), encoding="utf-8")
+    write_csv(state.metrics_dir / "prediction_count_audit.csv", state.prediction_audit_rows, PREDICTION_AUDIT_FIELDS)
+    write_csv(state.metrics_dir / "seed_level_metrics_by_split.csv", state.seed_rows, SEED_METRIC_FIELDS)
+    write_csv(state.metrics_dir / "main_table_adversarial_only.csv", aggregate_main(state.seed_rows, "adversarial_only"), MAIN_TABLE_FIELDS)
+    write_csv(state.metrics_dir / "main_table_original_only.csv", aggregate_main(state.seed_rows, "original_only"), MAIN_TABLE_FIELDS)
+    write_csv(state.metrics_dir / "main_table_all_row_legacy.csv", aggregate_main(state.seed_rows, "all_row_legacy"), MAIN_TABLE_FIELDS)
+    write_csv(state.metrics_dir / "paired_robustness_table.csv", state.paired_rows, PAIRED_FIELDS)
+    write_csv(state.metrics_dir / "seed_matched_delta_by_split.csv", seed_matched_deltas(state.seed_rows), DELTA_FIELDS)
+    write_csv(state.metrics_dir / "random_draw_distribution_by_split.csv", random_draw_distribution(state.seed_rows), DRAW_FIELDS)
+    write_csv(state.metrics_dir / "selected_condition_win_counts_by_split.csv", selected_win_counts(state.seed_rows), WIN_FIELDS)
+    write_csv(state.metrics_dir / "missing_or_failed_runs.csv", state.missing_rows, MISSING_FIELDS)
+    write_csv(state.predictions_dir / "MANIFEST.csv", state.prediction_manifest_rows, MANIFEST_FIELDS)
+
+
+def write_repair_readmes(args: argparse.Namespace, state: RepairState, split_audit_rows: list[dict[str, Any]]) -> None:
+    readme = f"""# Adversarial repair package
+
+Created UTC: {datetime.now(timezone.utc).isoformat()}
+
+This package contains split AddSent/AddOneSent metrics and paired robustness metrics. All-row AddSent/AddOneSent metrics are retained only as legacy/comparability metrics.
+
+Processed result directories:
+{chr(10).join(f'- {x}' for x in args.results_dir)}
+
+Prediction regeneration requested: {args.regenerate_missing}
+Missing/failed entries: {len(state.missing_rows)}
+"""
+    state.out_root.joinpath("README.md").write_text(readme, encoding="utf-8")
+    state.out_root.joinpath("REPAIR_SUMMARY.md").write_text(make_summary(state.seed_rows, state.paired_rows, state.missing_rows, split_audit_rows), encoding="utf-8")
+
+
+def make_tarball(out_root: Path) -> Path:
+    tar_path = out_root.with_suffix(".tar.gz")
+    if tar_path.exists():
+        tar_path.unlink()
+    shutil.make_archive(str(out_root), "gztar", root_dir=out_root.parent, base_dir=out_root.name)
+    return tar_path
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

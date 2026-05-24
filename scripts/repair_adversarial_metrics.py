@@ -121,6 +121,53 @@ MANIFEST_FIELDS = [
 
 
 
+def normalize_answer(s: str) -> str:
+    s = str(s).lower()
+    s = s.translate(PUNCT_TABLE)
+    s = ARTICLE_RE.sub(" ", s)
+    return " ".join(s.split())
+
+
+def exact_match_score(prediction: str, gold: str) -> int:
+    return int(normalize_answer(prediction) == normalize_answer(gold))
+
+
+def f1_score(prediction: str, gold: str) -> float:
+    pred_tokens = normalize_answer(prediction).split()
+    gold_tokens = normalize_answer(gold).split()
+    if not pred_tokens and not gold_tokens:
+        return 1.0
+    if not pred_tokens or not gold_tokens:
+        return 0.0
+    common = Counter(pred_tokens) & Counter(gold_tokens)
+    num_same = sum(common.values())
+    if num_same == 0:
+        return 0.0
+    precision = num_same / len(pred_tokens)
+    recall = num_same / len(gold_tokens)
+    return 2 * precision * recall / (precision + recall)
+
+
+def squad_scores(prediction: str, golds: list[str]) -> tuple[int, float]:
+    if not golds:
+        golds = [""]
+    return (
+        max(exact_match_score(prediction, g) for g in golds),
+        max(f1_score(prediction, g) for g in golds),
+    )
+
+
+def mean(xs: Iterable[float]) -> float:
+    vals = [float(x) for x in xs]
+    return sum(vals) / len(vals) if vals else float("nan")
+
+
+def stdev(xs: Iterable[float]) -> float:
+    vals = [float(x) for x in xs]
+    return statistics.stdev(vals) if len(vals) >= 2 else float("nan")
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

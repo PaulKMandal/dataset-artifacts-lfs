@@ -63,6 +63,63 @@ CONDITION_LABELS = {
 }
 
 
+SPLIT_COUNT_FIELDS = [
+    "evalset", "dataset_path", "all_rows", "original_rows", "adversarial_rows",
+    "n_base_ids_with_original", "n_base_ids_with_adversarial", "n_pairable_base_ids",
+    "split_method", "status",
+]
+
+PREDICTION_AUDIT_FIELDS = [
+    "run_id", "evalset", "dataset_path", "predictions_path", "n_dataset_rows",
+    "n_prediction_rows", "n_joined_rows", "n_missing_predictions", "n_extra_predictions", "status",
+]
+
+SEED_METRIC_FIELDS = [
+    "panel", "model", "condition", "subset_source", "train_seed", "random_draw_id",
+    "evalset", "split_type", "n", "exact_match", "f1", "dataset_path",
+    "predictions_path", "run_id",
+]
+
+MAIN_TABLE_FIELDS = [
+    "panel", "model", "condition", "subset_source", "evalset", "split_type",
+    "n_runs", "mean_exact_match", "std_exact_match", "mean_f1", "std_f1", "total_rows_scored",
+]
+
+PAIRED_FIELDS = [
+    "panel", "evalset", "model", "condition", "subset_source", "train_seed",
+    "random_draw_id", "run_id", "dataset_path", "predictions_path", "n_pairable_base_ids",
+    "n_original_correct_base_ids", "adversarial_em_over_paired_adv_rows",
+    "adversarial_f1_over_paired_adv_rows", "any_adv_failure_given_original_correct",
+    "all_adv_correct_given_original_correct", "mean_adv_em_given_original_correct",
+    "mean_adv_f1_given_original_correct",
+]
+
+DELTA_FIELDS = [
+    "panel", "model", "evalset", "split_type", "condition", "subset_source", "train_seed",
+    "cartographic_exact_match", "mean_random_exact_match_same_seed", "delta_exact_match",
+    "cartographic_f1", "mean_random_f1_same_seed", "delta_f1", "n_random_draws_same_seed",
+    "mean_delta_exact_match_over_seeds", "std_delta_exact_match_over_seeds",
+    "mean_delta_f1_over_seeds", "std_delta_f1_over_seeds", "n_training_seeds",
+]
+
+DRAW_FIELDS = [
+    "panel", "model", "evalset", "split_type", "random_draw_id", "n_training_seeds",
+    "mean_exact_match", "mean_f1",
+]
+
+WIN_FIELDS = [
+    "panel", "model", "evalset", "split_type", "condition", "n_training_seeds",
+    "n_seeds_delta_f1_positive", "n_seeds_delta_exact_match_positive", "mean_delta_f1",
+    "mean_delta_exact_match",
+]
+
+MISSING_FIELDS = ["panel", "run_id", "evalset", "issue", "path", "detail"]
+MANIFEST_FIELDS = [
+    "panel", "run_id", "evalset", "source_predictions_path", "packaged_predictions_path", "n_rows", "sha256",
+]
+
+
+
 
 def main() -> None:
     args = build_parser().parse_args()

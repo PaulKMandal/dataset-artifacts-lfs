@@ -198,6 +198,51 @@ def sha256_file(path: Path) -> str:
 
 
 
+def answer_texts(row: dict[str, Any]) -> list[str]:
+    answers = row.get("answers")
+    if isinstance(answers, dict):
+        texts = answers.get("text") or []
+        return [str(x) for x in texts]
+    if isinstance(answers, list):
+        out = []
+        for x in answers:
+            out.append(str(x.get("text", "")) if isinstance(x, dict) else str(x))
+        return [x for x in out if x]
+    for key in ("gold_answers", "gold", "answer", "answer_text"):
+        val = row.get(key)
+        if isinstance(val, list):
+            return [str(x) for x in val]
+        if val is not None:
+            return [str(val)]
+    return []
+
+
+def split_type_from_id(row_id: str) -> str:
+    return "adversarial" if ADV_MARKER in str(row_id) else "original"
+
+
+def base_id_from_id(row_id: str) -> str:
+    return str(row_id).split(ADV_MARKER, 1)[0]
+
+
+def condition_label(condition: str) -> str:
+    return CONDITION_LABELS.get(condition, condition)
+
+
+def sanitize_example(row: dict[str, Any], prediction: str | None = None) -> dict[str, Any]:
+    return {
+        "id": row.get("id"),
+        "base_id": base_id_from_id(str(row.get("id", ""))),
+        "split": split_type_from_id(str(row.get("id", ""))),
+        "title": row.get("title"),
+        "question": str(row.get("question", ""))[:200],
+        "context_prefix": str(row.get("context", ""))[:220],
+        "answers": answer_texts(row)[:3],
+        "predicted_answer": prediction,
+    }
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

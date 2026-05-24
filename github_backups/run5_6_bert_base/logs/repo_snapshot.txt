@@ -1,0 +1,10 @@
+date_utc=2026-05-24T03:29:15Z
+run_label=run5_6_bert_base
+results_dir=/workspace/dataset-artifacts/results/run5_6_bert_base
+branch=run5_6_bert_base
+commit=7920dc69f279551586cad1ccc27b9c42f3e477f5
+
+git_status_short:
+
+last_commit:
+7920dc6 (HEAD -> run5_6_bert_base, origin/working, origin/run5_6_bert_base) Add Run 5.6 balanced BERT panel config

@@ -755,6 +755,66 @@ def initialize_output(args: argparse.Namespace) -> RepairState:
 
 
 
+def resolve_prediction_for_eval(
+    args: argparse.Namespace,
+    state: RepairState,
+    run_info: RunInfo,
+    evalset: str,
+    dataset_path: Path,
+) -> Path | None:
+    pred_path = find_prediction_path(run_info.result_dir, run_info.run_id, evalset)
+    if pred_path is not None:
+        return pred_path
+    if not args.regenerate_missing:
+        state.missing_rows.append({"panel": run_info.panel, "run_id": run_info.run_id, "evalset": evalset, "issue": "missing_predictions", "path": str(run_info.result_dir), "detail": ""})
+        return None
+    if not checkpoint_available(run_info.run_dir):
+        state.missing_rows.append({"panel": run_info.panel, "run_id": run_info.run_id, "evalset": evalset, "issue": "missing_predictions_and_checkpoint", "path": str(run_info.run_dir), "detail": ""})
+        return None
+    try:
+        return regenerate_prediction(run_info, evalset, dataset_path, args.fp16, state.command_log)
+    except subprocess.CalledProcessError as e:
+        state.missing_rows.append({"panel": run_info.panel, "run_id": run_info.run_id, "evalset": evalset, "issue": "regenerate_eval_failed", "path": str(run_info.run_dir), "detail": str(e)})
+        return None
+
+
+def process_result_dirs(
+    args: argparse.Namespace,
+    state: RepairState,
+    datasets_by_eval: dict[str, tuple[Path, list[dict[str, Any]], dict[str, dict[str, Any]]]],
+) -> None:
+    for result_dir_raw in args.results_dir:
+        result_dir = Path(result_dir_raw)
+        runs_dir = result_dir / "runs"
+        if not runs_dir.exists():
+            state.missing_rows.append({"panel": result_dir.name, "run_id": "", "evalset": "", "issue": "missing_runs_dir", "path": str(runs_dir), "detail": ""})
+            continue
+        for run_info in iter_run_infos(result_dir):
+            for evalset, (dataset_path, dataset_rows, dataset_by_id) in datasets_by_eval.items():
+                pred_path = resolve_prediction_for_eval(args, state, run_info, evalset, dataset_path)
+                if pred_path is None:
+                    continue
+                out_pred_path = state.predictions_dir / f"{result_dir.name}__{run_info.run_id}__{evalset}.jsonl.gz"
+                metric_rows, pred_audit, scored_rows, paired_row = score_predictions(
+                    run_info, evalset, dataset_path, dataset_rows, dataset_by_id, pred_path, out_pred_path
+                )
+                state.seed_rows.extend(metric_rows)
+                state.prediction_audit_rows.append(pred_audit)
+                state.paired_rows.append(paired_row)
+                if not args.no_copy_predictions:
+                    write_jsonl_gz(out_pred_path, scored_rows)
+                    state.prediction_manifest_rows.append({
+                        "panel": run_info.panel,
+                        "run_id": run_info.run_id,
+                        "evalset": evalset,
+                        "source_predictions_path": str(pred_path),
+                        "packaged_predictions_path": str(out_pred_path),
+                        "n_rows": len(scored_rows),
+                        "sha256": sha256_file(out_pred_path),
+                    })
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

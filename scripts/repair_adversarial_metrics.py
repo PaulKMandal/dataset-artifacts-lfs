@@ -522,6 +522,53 @@ def paired_metrics(
 
 
 
+def aggregate_main(seed_rows: list[dict[str, Any]], split_type: str) -> list[dict[str, Any]]:
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    for r in seed_rows:
+        if r["split_type"] != split_type:
+            continue
+        key = (r["panel"], r["model"], r["condition"], r["subset_source"], r["evalset"], r["split_type"])
+        groups[key].append(r)
+    out = []
+    for (panel, model, condition, subset_source, evalset, split), rows in sorted(groups.items()):
+        out.append({
+            "panel": panel,
+            "model": model,
+            "condition": condition,
+            "subset_source": subset_source,
+            "evalset": evalset,
+            "split_type": split,
+            "n_runs": len(rows),
+            "mean_exact_match": mean([r["exact_match"] for r in rows]),
+            "std_exact_match": stdev([r["exact_match"] for r in rows]),
+            "mean_f1": mean([r["f1"] for r in rows]),
+            "std_f1": stdev([r["f1"] for r in rows]),
+            "total_rows_scored": sum(int(r["n"]) for r in rows),
+        })
+    return out
+
+
+def random_draw_distribution(seed_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
+    for r in seed_rows:
+        if r["condition"] == "random 33%" and r["random_draw_id"]:
+            groups[(r["panel"], r["model"], r["evalset"], r["split_type"], r["random_draw_id"])].append(r)
+    out = []
+    for (panel, model, evalset, split_type, draw), rows in sorted(groups.items()):
+        out.append({
+            "panel": panel,
+            "model": model,
+            "evalset": evalset,
+            "split_type": split_type,
+            "random_draw_id": draw,
+            "n_training_seeds": len({r["train_seed"] for r in rows}),
+            "mean_exact_match": mean([r["exact_match"] for r in rows]),
+            "mean_f1": mean([r["f1"] for r in rows]),
+        })
+    return out
+
+
+
 def main() -> None:
     args = build_parser().parse_args()
     raise SystemExit("repair implementation is incomplete; apply the remaining commits")

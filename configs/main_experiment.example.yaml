@@ -1,0 +1,60 @@
+# Example config for the main experiment.
+# Copy this file for each run and fill in all paths and hashes.
+
+run:
+  run_id: electra_small__hard__seed42__addsent
+  seed: 42
+  output_dir: results
+
+model:
+  name_or_path: google/electra-small-discriminator
+  tokenizer_name_or_path: google/electra-small-discriminator
+  max_seq_length: 384
+  doc_stride: 128
+  max_answer_length: 30
+
+training:
+  train_subset: hard
+  subset_fraction: 0.333
+  subset_draw_id: null
+  train_budget_type: same_epochs # same_epochs or same_steps
+  num_train_epochs: 3
+  learning_rate: 3.0e-5
+  per_device_train_batch_size: 16
+  per_device_eval_batch_size: 32
+  warmup_ratio: 0.1
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+
+cartography:
+  confidence_definition: joint_gold_span_probability
+  selection_rule: tercile_by_region
+  scores_path: results/cartography/cartography_scores.csv
+  subset_assignments_path: results/cartography/subset_assignments.csv
+
+datasets:
+  squad_train:
+    path: data/squad/train-v1.1.json
+    hash: sha256:FILL_ME
+  squad_dev:
+    path: data/squad/dev-v1.1.json
+    hash: sha256:FILL_ME
+  addsent:
+    path: data/adversarial_squad/addsent.json
+    hash: sha256:FILL_ME
+  addonesent:
+    path: data/adversarial_squad/addonesent.json
+    hash: sha256:FILL_ME
+
+evaluation:
+  evalsets:
+    - squad_dev
+    - addsent
+    - addonesent
+  eval_script: scripts/squad_eval.py
+
+logging:
+  save_raw_predictions: true
+  save_training_dynamics: true
+  save_command_log: true
+  save_environment: true

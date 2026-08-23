@@ -1,0 +1,12 @@
+accelerate
+datasets
+evaluate
+matplotlib
+nltk
+numpy
+pandas
+pyarrow
+scipy
+torch
+tqdm
+transformers

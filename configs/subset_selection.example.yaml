@@ -1,0 +1,33 @@
+# Example config for cartographic subset selection.
+
+cartography_source:
+  training_dynamics_path: results/cartography/training_dynamics_by_epoch.jsonl
+  output_scores_path: results/cartography/cartography_scores.csv
+  output_assignments_path: results/cartography/subset_assignments.csv
+
+confidence_definitions:
+  primary: joint_gold_span_probability
+  candidates:
+    - joint_gold_span_probability
+    - negative_gold_span_loss
+    - gold_span_margin
+    - epoch_exact_match
+
+region_assignment:
+  method: thresholds
+  easy:
+    min_confidence_quantile: 0.67
+    max_variability_quantile: 0.33
+  ambiguous:
+    min_variability_quantile: 0.67
+  hard:
+    max_confidence_quantile: 0.33
+
+subset_sizes:
+  fractions: [0.10, 0.20, 0.333, 0.50]
+  match_exact_counts: true
+
+random_baselines:
+  num_draws: 10
+  stratify_by: [] # optionally: question_type, answer_length_bin, answer_position_bin
+  seeds: [13, 21, 42, 87, 100]

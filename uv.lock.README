@@ -1,0 +1,11 @@
+This archive includes a checked-in uv.lock. Use frozen syncs so reviewers install the same Python package resolution:
+
+  # CPU/local checks
+  nix develop .#default
+  uv sync --frozen --extra cpu --group dev
+
+  # GPU experiments
+  nix develop .#server
+  uv sync --frozen --extra cuda --group dev
+
+The project declares the CPU and CUDA extras as conflicting, so sync exactly one of them at a time in a given environment.

@@ -1,0 +1,17 @@
+.direnv/
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.cache/
+.runtime-libs/
+.nix-driver-libs/
+data/
+results/
+server_results/
+output/
+outputs/
+checkpoints/
+*.log
+

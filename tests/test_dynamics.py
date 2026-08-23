@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from dynamics import categorize_examples, compute_metrics, load_training_dynamics, save_cartography_csv
+from dynamics import (
+    categorize_examples,
+    compute_metrics,
+    load_training_dynamics,
+    save_cartography_csv,
+)
 
 
 def write_jsonl(path: Path, rows):
@@ -65,3 +70,52 @@ def test_joint_confidence_falls_back_for_scalar_nli_rows(tmp_path):
 
     assert metrics[3]["avg_confidence"] == pytest.approx(0.6)
     assert metrics[3]["correctness"] == pytest.approx(1.0)
+
+
+def test_answer_only_epoch_aggregation_removes_overflow_weighting(tmp_path):
+    rows = [
+        {
+            "idx": 4,
+            "epoch": 0.5,
+            "joint_confidence": 0.2,
+            "correctness": 0.0,
+            "answer_in_window": False,
+        },
+        {
+            "idx": 4,
+            "epoch": 0.5,
+            "joint_confidence": 0.8,
+            "correctness": 1.0,
+            "answer_in_window": True,
+        },
+        {
+            "idx": 4,
+            "epoch": 1.5,
+            "joint_confidence": 0.6,
+            "correctness": 1.0,
+            "answer_in_window": True,
+        },
+    ]
+    write_jsonl(tmp_path / "training_dynamics.jsonl", rows)
+
+    dynamics = load_training_dynamics(tmp_path)
+    metrics = compute_metrics(
+        dynamics,
+        confidence_field="joint_confidence",
+        aggregation="answer_only_epoch_mean",
+    )
+
+    assert metrics[4]["n_records"] == 2
+    assert metrics[4]["avg_confidence"] == pytest.approx(0.7)
+    assert metrics[4]["variability"] == pytest.approx(0.1)
+    assert metrics[4]["correctness"] == pytest.approx(1.0)
+
+
+def test_answer_only_aggregation_requires_new_logger_field(tmp_path):
+    write_jsonl(
+        tmp_path / "training_dynamics.jsonl",
+        [{"idx": 5, "confidence": 0.4, "correctness": 0.0}],
+    )
+    dynamics = load_training_dynamics(tmp_path)
+    with pytest.raises(ValueError, match="answer_in_window"):
+        compute_metrics(dynamics, aggregation="answer_only_records")

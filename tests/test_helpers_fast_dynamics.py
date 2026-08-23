@@ -5,6 +5,7 @@ import types
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pytest
 import torch
 
@@ -65,6 +66,7 @@ def test_qa_dynamics_logger_records_scalars_not_full_vectors():
         end_positions=torch.tensor([2]),
         start_logits=start_logits,
         end_logits=end_logits,
+        answer_in_window=torch.tensor([True]),
     )
 
     assert len(logger._dynamics_rows) == 1
@@ -77,6 +79,7 @@ def test_qa_dynamics_logger_records_scalars_not_full_vectors():
     assert row["correctness"] == 1.0
     assert row["pred_start"] == 1
     assert row["pred_end"] == 2
+    assert row["answer_in_window"] is True
 
     start_gold = torch.softmax(start_logits, dim=-1)[0, 1].item()
     end_gold = torch.softmax(end_logits, dim=-1)[0, 2].item()
@@ -84,3 +87,39 @@ def test_qa_dynamics_logger_records_scalars_not_full_vectors():
     assert row["joint_confidence"] == pytest.approx(start_gold * end_gold)
     assert math.isfinite(row["start_logp"])
     assert math.isfinite(row["end_logp"])
+
+
+def test_sentence_pair_tokenization_infers_qnli_style_columns():
+    helpers = load_helpers_with_transformers_stub()
+
+    class DummyTokenizer:
+        model_max_length = 512
+
+        def __call__(self, text_a, text_b, **kwargs):
+            assert text_a == ["Who wrote it?"]
+            assert text_b == ["Ada wrote it."]
+            assert kwargs["max_length"] == 64
+            return {"input_ids": [[1, 2, 3]], "attention_mask": [[1, 1, 1]]}
+
+    output = helpers.prepare_dataset_nli(
+        {
+            "question": ["Who wrote it?"],
+            "candidate_sentence": ["Ada wrote it."],
+            "label": [1],
+            "idx": [9],
+        },
+        DummyTokenizer(),
+        max_seq_length=64,
+    )
+
+    assert output["labels"] == [1]
+    assert output["idx"] == [9]
+
+
+def test_compute_accuracy_handles_auxiliary_idx_labels():
+    helpers = load_helpers_with_transformers_stub()
+    prediction = SimpleNamespace(
+        predictions=np.array([[0.1, 0.9], [0.8, 0.2]]),
+        label_ids=(np.array([1, 0]), np.array([10, 11])),
+    )
+    assert helpers.compute_accuracy(prediction)["accuracy"] == 1.0

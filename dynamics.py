@@ -26,7 +26,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import gaussian_kde
 
-
 CATEGORY_LABELS = {
     "easy": "Easy-to-learn",
     "ambiguous": "Ambiguous",
@@ -90,22 +89,55 @@ def _metrics_from_record(record, confidence_field="confidence"):
     raise ValueError(f"Unrecognized dynamics row schema: {sorted(record.keys())}")
 
 
-def compute_metrics(dynamics, confidence_field="confidence"):
+AGGREGATIONS = {
+    "records",
+    "epoch_mean",
+    "answer_only_records",
+    "answer_only_epoch_mean",
+}
+
+
+def _aggregate_record_metrics(records, confidence_field, aggregation):
+    if aggregation not in AGGREGATIONS:
+        raise ValueError(f"Unknown aggregation {aggregation!r}; choose from {sorted(AGGREGATIONS)}")
+    answer_only = aggregation.startswith("answer_only_")
+    if answer_only:
+        if not any("answer_in_window" in record for record in records):
+            raise ValueError(
+                "answer-only aggregation requires dynamics logged with answer_in_window"
+            )
+        records = [record for record in records if record.get("answer_in_window") is True]
+
+    values = []
+    for record in records:
+        try:
+            values.append(_metrics_from_record(record, confidence_field=confidence_field))
+        except (KeyError, ValueError):
+            if confidence_field == "confidence":
+                raise
+            values.append(_metrics_from_record(record, confidence_field="confidence"))
+
+    if aggregation.endswith("epoch_mean"):
+        by_epoch = defaultdict(list)
+        for record, value in zip(records, values, strict=False):
+            epoch = record.get("epoch")
+            if epoch is None:
+                epoch = record.get("step")
+            by_epoch[epoch].append(value)
+        values = [
+            (mean(v[0] for v in epoch_values), mean(v[1] for v in epoch_values))
+            for _, epoch_values in sorted(by_epoch.items(), key=lambda item: str(item[0]))
+        ]
+    return values
+
+
+def compute_metrics(dynamics, confidence_field="confidence", aggregation="records"):
     """Compute cartography metrics per example index."""
     metrics = {}
     for idx, records in dynamics.items():
-        confidences = []
-        correctnesses = []
-        for record in records:
-            try:
-                confidence, correctness = _metrics_from_record(record, confidence_field=confidence_field)
-            except (KeyError, ValueError):
-                # E.g. user asked for joint_confidence on NLI or old legacy rows.
-                if confidence_field == "confidence":
-                    raise
-                confidence, correctness = _metrics_from_record(record, confidence_field="confidence")
-            confidences.append(confidence)
-            correctnesses.append(correctness)
+        values = _aggregate_record_metrics(records, confidence_field, aggregation)
+        confidences = [value[0] for value in values]
+        correctnesses = [value[1] for value in values]
         if confidences:
             metrics[idx] = {
                 "n_records": len(confidences),
@@ -130,7 +162,14 @@ def categorize_examples(metrics):
     return categories
 
 
-def save_cartography_csv(metrics, categories, output_dir):
+def save_cartography_csv(
+    metrics,
+    categories,
+    output_dir,
+    *,
+    confidence_field="confidence",
+    aggregation="records",
+):
     out_path = Path(output_dir) / "cartography_scores.csv"
     with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
@@ -142,6 +181,8 @@ def save_cartography_csv(metrics, categories, output_dir):
                 "variability",
                 "correctness",
                 "region",
+                "confidence_field",
+                "aggregation",
             ],
         )
         writer.writeheader()
@@ -155,6 +196,8 @@ def save_cartography_csv(metrics, categories, output_dir):
                     "variability": m["variability"],
                     "correctness": m["correctness"],
                     "region": categories[idx],
+                    "confidence_field": confidence_field,
+                    "aggregation": aggregation,
                 }
             )
     return out_path
@@ -219,8 +262,12 @@ def plot_histogram(data, xlabel, title, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot and aggregate training dynamics.")
-    parser.add_argument("--td_dir", type=str, required=True, help="Directory or JSONL file containing dynamics.")
-    parser.add_argument("--output_dir", type=str, default=".", help="Directory for plots and outputs.")
+    parser.add_argument(
+        "--td_dir", type=str, required=True, help="Directory or JSONL file containing dynamics."
+    )
+    parser.add_argument(
+        "--output_dir", type=str, default=".", help="Directory for plots and outputs."
+    )
     parser.add_argument("--limit_scatter_samples", type=int, default=None)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument(
@@ -233,13 +280,23 @@ def main():
             "confidence, or negative gold-span loss. Negative loss is higher-is-better."
         ),
     )
+    parser.add_argument(
+        "--aggregation",
+        default="records",
+        choices=sorted(AGGREGATIONS),
+        help="How multiple overflow-feature records are collapsed to one example map.",
+    )
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     print("Loading training dynamics...")
     dynamics = load_training_dynamics(args.td_dir)
     print("Computing cartography metrics...")
-    metrics = compute_metrics(dynamics, confidence_field=args.confidence_field)
+    metrics = compute_metrics(
+        dynamics,
+        confidence_field=args.confidence_field,
+        aggregation=args.aggregation,
+    )
     if not metrics:
         raise SystemExit("No usable dynamics records found.")
 
@@ -247,7 +304,26 @@ def main():
     categories = categorize_examples(metrics)
 
     print("Writing cartography_scores.csv...")
-    csv_path = save_cartography_csv(metrics, categories, args.output_dir)
+    csv_path = save_cartography_csv(
+        metrics,
+        categories,
+        args.output_dir,
+        confidence_field=args.confidence_field,
+        aggregation=args.aggregation,
+    )
+
+    with (Path(args.output_dir) / "cartography_manifest.json").open("w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "training_dynamics": str(Path(args.td_dir)),
+                "confidence_field": args.confidence_field,
+                "aggregation": args.aggregation,
+                "num_examples": len(metrics),
+            },
+            f,
+            indent=2,
+            sort_keys=True,
+        )
 
     print("Plotting confidence vs. variability scatter plot...")
     plot_scatter(metrics, categories, args.output_dir, args.limit_scatter_samples, args.seed)

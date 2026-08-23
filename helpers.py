@@ -1,9 +1,7 @@
 import collections
-import csv
 import json
 import os
-from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any
 
 import numpy as np
 import torch
@@ -14,17 +12,47 @@ from transformers import EvalPrediction, Trainer
 QA_MAX_ANSWER_LENGTH = 30
 
 
-def prepare_dataset_nli(examples, tokenizer, max_seq_length=None):
-    """Tokenize NLI premise/hypothesis pairs."""
+def _infer_text_pair_columns(examples):
+    """Infer a supported sentence-pair schema without relying on column order."""
+    for text_a, text_b in [
+        ("premise", "hypothesis"),
+        ("question", "sentence"),
+        ("question", "candidate_sentence"),
+        ("text", "text_pair"),
+    ]:
+        if text_a in examples and text_b in examples:
+            return text_a, text_b
+    raise ValueError(
+        "Could not infer sentence-pair columns. Pass --text_a_column and "
+        "--text_b_column; supported automatic schemas are premise/hypothesis, "
+        "question/sentence, question/candidate_sentence, and text/text_pair."
+    )
+
+
+def prepare_dataset_nli(
+    examples,
+    tokenizer,
+    max_seq_length=None,
+    text_a_column=None,
+    text_b_column=None,
+    label_column="label",
+):
+    """Tokenize a labeled sentence pair for NLI/QNLI-style classification."""
     max_seq_length = tokenizer.model_max_length if max_seq_length is None else max_seq_length
+    if text_a_column is None or text_b_column is None:
+        inferred_a, inferred_b = _infer_text_pair_columns(examples)
+        text_a_column = text_a_column or inferred_a
+        text_b_column = text_b_column or inferred_b
+    if label_column not in examples:
+        raise ValueError(f"Missing classification label column: {label_column}")
     tokenized_examples = tokenizer(
-        examples["premise"],
-        examples["hypothesis"],
+        examples[text_a_column],
+        examples[text_b_column],
         truncation=True,
         max_length=max_seq_length,
         padding="max_length",
     )
-    tokenized_examples["label"] = examples["label"]
+    tokenized_examples["labels"] = examples[label_column]
     if "idx" in examples:
         tokenized_examples["idx"] = examples["idx"]
     return tokenized_examples
@@ -32,10 +60,16 @@ def prepare_dataset_nli(examples, tokenizer, max_seq_length=None):
 
 def compute_accuracy(eval_preds: EvalPrediction):
     """Compute sentence-classification accuracy."""
+    predictions = (
+        eval_preds.predictions[0]
+        if isinstance(eval_preds.predictions, tuple)
+        else eval_preds.predictions
+    )
+    label_ids = (
+        eval_preds.label_ids[0] if isinstance(eval_preds.label_ids, tuple) else eval_preds.label_ids
+    )
     return {
-        "accuracy": (
-            np.argmax(eval_preds.predictions, axis=1) == eval_preds.label_ids
-        ).astype(np.float32).mean().item()
+        "accuracy": (np.argmax(predictions, axis=1) == label_ids).astype(np.float32).mean().item()
     }
 
 
@@ -77,6 +111,7 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
     tokenized_examples["start_positions"] = []
     tokenized_examples["end_positions"] = []
     tokenized_examples["idx"] = []
+    tokenized_examples["answer_in_window"] = []
 
     for i, offsets in enumerate(offset_mapping):
         input_ids = tokenized_examples["input_ids"][i]
@@ -89,6 +124,7 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
         if len(answers["answer_start"]) == 0:
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["answer_in_window"].append(False)
             continue
 
         start_char = answers["answer_start"][0]
@@ -105,12 +141,16 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
         if token_start_index >= len(offsets) or token_end_index < 0:
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["answer_in_window"].append(False)
             continue
 
         # If the answer is out of this feature window, train on CLS.
-        if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
+        if not (
+            offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char
+        ):
             tokenized_examples["start_positions"].append(cls_index)
             tokenized_examples["end_positions"].append(cls_index)
+            tokenized_examples["answer_in_window"].append(False)
         else:
             while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
                 token_start_index += 1
@@ -119,6 +159,7 @@ def prepare_train_dataset_qa(examples, tokenizer, max_seq_length=None):
             while token_end_index >= 0 and offsets[token_end_index][1] >= end_char:
                 token_end_index -= 1
             tokenized_examples["end_positions"].append(token_end_index + 1)
+            tokenized_examples["answer_in_window"].append(True)
 
     return tokenized_examples
 
@@ -159,7 +200,7 @@ def prepare_validation_dataset_qa(examples, tokenizer, max_seq_length=None):
 def postprocess_qa_predictions(
     examples,
     features,
-    predictions: Tuple[np.ndarray, np.ndarray],
+    predictions: tuple[np.ndarray, np.ndarray],
     n_best_size: int = 20,
     max_answer_length: int = QA_MAX_ANSWER_LENGTH,
 ):
@@ -243,14 +284,16 @@ class DynamicsLogger:
         self.output_dir = kwargs.pop("output_dir", None)
         self.label_names = kwargs.pop("label_names", ["labels"])
         super().__init__(*args, **kwargs)
-        self._dynamics_rows: List[Dict[str, Any]] = []
+        self._dynamics_rows: list[dict[str, Any]] = []
         if self.output_dir is None:
             self.output_dir = self.args.output_dir
 
     def _current_epoch(self):
         return float(self.state.epoch) if self.state.epoch is not None else None
 
-    def _append_nli_dynamics(self, idxs: torch.Tensor, labels: torch.Tensor, logits: torch.Tensor) -> None:
+    def _append_nli_dynamics(
+        self, idxs: torch.Tensor, labels: torch.Tensor, logits: torch.Tensor
+    ) -> None:
         if idxs is None:
             return
         with torch.no_grad():
@@ -259,16 +302,21 @@ class DynamicsLogger:
             log_probs = F.log_softmax(logits_f, dim=-1)
             gold_logp = log_probs.gather(1, labels.view(-1, 1)).squeeze(1)
             pred = logits_f.argmax(dim=-1)
-            rows = torch.stack(
-                [
-                    idxs.long().to(gold_logp.device).float(),
-                    gold_logp.exp(),
-                    pred.eq(labels).float(),
-                    labels.float(),
-                    pred.float(),
-                ],
-                dim=1,
-            ).detach().cpu().tolist()
+            rows = (
+                torch.stack(
+                    [
+                        idxs.long().to(gold_logp.device).float(),
+                        gold_logp.exp(),
+                        pred.eq(labels).float(),
+                        labels.float(),
+                        pred.float(),
+                    ],
+                    dim=1,
+                )
+                .detach()
+                .cpu()
+                .tolist()
+            )
 
         epoch = self._current_epoch()
         step = int(self.state.global_step)
@@ -293,6 +341,7 @@ class DynamicsLogger:
         end_positions: torch.Tensor,
         start_logits: torch.Tensor,
         end_logits: torch.Tensor,
+        answer_in_window: torch.Tensor | None = None,
     ) -> None:
         if idxs is None:
             return
@@ -319,26 +368,36 @@ class DynamicsLogger:
             pred_start = start_logits_f.argmax(dim=-1)
             pred_end = end_logits_f.argmax(dim=-1)
             exact_span = pred_start.eq(start_positions) & pred_end.eq(end_positions) & valid
+            if answer_in_window is None:
+                answer_in_window = torch.ones_like(valid, dtype=torch.bool)
+            else:
+                answer_in_window = answer_in_window.to(valid.device).bool()
 
             endpoint_confidence = 0.5 * (gold_start_logp.exp() + gold_end_logp.exp())
             joint_confidence = (gold_start_logp + gold_end_logp).exp()
 
-            payload = torch.stack(
-                [
-                    idxs.long().to(endpoint_confidence.device).float(),
-                    endpoint_confidence,
-                    joint_confidence,
-                    exact_span.float(),
-                    start_positions.float(),
-                    end_positions.float(),
-                    pred_start.float(),
-                    pred_end.float(),
-                    gold_start_logp,
-                    gold_end_logp,
-                    valid.float(),
-                ],
-                dim=1,
-            ).detach().cpu().tolist()
+            payload = (
+                torch.stack(
+                    [
+                        idxs.long().to(endpoint_confidence.device).float(),
+                        endpoint_confidence,
+                        joint_confidence,
+                        exact_span.float(),
+                        start_positions.float(),
+                        end_positions.float(),
+                        pred_start.float(),
+                        pred_end.float(),
+                        gold_start_logp,
+                        gold_end_logp,
+                        valid.float(),
+                        answer_in_window.float(),
+                    ],
+                    dim=1,
+                )
+                .detach()
+                .cpu()
+                .tolist()
+            )
 
         epoch = self._current_epoch()
         step = int(self.state.global_step)
@@ -354,6 +413,7 @@ class DynamicsLogger:
             start_logp,
             end_logp,
             valid_flag,
+            answer_in_window_flag,
         ) in payload:
             self._dynamics_rows.append(
                 {
@@ -371,11 +431,13 @@ class DynamicsLogger:
                     "start_logp": float(start_logp),
                     "end_logp": float(end_logp),
                     "valid_span_feature": bool(valid_flag),
+                    "answer_in_window": bool(answer_in_window_flag),
                 }
             )
 
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         idxs = inputs.pop("idx", None)
+        answer_in_window = inputs.pop("answer_in_window", None)
         outputs = model(**inputs)
         loss = outputs.loss
 
@@ -389,6 +451,7 @@ class DynamicsLogger:
                     inputs["end_positions"],
                     outputs.start_logits,
                     outputs.end_logits,
+                    answer_in_window=answer_in_window,
                 )
             else:
                 raise ValueError("Could not find labels/start_positions/end_positions in inputs.")
@@ -424,7 +487,9 @@ class CustomQuestionAnsweringTrainer(DynamicsLogger, Trainer):
     """Trainer with SQuAD-style QA post-processing."""
 
     def __init__(self, *args, eval_examples=None, **kwargs):
-        self.label_names = kwargs.pop("label_names", ["start_positions", "end_positions", "idx"])
+        self.label_names = kwargs.pop(
+            "label_names", ["start_positions", "end_positions", "idx", "answer_in_window"]
+        )
         super().__init__(*args, **kwargs)
         self.eval_examples = eval_examples
 
@@ -456,9 +521,7 @@ class CustomQuestionAnsweringTrainer(DynamicsLogger, Trainer):
 
         if self.compute_metrics is not None:
             eval_preds = postprocess_qa_predictions(eval_examples, eval_dataset, output.predictions)
-            formatted_predictions = [
-                {"id": k, "prediction_text": v} for k, v in eval_preds.items()
-            ]
+            formatted_predictions = [{"id": k, "prediction_text": v} for k, v in eval_preds.items()]
             references = [{"id": ex["id"], "answers": ex["answers"]} for ex in eval_examples]
             metrics = self.compute_metrics(
                 EvalPrediction(predictions=formatted_predictions, label_ids=references)

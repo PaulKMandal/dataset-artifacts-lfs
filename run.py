@@ -30,8 +30,14 @@ def _load_dataset(task: str, dataset_arg: str | None):
         dataset = datasets.load_dataset("json", data_files=dataset_arg)
         return dataset, None, "train"
 
-    default_datasets = {"qa": ("squad",), "nli": ("snli",)}
-    dataset_id = tuple(dataset_arg.split(":")) if dataset_arg is not None else default_datasets[task]
+    default_datasets = {
+        "qa": ("squad",),
+        "nli": ("snli",),
+        "classification": ("snli",),
+    }
+    dataset_id = (
+        tuple(dataset_arg.split(":")) if dataset_arg is not None else default_datasets[task]
+    )
     eval_split = "validation_matched" if dataset_id == ("glue", "mnli") else "validation"
     load_kwargs = {}
     # The adversarial SQuAD HF dataset uses a dataset script/config pair.
@@ -43,11 +49,12 @@ def _load_dataset(task: str, dataset_arg: str | None):
     return dataset, dataset_id, eval_split
 
 
-def _make_model_and_tokenizer(task: str, model_name_or_path: str):
-    task_kwargs = {"num_labels": 3} if task == "nli" else {}
+def _make_model_and_tokenizer(task: str, model_name_or_path: str, num_labels: int | None = None):
+    task_kwargs = {"num_labels": int(num_labels or 3)} if task in {"nli", "classification"} else {}
     model_classes = {
         "qa": AutoModelForQuestionAnswering,
         "nli": AutoModelForSequenceClassification,
+        "classification": AutoModelForSequenceClassification,
     }
     model = model_classes[task].from_pretrained(model_name_or_path, **task_kwargs)
 
@@ -72,9 +79,9 @@ def main():
     argp.add_argument(
         "--task",
         type=str,
-        choices=["nli", "qa"],
+        choices=["nli", "classification", "qa"],
         required=True,
-        help="Use 'nli' for SNLI-style classification or 'qa' for SQuAD-style QA.",
+        help="Use 'classification'/'nli' for sentence-pair classification or 'qa' for SQuAD-style QA.",
     )
     argp.add_argument(
         "--dataset",
@@ -90,6 +97,10 @@ def main():
     )
     argp.add_argument("--max_train_samples", type=int, default=None)
     argp.add_argument("--max_eval_samples", type=int, default=None)
+    argp.add_argument("--num_labels", type=int, default=None)
+    argp.add_argument("--text_a_column", type=str, default=None)
+    argp.add_argument("--text_b_column", type=str, default=None)
+    argp.add_argument("--label_column", type=str, default="label")
     argp.add_argument(
         "--save_only_final_model",
         action="store_true",
@@ -117,15 +128,42 @@ def main():
     if dataset_id == ("snli",):
         dataset = dataset.filter(lambda ex: ex["label"] != -1)
 
-    model, tokenizer = _make_model_and_tokenizer(args.task, args.model)
+    classification_task = args.task in {"nli", "classification"}
+    num_labels = args.num_labels
+    if classification_task and num_labels is None:
+        split_for_labels = "train" if "train" in dataset else eval_split
+        label_feature = dataset[split_for_labels].features.get(args.label_column)
+        num_labels = getattr(label_feature, "num_classes", None)
+        if not num_labels:
+            labels = dataset[split_for_labels][args.label_column]
+            nonnegative = [int(label) for label in labels if int(label) >= 0]
+            if not nonnegative:
+                raise ValueError("Could not infer any non-negative classification labels.")
+            num_labels = max(nonnegative) + 1
+
+    model, tokenizer = _make_model_and_tokenizer(args.task, args.model, num_labels=num_labels)
 
     if args.task == "qa":
-        prepare_train_dataset = lambda exs: prepare_train_dataset_qa(exs, tokenizer, args.max_length)
-        prepare_eval_dataset = lambda exs: prepare_validation_dataset_qa(exs, tokenizer, args.max_length)
-    elif args.task == "nli":
-        prepare_train_dataset = prepare_eval_dataset = lambda exs: prepare_dataset_nli(
-            exs, tokenizer, args.max_length
-        )
+
+        def prepare_train_dataset(examples):
+            return prepare_train_dataset_qa(examples, tokenizer, args.max_length)
+
+        def prepare_eval_dataset(examples):
+            return prepare_validation_dataset_qa(examples, tokenizer, args.max_length)
+
+    elif classification_task:
+
+        def prepare_train_dataset(examples):
+            return prepare_dataset_nli(
+                examples,
+                tokenizer,
+                args.max_length,
+                text_a_column=args.text_a_column,
+                text_b_column=args.text_b_column,
+                label_column=args.label_column,
+            )
+
+        prepare_eval_dataset = prepare_train_dataset
     else:
         raise ValueError(f"Unrecognized task name: {args.task}")
 
@@ -164,11 +202,14 @@ def main():
     if args.task == "qa":
         trainer_class = CustomQuestionAnsweringTrainer
         metric = evaluate.load("squad")
-        compute_metrics = lambda eval_preds: metric.compute(
-            predictions=eval_preds.predictions,
-            references=eval_preds.label_ids,
-        )
-        label_names = ["start_positions", "end_positions", "idx"]
+
+        def compute_metrics(eval_preds):
+            return metric.compute(
+                predictions=eval_preds.predictions,
+                references=eval_preds.label_ids,
+            )
+
+        label_names = ["start_positions", "end_positions", "idx", "answer_in_window"]
     else:
         trainer_class = CustomTrainer
         compute_metrics = compute_accuracy
@@ -225,6 +266,10 @@ def main():
                 "save_dynamics": args.save_dynamics,
                 "save_only_final_model": args.save_only_final_model,
                 "skip_save_model": args.skip_save_model,
+                "num_labels": num_labels,
+                "text_a_column": args.text_a_column,
+                "text_b_column": args.text_b_column,
+                "label_column": args.label_column,
                 "training_args": training_args.to_dict(),
             },
             f,
@@ -253,12 +298,16 @@ def main():
                         example_with_prediction["exact_match"] = squad_exact_match(
                             predicted_answer, example["answers"]
                         )
-                        example_with_prediction["f1"] = squad_f1(predicted_answer, example["answers"])
+                        example_with_prediction["f1"] = squad_f1(
+                            predicted_answer, example["answers"]
+                        )
                         f.write(json.dumps(example_with_prediction) + "\n")
                 else:
                     for i, example in enumerate(eval_dataset):
                         example_with_prediction = dict(example)
-                        example_with_prediction["predicted_scores"] = eval_predictions.predictions[i].tolist()
+                        example_with_prediction["predicted_scores"] = eval_predictions.predictions[
+                            i
+                        ].tolist()
                         example_with_prediction["predicted_label"] = int(
                             eval_predictions.predictions[i].argmax()
                         )

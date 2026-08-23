@@ -20,15 +20,18 @@ import json
 import math
 import random
 from argparse import Namespace
+from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
-
 
 CARTO_SUBSETS = ("easy", "ambiguous", "hard")
 
+
 def parse_args() -> Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train-data", required=True, help="Flat SQuAD train JSONL with stable idx fields.")
+    parser.add_argument(
+        "--train-data", required=True, help="Flat SQuAD train JSONL with stable idx fields."
+    )
     parser.add_argument("--cartography-scores", required=True)
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--assignments-out", default=None)
@@ -37,11 +40,18 @@ def parse_args() -> Namespace:
     parser.add_argument("--random-seed-base", type=int, default=7300)
     parser.add_argument("--confidence-definition", default="joint_confidence")
     parser.add_argument("--rounding", choices=["round", "floor", "ceil"], default="round")
+    parser.add_argument(
+        "--coverage-constrained",
+        action="store_true",
+        help="Also emit a high-variability subset with full-data stratum quotas.",
+    )
     return parser.parse_args()
+
 
 def fraction_label(frac: float) -> str:
     text = f"{frac:.6f}".rstrip("0").rstrip(".")
     return text.replace(".", "p")
+
 
 def read_jsonl(path: Path) -> list[dict]:
     rows = []
@@ -51,6 +61,7 @@ def read_jsonl(path: Path) -> list[dict]:
                 rows.append(json.loads(line))
     return rows
 
+
 def write_jsonl(rows: Iterable[dict], path: Path) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     count = 0
@@ -59,6 +70,7 @@ def write_jsonl(rows: Iterable[dict], path: Path) -> int:
             f.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
             count += 1
     return count
+
 
 def read_scores(path: Path) -> dict[int, dict]:
     with path.open("r", encoding="utf-8", newline="") as f:
@@ -78,6 +90,7 @@ def read_scores(path: Path) -> dict[int, dict]:
         raise SystemExit(f"No cartography scores loaded from {path}")
     return scores
 
+
 def answer_summary(example: dict) -> tuple[str, str, str]:
     answers = example.get("answers", {})
     texts = answers.get("text", []) if isinstance(answers, dict) else []
@@ -87,9 +100,80 @@ def answer_summary(example: dict) -> tuple[str, str, str]:
     answer_length = len(answer_text.split()) if answer_text else 0
     return answer_text, str(answer_start), str(answer_length)
 
+
 def question_type(question: str) -> str:
     stripped = question.strip().lower()
     return stripped.split(maxsplit=1)[0].rstrip(":?") if stripped else ""
+
+
+def numeric_answer_summary(example: dict) -> tuple[int, int, float]:
+    answers = example.get("answers", {})
+    texts = answers.get("text", []) if isinstance(answers, dict) else []
+    starts = answers.get("answer_start", []) if isinstance(answers, dict) else []
+    answer_length = len(texts[0].split()) if texts else 0
+    answer_start = int(starts[0]) if starts else 0
+    context_chars = max(len(example.get("context", "")), 1)
+    return answer_length, answer_start, answer_start / context_chars
+
+
+def bucket(value: float, boundaries: tuple[float, ...]) -> str:
+    for boundary in boundaries:
+        if value <= boundary:
+            return f"le_{boundary:g}"
+    return f"gt_{boundaries[-1]:g}"
+
+
+def coverage_stratum(example: dict) -> tuple[str, str, str]:
+    answer_length, _, answer_position = numeric_answer_summary(example)
+    return (
+        question_type(example.get("question", "")) or "other",
+        bucket(answer_length, (1, 3, 5, 10)),
+        bucket(answer_position, (0.25, 0.5, 0.75)),
+    )
+
+
+def proportional_quotas(stratum_sizes: dict[tuple[str, str, str], int], k: int) -> dict:
+    total = sum(stratum_sizes.values())
+    raw = {stratum: k * size / total for stratum, size in stratum_sizes.items()}
+    quotas = {
+        stratum: min(size, int(math.floor(raw[stratum]))) for stratum, size in stratum_sizes.items()
+    }
+    remaining = k - sum(quotas.values())
+    order = sorted(
+        stratum_sizes,
+        key=lambda stratum: (-(raw[stratum] - math.floor(raw[stratum])), stratum),
+    )
+    for stratum in order:
+        if remaining <= 0:
+            break
+        if quotas[stratum] < stratum_sizes[stratum]:
+            quotas[stratum] += 1
+            remaining -= 1
+    if remaining:
+        raise ValueError(f"Could not allocate {remaining} coverage-constrained rows")
+    return quotas
+
+
+def select_coverage_constrained_ambiguous(
+    by_idx: dict[int, dict], scores: dict[int, dict], k: int
+) -> list[int]:
+    by_stratum: dict[tuple[str, str, str], list[int]] = defaultdict(list)
+    for idx in scores:
+        by_stratum[coverage_stratum(by_idx[idx])].append(idx)
+    quotas = proportional_quotas({key: len(value) for key, value in by_stratum.items()}, k)
+    selected = []
+    for stratum in sorted(by_stratum):
+        ranked = sorted(
+            by_stratum[stratum],
+            key=lambda idx: (
+                -scores[idx]["variability"],
+                abs(scores[idx]["confidence"] - 0.5),
+                idx,
+            ),
+        )
+        selected.extend(ranked[: quotas[stratum]])
+    return sorted(selected)
+
 
 def select_indices(scores: dict[int, dict], subset: str, k: int) -> list[int]:
     rows = list(scores.values())
@@ -105,6 +189,7 @@ def select_indices(scores: dict[int, dict], subset: str, k: int) -> list[int]:
         raise ValueError(f"Unknown cartography subset: {subset}")
     return [int(r["idx"]) for r in rows[:k]]
 
+
 def subset_size(n_scores: int, frac: float, rounding: str) -> int:
     if not (0 < frac <= 1):
         raise SystemExit(f"Invalid fraction {frac}; expected 0 < fraction <= 1")
@@ -117,14 +202,18 @@ def subset_size(n_scores: int, frac: float, rounding: str) -> int:
         k = int(round(raw_k))
     return max(1, min(k, n_scores))
 
+
 def load_inputs(args: Namespace) -> tuple[list[dict], dict[int, dict], dict[int, dict]]:
     train_data = read_jsonl(Path(args.train_data))
     by_idx = {int(row.get("idx", i)): row for i, row in enumerate(train_data)}
     scores = read_scores(Path(args.cartography_scores))
     missing = sorted(set(scores) - set(by_idx))
     if missing:
-        raise SystemExit(f"Cartography scores contain {len(missing)} idx values absent from train data")
+        raise SystemExit(
+            f"Cartography scores contain {len(missing)} idx values absent from train data"
+        )
     return train_data, by_idx, scores
+
 
 def select_cartography_subsets(
     by_idx: dict[int, dict],
@@ -154,7 +243,25 @@ def select_cartography_subsets(
                 "selection_rule": subset,
             }
         )
+    if args.coverage_constrained:
+        subset = "ambiguous_coverage"
+        indices = select_coverage_constrained_ambiguous(by_idx, scores, k)
+        selected_by_name[subset] = set(indices)
+        path = out_dir / f"{subset}_frac{flabel}.jsonl"
+        count = write_jsonl((by_idx[idx] for idx in indices), path)
+        manifest_rows.append(
+            {
+                "subset": subset,
+                "subset_fraction": frac,
+                "subset_size": count,
+                "subset_draw_id": "",
+                "path": str(path),
+                "confidence_definition": args.confidence_definition,
+                "selection_rule": "variability_with_question_answer_position_quotas",
+            }
+        )
     return manifest_rows, selected_by_name
+
 
 def select_random_subsets(
     by_idx: dict[int, dict],
@@ -185,6 +292,7 @@ def select_random_subsets(
         )
     return manifest_rows
 
+
 def assignment_row(
     idx: int,
     example: dict,
@@ -196,6 +304,7 @@ def assignment_row(
     rank: int,
 ) -> dict:
     answer_text, answer_start, answer_length = answer_summary(example)
+    _, _, answer_position_normalized = numeric_answer_summary(example)
     return {
         "idx": idx,
         "example_id": example.get("id", ""),
@@ -205,6 +314,7 @@ def assignment_row(
         "answer_start": answer_start,
         "context_length": len(example.get("context", "").split()),
         "answer_length": answer_length,
+        "answer_position_normalized": answer_position_normalized,
         "question_type": question_type(example.get("question", "")),
         "confidence": score["confidence"],
         "variability": score["variability"],
@@ -217,7 +327,9 @@ def assignment_row(
         "selected_easy": idx in selected_by_name["easy"],
         "selected_ambiguous": idx in selected_by_name["ambiguous"],
         "selected_hard": idx in selected_by_name["hard"],
+        "selected_ambiguous_coverage": idx in selected_by_name.get("ambiguous_coverage", set()),
     }
+
 
 def append_assignment_rows(
     rows: list[dict],
@@ -242,6 +354,7 @@ def append_assignment_rows(
             )
         )
 
+
 def write_csv(rows: list[dict], path: Path) -> None:
     if not rows:
         raise SystemExit(f"No rows available for {path}")
@@ -250,6 +363,7 @@ def write_csv(rows: list[dict], path: Path) -> None:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
+
 
 def build_outputs(args: Namespace) -> tuple[Path, Path]:
     _, by_idx, scores = load_inputs(args)
@@ -261,21 +375,31 @@ def build_outputs(args: Namespace) -> tuple[Path, Path]:
 
     for frac in args.fractions:
         k = subset_size(len(scores), frac, args.rounding)
-        carto_rows, selected_by_name = select_cartography_subsets(by_idx, scores, out_dir, args, frac=frac, k=k)
+        carto_rows, selected_by_name = select_cartography_subsets(
+            by_idx, scores, out_dir, args, frac=frac, k=k
+        )
         manifest_rows.extend(carto_rows)
-        manifest_rows.extend(select_random_subsets(by_idx, all_indices, out_dir, args, frac=frac, k=k))
-        append_assignment_rows(assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac)
+        manifest_rows.extend(
+            select_random_subsets(by_idx, all_indices, out_dir, args, frac=frac, k=k)
+        )
+        append_assignment_rows(
+            assignment_rows, by_idx, scores, selected_by_name, all_indices, args, frac=frac
+        )
 
     manifest_path = out_dir / "subset_manifest.csv"
-    assignments_path = Path(args.assignments_out) if args.assignments_out else out_dir / "subset_assignments.csv"
+    assignments_path = (
+        Path(args.assignments_out) if args.assignments_out else out_dir / "subset_assignments.csv"
+    )
     write_csv(manifest_rows, manifest_path)
     write_csv(assignment_rows, assignments_path)
     return manifest_path, assignments_path
+
 
 def main() -> None:
     manifest_path, assignments_path = build_outputs(parse_args())
     print(f"Wrote {manifest_path}")
     print(f"Wrote {assignments_path}")
+
 
 if __name__ == "__main__":
     main()

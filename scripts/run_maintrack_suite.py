@@ -336,7 +336,11 @@ def train_success_path(spec: TrainSpec) -> Path:
     return Path(spec.output_dir) / "_TRAIN_SUCCESS.json"
 
 
-def train_artifact_paths(spec: TrainSpec) -> list[Path] | None:
+def train_pruned_path(spec: TrainSpec) -> Path:
+    return Path(spec.output_dir) / "_MODEL_PRUNED.json"
+
+
+def train_retained_artifact_paths(spec: TrainSpec) -> list[Path] | None:
     output_dir = Path(spec.output_dir)
     required = [
         output_dir / "maintrack_train_spec.json",
@@ -347,13 +351,11 @@ def train_artifact_paths(spec: TrainSpec) -> list[Path] | None:
         output_dir / "run_manifest.json",
         output_dir / "tokenizer_config.json",
     ]
-    model_candidates = [output_dir / "model.safetensors", output_dir / "pytorch_model.bin"]
     tokenizer_candidates = [output_dir / "tokenizer.json", output_dir / "vocab.txt"]
-    model_path = next((path for path in model_candidates if path.exists()), None)
     tokenizer_path = next((path for path in tokenizer_candidates if path.exists()), None)
-    if model_path is None or tokenizer_path is None or not all(path.exists() for path in required):
+    if tokenizer_path is None or not all(path.exists() for path in required):
         return None
-    required.extend([model_path, tokenizer_path])
+    required.append(tokenizer_path)
     if spec.save_dynamics:
         dynamics_paths = sorted(output_dir.glob("training_dynamics*.jsonl"))
         if not dynamics_paths:
@@ -362,15 +364,57 @@ def train_artifact_paths(spec: TrainSpec) -> list[Path] | None:
     return required
 
 
+def model_weight_paths(output_dir: Path) -> list[Path]:
+    candidates: set[Path] = set()
+    for pattern in (
+        "model.safetensors",
+        "model-*.safetensors",
+        "model.safetensors.index.json",
+        "pytorch_model.bin",
+        "pytorch_model-*.bin",
+        "pytorch_model.bin.index.json",
+    ):
+        candidates.update(path for path in output_dir.glob(pattern) if path.is_file())
+    return sorted(candidates)
+
+
+def train_artifact_paths(spec: TrainSpec) -> list[Path] | None:
+    output_dir = Path(spec.output_dir)
+    retained = train_retained_artifact_paths(spec)
+    model_paths = model_weight_paths(output_dir)
+    if retained is None or not model_paths:
+        return None
+    return retained + model_paths
+
+
 def train_complete(config: dict[str, Any], spec: TrainSpec) -> bool:
     marker = train_success_path(spec)
-    artifacts = train_artifact_paths(spec)
-    if not marker.exists() or artifacts is None:
+    if not marker.exists():
         return False
     payload = json.loads(marker.read_text(encoding="utf-8"))
+    if payload.get("train_hash") != train_hash(config, spec):
+        return False
     expected_sizes = payload.get("artifact_sizes", {})
-    return payload.get("train_hash") == train_hash(config, spec) and all(
+
+    artifacts = train_artifact_paths(spec)
+    if artifacts is not None and all(
         expected_sizes.get(path.name) == path.stat().st_size for path in artifacts
+    ):
+        return True
+
+    # Completed runs may deliberately discard heavyweight model weights after
+    # every configured evaluation has been materialized.  The prune marker is
+    # tied to both the exact suite configuration and the original train hash so
+    # an unchanged interrupted run can resume without retraining old models.
+    prune_marker = train_pruned_path(spec)
+    retained = train_retained_artifact_paths(spec)
+    if not prune_marker.exists() or retained is None or model_weight_paths(Path(spec.output_dir)):
+        return False
+    pruned = json.loads(prune_marker.read_text(encoding="utf-8"))
+    return (
+        pruned.get("config_hash") == config_hash(config)
+        and pruned.get("train_hash") == train_hash(config, spec)
+        and all(expected_sizes.get(path.name) == path.stat().st_size for path in retained)
     )
 
 
@@ -617,6 +661,117 @@ def normalize_eval_metrics(
     return row
 
 
+def eval_complete(config: dict[str, Any], spec: TrainSpec, evalset: str, eval_path: str) -> bool:
+    results_dir = Path(config["suite"]["results_dir"])
+    eval_id = f"{spec.run_id}__{evalset}"
+    metrics_out = results_dir / "metrics" / "raw" / f"{eval_id}.json"
+    predictions_dest = results_dir / "predictions" / f"{eval_id}.jsonl"
+    if not metrics_out.exists() or not predictions_dest.exists():
+        return False
+    try:
+        prior = json.loads(metrics_out.read_text(encoding="utf-8"))
+        return (
+            prior.get("eval_hash") == eval_hash(config, spec, evalset, eval_path)
+            and prior.get("predictions_hash") == sha256_file(predictions_dest)
+        )
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+
+
+def all_evals_complete(config: dict[str, Any], spec: TrainSpec) -> bool:
+    return all(
+        eval_complete(config, spec, evalset, eval_path)
+        for evalset, eval_path in evalsets_for(config, spec)
+    )
+
+
+def prune_model_weights(config: dict[str, Any], spec: TrainSpec) -> int:
+    """Discard model weights only after all canonical evaluation artifacts exist."""
+    if not train_success_path(spec).exists() or not all_evals_complete(config, spec):
+        return 0
+    success = json.loads(train_success_path(spec).read_text(encoding="utf-8"))
+    if success.get("train_hash") != train_hash(config, spec):
+        return 0
+    output_dir = Path(spec.output_dir)
+    weights = model_weight_paths(output_dir)
+    removed = {path.name: path.stat().st_size for path in weights}
+    freed = sum(removed.values())
+    for path in weights:
+        path.unlink()
+    write_success_marker(
+        train_pruned_path(spec),
+        {
+            "run_id": spec.run_id,
+            "config_hash": config_hash(config),
+            "train_hash": train_hash(config, spec),
+            "removed_model_files": removed,
+            "bytes_freed": freed,
+            "pruned_at_utc": now_utc(),
+        },
+    )
+    return freed
+
+
+def reclaim_completed_run_space(config: dict[str, Any]) -> dict[str, int]:
+    """Retroactively reclaim safe-to-delete artifacts after an interrupted suite."""
+    results_dir = Path(config["suite"]["results_dir"])
+    runs_dir = results_dir / "runs"
+    freed_models = 0
+    pruned_runs = 0
+    partial_weights = 0
+    partial_bytes = 0
+    if runs_dir.exists():
+        for run_dir in sorted(path for path in runs_dir.iterdir() if path.is_dir()):
+            spec_path = run_dir / "maintrack_train_spec.json"
+            if not spec_path.exists():
+                continue
+            try:
+                spec = TrainSpec(**json.loads(spec_path.read_text(encoding="utf-8")))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                continue
+            if train_success_path(spec).exists():
+                freed = prune_model_weights(config, spec)
+                if freed:
+                    freed_models += freed
+                    pruned_runs += 1
+            else:
+                # A run without _TRAIN_SUCCESS is scientifically incomplete.
+                # Failed final serialization can leave a large partial weight file.
+                weights = model_weight_paths(run_dir)
+                for path in weights:
+                    partial_bytes += path.stat().st_size
+                    partial_weights += 1
+                    path.unlink()
+
+    # Successful evaluations are already copied into canonical metrics/ and
+    # predictions/ locations. Their evals/ directories are duplicate scratch.
+    scratch_bytes = 0
+    scratch_dirs = 0
+    evals_dir = results_dir / "evals"
+    if evals_dir.exists():
+        metrics_dir = results_dir / "metrics" / "raw"
+        predictions_dir = results_dir / "predictions"
+        for eval_dir in sorted(path for path in evals_dir.iterdir() if path.is_dir()):
+            metrics = metrics_dir / f"{eval_dir.name}.json"
+            predictions = predictions_dir / f"{eval_dir.name}.jsonl"
+            if not metrics.exists() or not predictions.exists():
+                continue
+            scratch_bytes += sum(
+                path.stat().st_size for path in eval_dir.rglob("*") if path.is_file()
+            )
+            shutil.rmtree(eval_dir)
+            scratch_dirs += 1
+    return {
+        "pruned_runs": pruned_runs,
+        "model_bytes": freed_models,
+        "partial_weight_files": partial_weights,
+        "partial_weight_bytes": partial_bytes,
+        "eval_scratch_dirs": scratch_dirs,
+        "eval_scratch_bytes": scratch_bytes,
+        "total_bytes": freed_models + partial_bytes + scratch_bytes,
+    }
+
+
 def run_eval(
     config: dict[str, Any],
     spec: TrainSpec,
@@ -635,18 +790,17 @@ def run_eval(
     metrics_out = results_dir / "metrics" / "raw" / f"{eval_id}.json"
     predictions_dest = results_dir / "predictions" / f"{eval_id}.jsonl"
     tracker.register(job_id, kind="eval", stage=spec.stage, run_id=spec.run_id, evalset=evalset)
-    if metrics_out.exists() and predictions_dest.exists():
-        prior = json.loads(metrics_out.read_text(encoding="utf-8"))
-        if prior.get("eval_hash") == eval_hash(config, spec, evalset, eval_path) and prior.get(
-            "predictions_hash"
-        ) == sha256_file(predictions_dest):
-            tracker.transition(job_id, "complete", resumed=True)
-            with PRINT_LOCK:
-                print(f"[skip eval] {eval_id}", flush=True)
-            return
+    if eval_complete(config, spec, evalset, eval_path):
+        tracker.transition(job_id, "complete", resumed=True)
+        with PRINT_LOCK:
+            print(f"[skip eval] {eval_id}", flush=True)
+        return
     tracker.transition(job_id, "running", gpu_id=gpu_id, started_at_utc=now_utc())
     try:
         if not dry_run:
+            # A prior ENOSPC or interrupted evaluation can leave partial scratch.
+            # Canonical completed outputs were checked above, so this directory is safe to reset.
+            shutil.rmtree(eval_out, ignore_errors=True)
             eval_out.mkdir(parents=True, exist_ok=True)
         run_cmd(
             eval_args(config, spec, eval_path, eval_out),
@@ -666,6 +820,9 @@ def run_eval(
         )
         metrics_out.parent.mkdir(parents=True, exist_ok=True)
         write_success_marker(metrics_out, normalized)
+        # eval_out is only scratch: normalized metrics and predictions now live in
+        # their canonical durable locations. Avoid retaining a duplicate copy.
+        shutil.rmtree(eval_out)
         tracker.transition(job_id, "complete", gpu_id=gpu_id, completed_at_utc=now_utc())
     except Exception as exc:
         tracker.transition(
@@ -701,6 +858,14 @@ def run_train_and_evals(
                 dry_run=dry_run,
                 gpu_id=gpu_id,
             )
+        if not dry_run:
+            freed = prune_model_weights(config, spec)
+            if freed:
+                with PRINT_LOCK:
+                    print(
+                        f"[prune model] {spec.run_id}: freed {freed / (1024 ** 3):.2f} GiB",
+                        flush=True,
+                    )
 
 
 def run_parallel_specs(

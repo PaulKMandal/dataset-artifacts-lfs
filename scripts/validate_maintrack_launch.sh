@@ -35,6 +35,11 @@ case "$results_dir" in
 esac
 mkdir -p "$results_dir/status"
 
+echo "=== foreground launch validation: safe disk reclamation ==="
+if [ -x "$REPO_ROOT/.venv/bin/python3" ]; then
+  "$REPO_ROOT/.venv/bin/python3" scripts/reclaim_maintrack_space.py --config "$config_path"
+fi
+
 echo "=== foreground launch validation: dependency/runtime preflight ==="
 uv sync --frozen --extra cuda --group dev
 scripts/recover_adversarial_squad_sources.sh "$REPO_ROOT/data/sources/squad_adversarial"

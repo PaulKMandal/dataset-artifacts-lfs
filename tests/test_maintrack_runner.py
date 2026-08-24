@@ -209,3 +209,85 @@ def test_default_bootstrap_contrasts_cover_both_task_formulations(tmp_path):
     assert len(contrasts) == 42
     assert {item["metric"] for item in contrasts} == {"exact_match", "f1", "correct"}
     assert {item["common"]["task"] for item in contrasts} == {"qa", "classification"}
+
+
+def _write_complete_eval(cfg, spec, evalset, eval_path):
+    results = Path(cfg["suite"]["results_dir"])
+    eval_id = f"{spec.run_id}__{evalset}"
+    predictions = results / "predictions" / f"{eval_id}.jsonl"
+    predictions.parent.mkdir(parents=True, exist_ok=True)
+    predictions.write_text('{"id":"q0"}\n', encoding="utf-8")
+    metrics = results / "metrics" / "raw" / f"{eval_id}.json"
+    metrics.parent.mkdir(parents=True, exist_ok=True)
+    suite.write_success_marker(
+        metrics,
+        {
+            "eval_hash": suite.eval_hash(cfg, spec, evalset, eval_path),
+            "predictions_hash": suite.sha256_file(predictions),
+        },
+    )
+
+
+def test_pruned_training_remains_complete_for_same_config(tmp_path):
+    cfg = config()
+    cfg["suite"]["results_dir"] = str(tmp_path / "results")
+    train_data = tmp_path / "train.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    eval_path = tmp_path / "eval.jsonl"
+    eval_path.write_text('{"id":"q0"}\n', encoding="utf-8")
+    cfg["tasks"]["qa"]["evalsets"] = {"dev": str(eval_path)}
+    cfg["tasks"]["qa"]["eval_profiles"]["core"] = ["dev"]
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+        output_dir=str(Path(cfg["suite"]["results_dir"]) / "runs" / "test"),
+        eval_profile="core",
+    )
+    output = Path(spec.output_dir)
+    output.mkdir(parents=True)
+    (output / "maintrack_train_spec.json").write_text(
+        json.dumps(suite.asdict(spec)), encoding="utf-8"
+    )
+    for name in [
+        "config.json", "train_metrics.json", "trainer_state.json", "training_args.bin",
+        "run_manifest.json", "tokenizer_config.json", "tokenizer.json", "training_dynamics.jsonl",
+        "model.safetensors",
+    ]:
+        (output / name).write_text(name, encoding="utf-8")
+    artifacts = suite.train_artifact_paths(spec)
+    assert artifacts is not None
+    suite.write_success_marker(
+        suite.train_success_path(spec),
+        {
+            "train_hash": suite.train_hash(cfg, spec),
+            "artifact_sizes": {path.name: path.stat().st_size for path in artifacts},
+        },
+    )
+    _write_complete_eval(cfg, spec, "dev", str(eval_path))
+    assert suite.prune_model_weights(cfg, spec) > 0
+    assert not (output / "model.safetensors").exists()
+    assert suite.train_complete(cfg, spec)
+
+    changed = json.loads(json.dumps(cfg))
+    changed["suite"]["name"] = "changed-suite"
+    assert not suite.train_complete(changed, spec)
+
+
+def test_reclaim_removes_partial_failed_weight(tmp_path):
+    cfg = config()
+    cfg["suite"]["results_dir"] = str(tmp_path / "results")
+    run_dir = Path(cfg["suite"]["results_dir"]) / "runs" / "failed"
+    run_dir.mkdir(parents=True)
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        run_id="failed",
+        output_dir=str(run_dir),
+    )
+    (run_dir / "maintrack_train_spec.json").write_text(
+        json.dumps(suite.asdict(spec)), encoding="utf-8"
+    )
+    (run_dir / "model.safetensors").write_bytes(b"x" * 4096)
+    report = suite.reclaim_completed_run_space(cfg)
+    assert report["partial_weight_files"] == 1
+    assert report["partial_weight_bytes"] == 4096
+    assert not (run_dir / "model.safetensors").exists()

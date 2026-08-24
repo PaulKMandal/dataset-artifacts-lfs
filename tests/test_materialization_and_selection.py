@@ -3,7 +3,12 @@ from pathlib import Path
 import pytest
 
 from scripts.materialize_qa_data import local_records, mrqa_paragraph_records, write_jsonl
-from scripts.materialize_sentence_classification import build_eval, build_train
+from scripts.materialize_sentence_classification import (
+    build_eval,
+    build_train,
+    fallback_pool,
+    negative_sentence,
+)
 from scripts.select_qa_subsets import (
     proportional_quotas,
     select_coverage_constrained_ambiguous,
@@ -63,6 +68,62 @@ def test_matched_classification_eval_emits_positive_negative_pairs():
     assert [row["label"] for row in output].count(1) == 4
     assert [row["label"] for row in output].count(0) == 4
     assert len({row["id"] for row in output}) == 8
+
+
+def test_sentence_classification_preserves_gold_answer_across_us_abbreviation():
+    context = (
+        "The program includes tutoring. "
+        "This program has been recognized previously, by U.S. News & World Report, as outstanding. "
+        "Another sentence follows."
+    )
+    answer = "U.S. News & World Report"
+    row = {
+        "id": "5733a70c4776f41900660f65",
+        "idx": 0,
+        "title": "University_of_Notre_Dame",
+        "context": context,
+        "question": "Which organization recognized the program?",
+        "answers": {"text": [answer], "answer_start": [context.index(answer)]},
+    }
+    other = {
+        "id": "other",
+        "idx": 1,
+        "title": "Other",
+        "context": "Ada wrote the program. Charles reviewed it.",
+        "question": "Who wrote the program?",
+        "answers": {"text": ["Ada"], "answer_start": [0]},
+    }
+
+    output = build_eval([row, other])
+    positive = next(record for record in output if record["id"] == f"{row['id']}::pos")
+    assert answer in positive["candidate_sentence"]
+    assert positive["candidate_sentence"].endswith("as outstanding.")
+
+
+def test_negative_sentence_excludes_every_gold_answer_sentence():
+    context = "Rome is the archive city. The archive city is Rome. Paris has a copy."
+    first = context.index("Rome")
+    second = context.index("Rome", first + 1)
+    row = {
+        "id": "multi-answer",
+        "idx": 0,
+        "title": "Archive",
+        "context": context,
+        "question": "Where is the archive city?",
+        "answers": {"text": ["Rome", "Rome"], "answer_start": [first, second]},
+    }
+    other = {
+        "id": "other",
+        "idx": 1,
+        "title": "Other",
+        "context": "Ada wrote the program. Charles reviewed it.",
+        "question": "Who wrote the program?",
+        "answers": {"text": ["Ada"], "answer_start": [0]},
+    }
+
+    negative, kind = negative_sentence(row, fallback_pool([row, other]))
+    assert kind == "same_context_hard_negative"
+    assert negative == "Paris has a copy."
 
 
 def test_mrqa_records_use_authoritative_span_instead_of_lowercase_alias():

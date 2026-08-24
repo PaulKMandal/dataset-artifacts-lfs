@@ -58,37 +58,70 @@ def sha256_file(path: Path) -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def sentence_spans(text: str) -> list[tuple[int, int, str]]:
+def answer_spans(row: dict) -> list[tuple[int, int, str]]:
+    answers = row["answers"]
+    texts = list(answers.get("text", []))
+    starts = [int(start) for start in answers.get("answer_start", [])]
+    if not texts or len(texts) != len(starts):
+        raise ValueError(f"Invalid answer annotations for {row['id']!r}")
+
+    context = row["context"]
+    spans = []
+    for text, start in zip(texts, starts, strict=True):
+        end = start + len(text)
+        if start < 0 or context[start:end] != text:
+            raise ValueError(
+                f"Invalid answer span [{start}, {end}) for {row['id']!r}: {text!r}"
+            )
+        spans.append((start, end, text))
+    return spans
+
+
+def sentence_spans(
+    text: str, *, protected_spans: list[tuple[int, int]] | tuple[tuple[int, int], ...] = ()
+) -> list[tuple[int, int, str]]:
+    """Split text into sentence spans without cutting protected gold spans.
+
+    ``protected_spans`` are character ranges that must remain inside a single
+    candidate sentence. This is a final safety invariant for extractive-QA gold
+    answers: a candidate boundary cannot legitimately bisect a contiguous gold
+    answer string.
+    """
     spans = []
     start = 0
     for match in SENTENCE_BOUNDARY.finditer(text):
-        end = match.start()
-        sentence = text[start:end].strip()
+        boundary = match.start()
+        if any(span_start < boundary < span_end for span_start, span_end in protected_spans):
+            continue
+
+        end = boundary
+        raw_sentence = text[start:end]
+        sentence = raw_sentence.strip()
         if sentence:
-            left_trim = len(text[start:end]) - len(text[start:end].lstrip())
+            left_trim = len(raw_sentence) - len(raw_sentence.lstrip())
             spans.append((start + left_trim, end, sentence))
         start = match.end()
-    tail = text[start:].strip()
+
+    raw_tail = text[start:]
+    tail = raw_tail.strip()
     if tail:
-        left_trim = len(text[start:]) - len(text[start:].lstrip())
+        left_trim = len(raw_tail) - len(raw_tail.lstrip())
         spans.append((start + left_trim, len(text), tail))
     return spans or [(0, len(text), text)]
 
 
-def answer_span(row: dict) -> tuple[int, int]:
-    answers = row["answers"]
-    start = int(answers["answer_start"][0])
-    return start, start + len(answers["text"][0])
+def row_sentence_spans(row: dict) -> list[tuple[int, int, str]]:
+    protected = [(start, end) for start, end, _ in answer_spans(row)]
+    return sentence_spans(row["context"], protected_spans=protected)
 
 
 def answer_sentence(row: dict) -> tuple[str, int]:
-    start, end = answer_span(row)
+    start, end, answer = answer_spans(row)[0]
     for sentence_index, (sentence_start, sentence_end, sentence) in enumerate(
-        sentence_spans(row["context"])
+        row_sentence_spans(row)
     ):
         if sentence_start <= start and end <= sentence_end:
             return sentence, sentence_index
-    answer = row["answers"]["text"][0]
     raise ValueError(f"Answer {answer!r} is not contained in any sentence for {row['id']!r}")
 
 
@@ -109,11 +142,14 @@ def fallback_pool(rows: list[dict]) -> list[tuple[str, str]]:
 
 
 def negative_sentence(row: dict, pool: list[tuple[str, str]]) -> tuple[str, str]:
-    _, answer_sentence_index = answer_sentence(row)
+    gold_spans = [(start, end) for start, end, _ in answer_spans(row)]
     candidates = [
         sentence
-        for index, (_, _, sentence) in enumerate(sentence_spans(row["context"]))
-        if index != answer_sentence_index
+        for sentence_start, sentence_end, sentence in row_sentence_spans(row)
+        if not any(
+            sentence_start < gold_end and gold_start < sentence_end
+            for gold_start, gold_end in gold_spans
+        )
     ]
     if candidates:
         candidates.sort(
@@ -229,6 +265,45 @@ def manifest_row(source: Path, output: Path, rows: list[dict]) -> dict:
     }
 
 
+def _collect_materialization_errors(
+    datasets: list[tuple[str, list[dict]]], *, max_reported: int = 20
+) -> None:
+    """Fail once with a corpus-wide diagnostic instead of one row at a time."""
+    failures: list[str] = []
+    total_failures = 0
+    for dataset_name, rows in datasets:
+        pool = []
+        valid_answer_ids = set()
+        for row in rows:
+            try:
+                pool.append((row["id"], answer_sentence(row)[0]))
+                valid_answer_ids.add(row["id"])
+            except ValueError as exc:
+                total_failures += 1
+                if len(failures) < max_reported:
+                    failures.append(f"{dataset_name}:{row['id']}: {exc}")
+
+        for row in rows:
+            if row["id"] not in valid_answer_ids:
+                continue
+            try:
+                negative_sentence(row, pool)
+            except ValueError as exc:
+                total_failures += 1
+                if len(failures) < max_reported:
+                    failures.append(f"{dataset_name}:{row['id']}: {exc}")
+
+    if total_failures:
+        details = "\n".join(f"  - {failure}" for failure in failures)
+        omitted = total_failures - len(failures)
+        if omitted:
+            details += f"\n  - ... {omitted} additional failures omitted"
+        raise ValueError(
+            f"Sentence-classification preflight found {total_failures} materialization failures:\n"
+            f"{details}"
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--train-qa", required=True)
@@ -239,13 +314,21 @@ def main() -> None:
 
     out_dir = Path(args.out_dir)
     train_source = Path(args.train_qa)
-    train_rows = build_train(read_jsonl(train_source), args.seed)
+    train_source_rows = read_jsonl(train_source)
+    eval_sources = [(name, source, read_jsonl(source)) for name, source in args.evalset]
+
+    _collect_materialization_errors(
+        [("squad_train", train_source_rows)]
+        + [(name, rows) for name, _, rows in eval_sources]
+    )
+
+    train_rows = build_train(train_source_rows, args.seed)
     train_out = out_dir / "squad_train.jsonl"
     write_jsonl(train_out, train_rows)
     manifest = {"squad_train": manifest_row(train_source, train_out, train_rows)}
 
-    for name, source in args.evalset:
-        eval_rows = build_eval(read_jsonl(source))
+    for name, source, source_rows in eval_sources:
+        eval_rows = build_eval(source_rows)
         output = out_dir / f"{name}.jsonl"
         write_jsonl(output, eval_rows)
         manifest[name] = manifest_row(source, output, eval_rows)

@@ -19,11 +19,38 @@ if ! command -v nix >/dev/null 2>&1; then
   echo "nix is required to create an isolated runtime inside tmux." >&2
   exit 1
 fi
+TMUX_BIN="$(command -v tmux)"
 NIX_BIN="$(command -v nix)"
-if tmux has-session -t "$SESSION" 2>/dev/null; then
-  echo "tmux session already exists: $SESSION" >&2
-  echo "Attach with: tmux attach -t $SESSION" >&2
-  exit 1
+
+# A supervised run deliberately sets remain-on-exit so a failed pane stays
+# inspectable.  After a controlled stop or host crash that can leave a dead
+# tmux session behind even though no experiment process is running.  Refuse to
+# touch a session with any live pane, but automatically remove an all-dead
+# inspection session so a validated resume is not blocked by stale tmux state.
+if "$TMUX_BIN" has-session -t "$SESSION" 2>/dev/null; then
+  live_panes=0
+  pane_summary=""
+  while IFS='|' read -r pane_id pane_dead pane_status pane_command; do
+    [ -n "$pane_id" ] || continue
+    pane_summary+="  pane=$pane_id dead=$pane_dead status=${pane_status:-?} command=${pane_command:-?}"$'\n'
+    if [ "$pane_dead" = "0" ]; then
+      live_panes=$((live_panes + 1))
+    fi
+  done < <(
+    "$TMUX_BIN" list-panes -s -t "$SESSION" \
+      -F '#{pane_id}|#{pane_dead}|#{pane_dead_status}|#{pane_current_command}'
+  )
+
+  if [ "$live_panes" -gt 0 ]; then
+    echo "tmux session already exists with live pane(s): $SESSION" >&2
+    printf '%s' "$pane_summary" >&2
+    echo "Attach with: $TMUX_BIN attach -t $SESSION" >&2
+    exit 1
+  fi
+
+  echo "Removing stale exited tmux inspection session: $SESSION" >&2
+  printf '%s' "$pane_summary" >&2
+  "$TMUX_BIN" kill-session -t "$SESSION"
 fi
 
 results_dir="$(
@@ -98,16 +125,16 @@ chmod +x "$supervisor_file"
 
 : > "$tmux_log"
 : > "$pane_log"
-tmux new-session -d -s "$SESSION" -n experiments -c "$REPO_ROOT" bash --noprofile --norc
-tmux set-option -w -t "$SESSION:experiments" remain-on-exit on
-tmux pipe-pane -o -t "$SESSION:experiments.0" "exec cat >> $(printf '%q' "$pane_log")"
+"$TMUX_BIN" new-session -d -s "$SESSION" -n experiments -c "$REPO_ROOT" bash --noprofile --norc
+"$TMUX_BIN" set-option -w -t "$SESSION:experiments" remain-on-exit on
+"$TMUX_BIN" pipe-pane -o -t "$SESSION:experiments.0" "exec cat >> $(printf '%q' "$pane_log")"
 printf '%s\n' "$SESSION" > "$results_dir/status/tmux_session.txt"
 printf '%s\n' "$tmux_log" > "$results_dir/status/tmux_log_path.txt"
 printf '%s\n' "$pane_log" > "$results_dir/status/tmux_pane_log_path.txt"
-tmux send-keys -t "$SESSION:experiments.0" "bash $(printf '%q' "$supervisor_file")" Enter
+"$TMUX_BIN" send-keys -t "$SESSION:experiments.0" "bash $(printf '%q' "$supervisor_file")" Enter
 
 echo "Started tmux session: $SESSION"
-echo "Attach: tmux attach -t $SESSION"
+echo "Attach: $TMUX_BIN attach -t $SESSION"
 echo "Foreground validation log: $validation_log"
 echo "Durable runner log: $tmux_log"
 echo "Raw pane log: $pane_log"

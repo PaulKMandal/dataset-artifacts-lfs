@@ -23,32 +23,42 @@ TMUX_BIN="$(command -v tmux)"
 NIX_BIN="$(command -v nix)"
 
 # A supervised run deliberately sets remain-on-exit so a failed pane stays
-# inspectable.  After a controlled stop or host crash that can leave a dead
-# tmux session behind even though no experiment process is running.  Refuse to
-# touch a session with any live pane, but automatically remove an all-dead
-# inspection session so a validated resume is not blocked by stale tmux state.
+# inspectable.  Older launcher revisions started the supervisor as a child of
+# an interactive bash.  When that child exited, tmux still reported the idle
+# parent bash as a live pane even though the experiment was gone.  Treat a
+# childless bash pane as a stale inspection shell, but refuse to touch any pane
+# that is dead=0 and either has children or is running a non-shell command.
 if "$TMUX_BIN" has-session -t "$SESSION" 2>/dev/null; then
   live_panes=0
   pane_summary=""
-  while IFS='|' read -r pane_id pane_dead pane_status pane_command; do
+  while IFS='|' read -r pane_id pane_dead pane_status pane_command pane_pid; do
     [ -n "$pane_id" ] || continue
-    pane_summary+="  pane=$pane_id dead=$pane_dead status=${pane_status:-?} command=${pane_command:-?}"$'\n'
-    if [ "$pane_dead" = "0" ]; then
-      live_panes=$((live_panes + 1))
+    pane_summary+="  pane=$pane_id dead=$pane_dead status=${pane_status:-?} command=${pane_command:-?} pid=${pane_pid:-?}"$'\n'
+    if [ "$pane_dead" = "1" ]; then
+      continue
     fi
+
+    if [ "$pane_command" = "bash" ] && [ -n "${pane_pid:-}" ]; then
+      pane_children="$(ps -o pid= --ppid "$pane_pid" 2>/dev/null || true)"
+      if [ -z "${pane_children//[[:space:]]/}" ]; then
+        continue
+      fi
+    fi
+
+    live_panes=$((live_panes + 1))
   done < <(
     "$TMUX_BIN" list-panes -s -t "$SESSION" \
-      -F '#{pane_id}|#{pane_dead}|#{pane_dead_status}|#{pane_current_command}'
+      -F '#{pane_id}|#{pane_dead}|#{pane_dead_status}|#{pane_current_command}|#{pane_pid}'
   )
 
   if [ "$live_panes" -gt 0 ]; then
-    echo "tmux session already exists with live pane(s): $SESSION" >&2
+    echo "tmux session already exists with active pane(s): $SESSION" >&2
     printf '%s' "$pane_summary" >&2
     echo "Attach with: $TMUX_BIN attach -t $SESSION" >&2
     exit 1
   fi
 
-  echo "Removing stale exited tmux inspection session: $SESSION" >&2
+  echo "Removing stale tmux inspection session: $SESSION" >&2
   printf '%s' "$pane_summary" >&2
   "$TMUX_BIN" kill-session -t "$SESSION"
 fi
@@ -131,7 +141,7 @@ chmod +x "$supervisor_file"
 printf '%s\n' "$SESSION" > "$results_dir/status/tmux_session.txt"
 printf '%s\n' "$tmux_log" > "$results_dir/status/tmux_log_path.txt"
 printf '%s\n' "$pane_log" > "$results_dir/status/tmux_pane_log_path.txt"
-"$TMUX_BIN" send-keys -t "$SESSION:experiments.0" "bash $(printf '%q' "$supervisor_file")" Enter
+"$TMUX_BIN" send-keys -t "$SESSION:experiments.0" "exec bash $(printf '%q' "$supervisor_file")" Enter
 
 echo "Started tmux session: $SESSION"
 echo "Attach: $TMUX_BIN attach -t $SESSION"

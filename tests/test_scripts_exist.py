@@ -129,9 +129,69 @@ def test_tmux_launcher_removes_all_dead_stale_session(tmp_path):
     )
 
     assert completed.returncode == 0, completed.stderr
-    assert "Removing stale exited tmux inspection session" in completed.stderr
+    assert "Removing stale tmux inspection session" in completed.stderr
     actions = Path(environment["FAKE_TMUX_LOG"]).read_text(encoding="utf-8").splitlines()
     assert actions[0:2] == ["kill-session", "new-session"]
+
+
+def test_tmux_launcher_removes_legacy_idle_bash_session(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    launcher = root / "scripts" / "launch_maintrack_tmux.sh"
+    config = tmp_path / "maintrack.yaml"
+    config.write_text("results_dir: results/maintrack_week\n", encoding="utf-8")
+    # Use an impossible PID so the launcher sees the legacy bash pane as
+    # childless. This reproduces the old launcher state after its supervised
+    # runner exited and returned control to the parent shell.
+    environment = _fake_tmux_environment(tmp_path, "%1|0||bash|999999")
+
+    completed = subprocess.run(
+        ["bash", str(launcher), str(config)],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "Removing stale tmux inspection session" in completed.stderr
+    actions = Path(environment["FAKE_TMUX_LOG"]).read_text(encoding="utf-8").splitlines()
+    assert actions[0:2] == ["kill-session", "new-session"]
+
+
+def test_tmux_launcher_refuses_legacy_bash_with_live_child(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    launcher = root / "scripts" / "launch_maintrack_tmux.sh"
+    config = tmp_path / "maintrack.yaml"
+    config.write_text("results_dir: results/maintrack_week\n", encoding="utf-8")
+
+    parent = subprocess.Popen(["bash", "-c", "sleep 60 & wait"])
+    try:
+        environment = _fake_tmux_environment(tmp_path, f"%1|0||bash|{parent.pid}")
+        completed = subprocess.run(
+            ["bash", str(launcher), str(config)],
+            cwd=tmp_path,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    finally:
+        parent.terminate()
+        parent.wait(timeout=5)
+
+    assert completed.returncode == 1
+    assert "tmux session already exists with active pane(s)" in completed.stderr
+    log = Path(environment["FAKE_TMUX_LOG"])
+    assert not log.exists() or "kill-session" not in log.read_text(encoding="utf-8")
+
+
+
+def test_tmux_launcher_execs_supervisor_into_pane():
+    root = Path(__file__).resolve().parents[1]
+    launcher = (root / "scripts" / "launch_maintrack_tmux.sh").read_text(encoding="utf-8")
+    assert '"$TMUX_BIN" send-keys -t "$SESSION:experiments.0" "exec bash ' in launcher
+    assert '"$TMUX_BIN" send-keys -t "$SESSION:experiments.0" "bash ' not in launcher
 
 
 def test_tmux_launcher_refuses_session_with_live_pane(tmp_path):
@@ -139,7 +199,7 @@ def test_tmux_launcher_refuses_session_with_live_pane(tmp_path):
     launcher = root / "scripts" / "launch_maintrack_tmux.sh"
     config = tmp_path / "maintrack.yaml"
     config.write_text("results_dir: results/maintrack_week\n", encoding="utf-8")
-    environment = _fake_tmux_environment(tmp_path, "%1|0||bash")
+    environment = _fake_tmux_environment(tmp_path, "%1|0||python3|12345")
 
     completed = subprocess.run(
         ["bash", str(launcher), str(config)],
@@ -151,6 +211,6 @@ def test_tmux_launcher_refuses_session_with_live_pane(tmp_path):
     )
 
     assert completed.returncode == 1
-    assert "tmux session already exists with live pane(s)" in completed.stderr
+    assert "tmux session already exists with active pane(s)" in completed.stderr
     log = Path(environment["FAKE_TMUX_LOG"])
     assert not log.exists() or "kill-session" not in log.read_text(encoding="utf-8")

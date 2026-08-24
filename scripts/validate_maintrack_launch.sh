@@ -37,7 +37,7 @@ mkdir -p "$results_dir/status"
 
 echo "=== foreground launch validation: safe disk reclamation ==="
 if [ -x "$REPO_ROOT/.venv/bin/python3" ]; then
-  "$REPO_ROOT/.venv/bin/python3" scripts/reclaim_maintrack_space.py --config "$config_path"
+  "$REPO_ROOT/.venv/bin/python3" -m scripts.reclaim_maintrack_space --config "$config_path"
 fi
 
 echo "=== foreground launch validation: dependency/runtime preflight ==="

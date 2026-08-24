@@ -5,7 +5,16 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import sys
 from pathlib import Path
+
+# When this file is executed as ``python scripts/reclaim_maintrack_space.py``,
+# Python places ``scripts/`` rather than the repository root on sys.path.
+# Add the repository root explicitly so the package-style import below works
+# both for direct execution and for ``python -m scripts.reclaim_maintrack_space``.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from scripts import run_maintrack_suite as suite
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.materialize_qa_data import local_records, mrqa_records, write_jsonl
+from scripts.materialize_qa_data import local_records, mrqa_paragraph_records, write_jsonl
 from scripts.materialize_sentence_classification import build_eval, build_train
 from scripts.select_qa_subsets import (
     proportional_quotas,
@@ -65,20 +65,51 @@ def test_matched_classification_eval_emits_positive_negative_pairs():
     assert len({row["id"] for row in output}) == 8
 
 
-def test_mrqa_records_find_all_answer_alias_spans():
-    dataset = {
-        "validation": [
+def test_mrqa_records_use_authoritative_span_instead_of_lowercase_alias():
+    context = "[DOC] [TLE] Hold On to the Nights by Richard Marx."
+    start = context.index("Richard Marx")
+    paragraph = {
+        "context": context,
+        "qas": [
             {
-                "qid": "m0",
-                "subset": "NewsQA",
-                "context": "The answer is cobalt.",
-                "question": "What is the answer?",
-                "answers": ["cobalt", "not present"],
+                "qid": "feabd1ae0c0246699a00e4e4b84cae69",
+                "question": "Who had the hit?",
+                "answers": ["richard marx"],
+                "detected_answers": [
+                    {
+                        "text": "richard marx",
+                        "char_spans": [[start, start + len("Richard Marx") - 1]],
+                    }
+                ],
             }
-        ]
+        ],
     }
-    output = list(mrqa_records(dataset, "validation"))
-    assert output[0]["answers"] == {"text": ["cobalt"], "answer_start": [14]}
+    output = list(mrqa_paragraph_records(paragraph, subset="TriviaQA-web", excluded_qids=set()))
+    expected_start = output[0]["context"].index("Richard Marx")
+    assert output[0]["answers"] == {
+        "text": ["Richard Marx"],
+        "answer_start": [expected_start],
+    }
+
+
+def test_mrqa_known_structural_marker_span_is_explicitly_excluded():
+    qid = "355adac432e64303a0d035784b5078c2"
+    paragraph = {
+        "context": "[DOC] [TLE] Snow White",
+        "qas": [
+            {
+                "qid": qid,
+                "question": "Which dwarf wears spectacles?",
+                "answers": ["doc"],
+                "detected_answers": [{"text": "doc", "char_spans": [[0, 4]]}],
+            }
+        ],
+    }
+    assert list(
+        mrqa_paragraph_records(paragraph, subset="TriviaQA-web", excluded_qids={qid})
+    ) == []
+    with pytest.raises(ValueError, match="no authoritative answer span"):
+        list(mrqa_paragraph_records(paragraph, subset="TriviaQA-web", excluded_qids=set()))
 
 
 def test_local_jsonl_source_is_normalized(tmp_path):

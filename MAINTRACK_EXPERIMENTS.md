@@ -40,11 +40,13 @@ output to `results/maintrack_week/logs/launch-validation-*.log`:
 1. frozen CUDA dependency synchronization;
 2. recovery of a prior local AddSent/AddOneSent copy when available, otherwise
    checksum-pinned acquisition from the official source;
-3. two-V100, PyTorch/CUDA, test, lint, compile, and dry-expansion preflight;
-4. complete data materialization and checksum validation;
-5. an end-to-end smoke matrix using the real max lengths and per-model batch profiles.
+3. checksum-pinned acquisition of the official MRQA validation archives and
+   reconstruction from their supplied character spans;
+4. two-V100, PyTorch/CUDA, test, lint, compile, and dry-expansion preflight;
+5. complete data materialization and checksum validation;
+6. an end-to-end smoke matrix using the real max lengths and per-model batch profiles.
 
-Only after all five checks pass does the launcher create the
+Only after all six checks pass does the launcher create the
 `cartography-maintrack` tmux session, enable an absolute raw `pipe-pane` log,
 and start the source, core, capacity, budget, ablation, and analysis stages.
 Failure in data acquisition or smoke validation therefore leaves no detached

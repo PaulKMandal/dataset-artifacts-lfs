@@ -11,6 +11,7 @@ data:
   classification_dir: data/sentence_classification_maintrack
   subsets_dir: data/subsets_maintrack
   adversarial_source_dir: data/sources/squad_adversarial
+  mrqa_source_dir: data/sources/mrqa
   mrqa_configs: [newsqa, triviaqa, searchqa]
   classification_seed: 1729
   squad_train_json: null

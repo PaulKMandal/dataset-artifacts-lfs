@@ -112,12 +112,22 @@ official adversarial SQuAD source files through checksum-pinned local storage:
   `40e3602aa5195cdacd03904a9c301ceb17ccf730cc32bd3ab998b66b4401e660`.
 - AddOneSent: 1,920,649-byte source with SHA-256
   `50420ac8d8b7547cd3715347c9a276802bc9466328ba0814adce4c20495e2889`.
+- MRQA NewsQA, TriviaQA-web, and SearchQA are read directly from the pinned
+  official validation archives under `data/sources/mrqa/`. The converter uses
+  the release's `detected_answers.char_spans` rather than the lossy answer
+  aliases emitted by the `tau/mrqa` adapter.
 
 The source files live under `data/sources/squad_adversarial/`. The main-track
 foreground gate first searches the prior server checkout/cache for verified
 copies and only then attempts the official CodaLab endpoints. A source transfer,
 count mismatch, duplicate ID, or invalid answer span fails before the batch is
 started. Materialized output replacement is atomic.
+
+The official TriviaQA-web validation archive contains one malformed row,
+`355adac432e64303a0d035784b5078c2`, whose detected answer span points to the
+structural `[DOC]` marker. That row is explicitly excluded and recorded in the
+dataset manifest. The pinned materializations contain 4,212 NewsQA rows, 7,784
+TriviaQA rows, and 16,980 SearchQA rows.
 
 The materialized files and checksums are written under `data/qa/`:
 
@@ -141,7 +151,7 @@ data:
 
 The materializer accepts either SQuAD JSON or already flattened JSONL files. It
 records both source and materialized hashes in `dataset_manifest.json` for the
-adversarial sets.
+adversarial and MRQA sets.
 
 ## 7. Reproduce the minimum panel
 

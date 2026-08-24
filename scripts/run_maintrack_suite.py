@@ -825,6 +825,8 @@ def ensure_data(
         data["qa_dir"],
         "--adversarial-source-dir",
         data["adversarial_source_dir"],
+        "--mrqa-source-dir",
+        data["mrqa_source_dir"],
         "--include-ood",
         "--mrqa-configs",
         *data["mrqa_configs"],

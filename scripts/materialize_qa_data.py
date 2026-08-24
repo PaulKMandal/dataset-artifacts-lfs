@@ -16,6 +16,7 @@ server is expected to use a frozen private data mirror.
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -30,7 +31,7 @@ from pathlib import Path
 
 import datasets
 
-DEFAULT_MRQA_CONFIGS = ("newsqa", "triviaqa", "searchqa", "natural_questions")
+DEFAULT_MRQA_CONFIGS = ("newsqa", "triviaqa", "searchqa")
 ADVERSARIAL_SQUAD_SOURCES = {
     "addsent": {
         "url": "https://worksheets.codalab.org/rest/bundles/0xb765680b60c64d088f5daccac08b3905/contents/blob/",
@@ -43,6 +44,36 @@ ADVERSARIAL_SQUAD_SOURCES = {
         "sha256": "sha256:50420ac8d8b7547cd3715347c9a276802bc9466328ba0814adce4c20495e2889",
         "num_bytes": 1_920_649,
         "num_examples": 1_787,
+    },
+}
+MRQA_VALIDATION_SOURCES = {
+    "newsqa": {
+        "url": "https://s3.us-east-2.amazonaws.com/mrqa/release/v2/dev/NewsQA.jsonl.gz",
+        "filename": "NewsQA.jsonl.gz",
+        "sha256": "sha256:66bfb10cab2029bbc7d1afaece20c35fac341b1c179d15b70fde22a207f096ae",
+        "num_bytes": 3_142_984,
+        "num_examples": 4_212,
+        "excluded_qids": (),
+    },
+    "triviaqa": {
+        "url": "https://s3.us-east-2.amazonaws.com/mrqa/release/v2/dev/TriviaQA-web.jsonl.gz",
+        "filename": "TriviaQA-web.jsonl.gz",
+        "sha256": "sha256:faf8add436de5a5fa81071a4e7190850d7e9a20acc811439e8a127ba8ec25640",
+        "num_bytes": 44_971_198,
+        "num_examples": 7_785,
+        # The official span for this question points to the structural [DOC]
+        # marker rather than an occurrence of the answer "doc".  The marker is
+        # removed by the standard MRQA context cleanup, so the row is excluded
+        # explicitly instead of silently manufacturing a span.
+        "excluded_qids": ("355adac432e64303a0d035784b5078c2",),
+    },
+    "searchqa": {
+        "url": "https://s3.us-east-2.amazonaws.com/mrqa/release/v2/dev/SearchQA.jsonl.gz",
+        "filename": "SearchQA.jsonl.gz",
+        "sha256": "sha256:c84d2cc02cac5aa9d576ce1cd22900e9d75fe8a37bc795901c36cae6ef9e5ff0",
+        "num_bytes": 92_526_612,
+        "num_examples": 16_980,
+        "excluded_qids": (),
     },
 }
 
@@ -64,10 +95,18 @@ def parse_args() -> Namespace:
         ),
     )
     parser.add_argument(
+        "--mrqa-source-dir",
+        default=None,
+        help=(
+            "Persistent directory for checksum-pinned official MRQA validation archives. "
+            "Defaults to OUT_DIR/../sources/mrqa."
+        ),
+    )
+    parser.add_argument(
         "--download-retries",
         type=int,
         default=6,
-        help="Attempts for each checksum-pinned adversarial SQuAD download.",
+        help="Attempts for each checksum-pinned source download.",
     )
     parser.add_argument(
         "--include-ood",
@@ -79,12 +118,6 @@ def parse_args() -> Namespace:
         nargs="*",
         default=list(DEFAULT_MRQA_CONFIGS),
         help="MRQA configs to materialize when --include-ood is set.",
-    )
-    parser.add_argument(
-        "--trust-remote-code",
-        action="store_true",
-        default=True,
-        help="Pass trust_remote_code=True for stanfordnlp/squad_adversarial.",
     )
     return parser.parse_args()
 
@@ -163,29 +196,121 @@ def dataset_records(dataset, split: str, *, with_idx: bool = False) -> Iterable[
         yield normalize_record(record, idx if with_idx else None)
 
 
-def mrqa_records(dataset, split: str) -> Iterable[dict]:
-    """Convert tau/mrqa rows to SQuAD-style records with auditable spans."""
-    for row_number, record in enumerate(dataset[split]):
-        context = record["context"]
-        answer_texts = list(dict.fromkeys(record.get("answers", [])))
-        texts = []
-        starts = []
-        for answer in answer_texts:
-            start = context.find(answer)
-            if start >= 0:
-                texts.append(answer)
-                starts.append(start)
-        if not texts:
-            raise ValueError(
-                f"MRQA row {record.get('qid', row_number)!r} has no answer string in its context"
-            )
+def clean_mrqa_spaces(text: str) -> str:
+    """Apply the whitespace cleanup used by the canonical tau/mrqa loader."""
+    return (
+        text.replace(" .", ".")
+        .replace(" ?", "?")
+        .replace(" !", "!")
+        .replace(" ,", ",")
+        .replace(" ' ", "'")
+        .replace(" n't", "n't")
+        .replace(" 'm", "'m")
+        .replace(" 's", "'s")
+        .replace(" 've", "'ve")
+        .replace(" 're", "'re")
+        .replace("( ", "(")
+        .replace(" )", ")")
+        .replace(" %", "%")
+        .replace("`` ", '"')
+        .replace(" ''", '"')
+        .replace(" :", ":")
+    )
+
+
+def clean_mrqa_context(context: str) -> str:
+    """Match the canonical MRQA structural-marker cleanup."""
+    cleaned = (
+        context.replace("[PAR] ", "\n\n")
+        .replace("[TLE]", "Title:")
+        .replace("[SEP]", "\nPassage:")
+        .strip()
+    )
+    for tag in (
+        "<Li>",
+        "</Li>",
+        "<OI>",
+        "</OI>",
+        "<Ol>",
+        "</Ol>",
+        "<Dd>",
+        "</Dd>",
+        "<UI>",
+        "</UI>",
+        "<Ul>",
+        "</Ul>",
+        "<P>",
+        "</P>",
+        "[DOC]",
+    ):
+        cleaned = cleaned.replace(tag, "")
+    return clean_mrqa_spaces(cleaned.strip())
+
+
+def mrqa_paragraph_records(
+    paragraph: dict, *, subset: str, excluded_qids: set[str]
+) -> Iterable[dict]:
+    """Convert one raw MRQA paragraph using its authoritative character spans."""
+    raw_context = paragraph["context"]
+    context = clean_mrqa_context(raw_context)
+    for qa in paragraph["qas"]:
+        qid = str(qa["qid"])
+        candidates = []
+        for detected in qa.get("detected_answers", []):
+            for raw_start, raw_end in detected.get("char_spans", []):
+                if raw_start < 0 or raw_end < raw_start or raw_end >= len(raw_context):
+                    raise ValueError(
+                        f"MRQA row {qid!r} has invalid raw span "
+                        f"[{raw_start}, {raw_end}] for context length {len(raw_context)}"
+                    )
+                answer = clean_mrqa_spaces(raw_context[raw_start : raw_end + 1]).strip()
+                start = context.find(answer)
+                if start >= 0 and (answer, start) not in candidates:
+                    candidates.append((answer, start))
+        if not candidates:
+            if qid in excluded_qids:
+                continue
+            raise ValueError(f"MRQA row {qid!r} has no authoritative answer span after cleanup")
+        if qid in excluded_qids:
+            raise ValueError(f"MRQA row {qid!r} was marked excluded but now has a valid span")
         yield {
-            "id": str(record.get("qid", row_number)),
-            "title": str(record.get("subset", "")),
+            "id": qid,
+            "title": subset,
             "context": context,
-            "question": record["question"],
-            "answers": {"text": texts, "answer_start": starts},
+            "question": clean_mrqa_spaces(qa["question"].strip()),
+            "answers": {
+                "text": [answer for answer, _ in candidates],
+                "answer_start": [start for _, start in candidates],
+            },
         }
+
+
+def raw_mrqa_records(path: Path, source: dict) -> Iterable[dict]:
+    """Read a checksum-pinned MRQA JSONL archive without the lossy HF adapter."""
+    excluded_qids = set(source.get("excluded_qids", ()))
+    seen_exclusions: set[str] = set()
+    raw_count = 0
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        header = json.loads(next(handle))["header"]
+        subset = str(header["dataset"])
+        for line in handle:
+            paragraph = json.loads(line)
+            for qa in paragraph["qas"]:
+                raw_count += 1
+                if str(qa["qid"]) in excluded_qids:
+                    seen_exclusions.add(str(qa["qid"]))
+            yield from mrqa_paragraph_records(
+                paragraph,
+                subset=subset,
+                excluded_qids=excluded_qids,
+            )
+    if raw_count != source["num_examples"]:
+        raise ValueError(f"MRQA source contained {raw_count} rows; expected {source['num_examples']}")
+    if seen_exclusions != excluded_qids:
+        raise ValueError(
+            f"MRQA exclusions did not match source: found {sorted(seen_exclusions)}, "
+            f"expected {sorted(excluded_qids)}"
+        )
 
 
 def validate_record(record: dict, path: Path) -> None:
@@ -261,8 +386,7 @@ def validate_pinned_source(path: Path, source: dict) -> None:
         )
 
 
-def download_pinned_source(name: str, destination: Path, retries: int) -> Path:
-    source = ADVERSARIAL_SQUAD_SOURCES[name]
+def download_pinned_source(label: str, source: dict, destination: Path, retries: int) -> Path:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         validate_pinned_source(destination, source)
@@ -303,7 +427,7 @@ def download_pinned_source(name: str, destination: Path, retries: int) -> Path:
 
     details = "; ".join(errors)
     raise RuntimeError(
-        f"Unable to obtain checksum-pinned {name}. Place the official file at "
+        f"Unable to obtain checksum-pinned {label}. Place the official file at "
         f"{destination} (expected {source['sha256']}) and rerun. {details}"
     )
 
@@ -317,7 +441,12 @@ def adversarial_source_path(args: Namespace, out_dir: Path, name: str) -> Path:
     materialized_source = source_dir / f"{name}.jsonl"
     if materialized_source.exists():
         return materialized_source
-    return download_pinned_source(name, source_dir / f"{name}.json", args.download_retries)
+    return download_pinned_source(
+        name,
+        ADVERSARIAL_SQUAD_SOURCES[name],
+        source_dir / f"{name}.json",
+        args.download_retries,
+    )
 
 
 def materialize_adversarial_source(name: str, source_path: Path, out_dir: Path) -> dict:
@@ -389,13 +518,34 @@ def materialize_adversarialqa(args: Namespace, out_dir: Path) -> dict:
 
 
 def materialize_mrqa(config_name: str, args: Namespace, out_dir: Path) -> dict:
-    dataset = datasets.load_dataset(
-        "tau/mrqa",
-        config_name,
-        trust_remote_code=args.trust_remote_code,
+    if config_name not in MRQA_VALIDATION_SOURCES:
+        raise ValueError(
+            f"Unsupported checksum-pinned MRQA config {config_name!r}; "
+            f"choose from {sorted(MRQA_VALIDATION_SOURCES)}"
+        )
+    source = MRQA_VALIDATION_SOURCES[config_name]
+    source_dir = (
+        Path(args.mrqa_source_dir)
+        if args.mrqa_source_dir
+        else out_dir.parent / "sources" / "mrqa"
+    )
+    source_path = download_pinned_source(
+        f"MRQA {config_name}",
+        source,
+        source_dir / source["filename"],
+        args.download_retries,
     )
     name = f"mrqa_{config_name}"
-    return materialize_one(name, mrqa_records(dataset, "validation"), out_dir)
+    result = materialize_one(
+        name,
+        raw_mrqa_records(source_path, source),
+        out_dir,
+        expected_count=source["num_examples"] - len(source.get("excluded_qids", ())),
+    )
+    result["source_path"] = str(source_path)
+    result["source_sha256"] = sha256_file(source_path)
+    result["excluded_qids"] = list(source.get("excluded_qids", ()))
+    return result
 
 
 def write_manifest(manifest: dict[str, dict], out_dir: Path) -> Path:

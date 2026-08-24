@@ -24,7 +24,9 @@ class FakeDataset:
 
 
 def test_map_retries_corrupt_cache_without_reusing_it(capsys):
-    transform = lambda row: row
+    def transform(row):
+        return row
+
     dataset = FakeDataset([CacheReadError("truncated Arrow stream"), "fresh-dataset"])
 
     result = map_with_cache_recovery(

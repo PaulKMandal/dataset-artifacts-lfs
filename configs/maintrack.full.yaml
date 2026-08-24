@@ -1,0 +1,194 @@
+suite:
+  name: dataset_cartography_maintrack_week
+  results_dir: results/maintrack_week
+  expected_gpu_count: 2
+  expected_gpu_name: V100
+  smoke_train_examples: 96
+  smoke_eval_examples: 32
+
+data:
+  qa_dir: data/qa_maintrack
+  classification_dir: data/sentence_classification_maintrack
+  subsets_dir: data/subsets_maintrack
+  mrqa_configs: [newsqa, triviaqa, searchqa]
+  classification_seed: 1729
+  squad_train_json: null
+  squad_dev_json: null
+  addsent_json: null
+  addonesent_json: null
+  adversarialqa_json: null
+
+tasks:
+  qa:
+    runner_task: qa
+    train_data: data/qa_maintrack/squad_train.jsonl
+    evalsets:
+      squad_dev: data/qa_maintrack/squad_dev.jsonl
+      addsent: data/qa_maintrack/addsent.jsonl
+      addonesent: data/qa_maintrack/addonesent.jsonl
+      adversarialqa: data/qa_maintrack/adversarialqa.jsonl
+      mrqa_newsqa: data/qa_maintrack/mrqa_newsqa.jsonl
+      mrqa_triviaqa: data/qa_maintrack/mrqa_triviaqa.jsonl
+      mrqa_searchqa: data/qa_maintrack/mrqa_searchqa.jsonl
+    eval_profiles:
+      core: [squad_dev, addsent, addonesent]
+      extended: [squad_dev, addsent, addonesent, adversarialqa, mrqa_newsqa, mrqa_triviaqa, mrqa_searchqa]
+  classification:
+    runner_task: classification
+    train_data: data/sentence_classification_maintrack/squad_train.jsonl
+    num_labels: 2
+    text_a_column: question
+    text_b_column: candidate_sentence
+    label_column: label
+    evalsets:
+      squad_dev: data/sentence_classification_maintrack/squad_dev.jsonl
+      addsent: data/sentence_classification_maintrack/addsent.jsonl
+      addonesent: data/sentence_classification_maintrack/addonesent.jsonl
+      adversarialqa: data/sentence_classification_maintrack/adversarialqa.jsonl
+      mrqa_newsqa: data/sentence_classification_maintrack/mrqa_newsqa.jsonl
+      mrqa_triviaqa: data/sentence_classification_maintrack/mrqa_triviaqa.jsonl
+      mrqa_searchqa: data/sentence_classification_maintrack/mrqa_searchqa.jsonl
+    eval_profiles:
+      core: [squad_dev, addsent, addonesent]
+      extended: [squad_dev, addsent, addonesent, adversarialqa, mrqa_newsqa, mrqa_triviaqa, mrqa_searchqa]
+
+training:
+  defaults:
+    num_train_epochs: 3
+    warmup_ratio: 0.0
+    weight_decay: 0.0
+    fp16: true
+    fp16_eval: true
+    dataloader_num_workers: 2
+
+models:
+  electra_small:
+    name_or_path: google/electra-small-discriminator
+    defaults:
+      learning_rate: 5.0e-5
+      gradient_checkpointing: false
+    tasks:
+      qa:
+        max_length: 384
+        train_batch_size: 32
+        eval_batch_size: 64
+        gradient_accumulation_steps: 1
+        same_steps_fallback: 9000
+      classification:
+        max_length: 384
+        train_batch_size: 32
+        eval_batch_size: 64
+        gradient_accumulation_steps: 1
+        same_steps_fallback: 8214
+  electra_base:
+    name_or_path: google/electra-base-discriminator
+    defaults:
+      learning_rate: 3.0e-5
+      gradient_checkpointing: false
+    tasks:
+      qa:
+        max_length: 384
+        train_batch_size: 8
+        eval_batch_size: 24
+        gradient_accumulation_steps: 4
+        same_steps_fallback: 9000
+      classification:
+        max_length: 384
+        train_batch_size: 16
+        eval_batch_size: 48
+        gradient_accumulation_steps: 2
+        same_steps_fallback: 8214
+  electra_large:
+    name_or_path: google/electra-large-discriminator
+    defaults:
+      learning_rate: 2.0e-5
+      gradient_checkpointing: true
+    tasks:
+      qa:
+        max_length: 384
+        train_batch_size: 1
+        eval_batch_size: 4
+        gradient_accumulation_steps: 32
+        same_steps_fallback: 9000
+      classification:
+        max_length: 384
+        train_batch_size: 4
+        eval_batch_size: 16
+        gradient_accumulation_steps: 8
+        same_steps_fallback: 8214
+
+cartography:
+  limit_scatter_samples: 20000
+  primary_by_task:
+    qa: joint_epoch
+    classification: confidence_epoch
+  definitions_by_task:
+    qa:
+      joint_epoch: {field: joint_confidence, aggregation: epoch_mean}
+      joint_records: {field: joint_confidence, aggregation: records}
+      endpoint_epoch: {field: confidence, aggregation: epoch_mean}
+      neglogp_epoch: {field: negative_gold_span_loss, aggregation: epoch_mean}
+      answer_only_joint_epoch: {field: joint_confidence, aggregation: answer_only_epoch_mean}
+    classification:
+      confidence_epoch: {field: confidence, aggregation: epoch_mean}
+      confidence_records: {field: confidence, aggregation: records}
+  consensus_maps:
+    - id: consensus__qa__electra_small_base
+      role: within_task
+      task: qa
+      inputs: [[qa, electra_small], [qa, electra_base]]
+      target_tasks: [qa, classification]
+    - id: consensus__classification__electra_small_base
+      role: within_task
+      task: classification
+      inputs: [[classification, electra_small], [classification, electra_base]]
+      target_tasks: [qa, classification]
+    - id: consensus__cross_task__electra_small_base
+      role: cross_task
+      inputs: [[qa, electra_small], [qa, electra_base], [classification, electra_small], [classification, electra_base]]
+      target_tasks: [qa, classification]
+
+design:
+  tasks: [qa, classification]
+  core_models: [electra_small, electra_base]
+  pilot_models: [electra_large]
+  proxy_source_model: electra_small
+  source_seed: 42
+  source_seeds: [13, 21, 42]
+  training_seeds: [13, 21, 42]
+  random_draws: 5
+  pilot_random_draws: 3
+  random_seed_base: 7300
+  primary_fraction: 0.333
+  subset_fractions: [0.20, 0.333, 0.50, 0.75]
+  bootstrap_samples: 10000
+  budget_curves:
+    - model: electra_small
+      task: qa
+      fractions: [0.20, 0.50, 0.75]
+      subsets: [random, easy, ambiguous, hard]
+      random_draws: 3
+    - model: electra_small
+      task: classification
+      fractions: [0.20, 0.50, 0.75]
+      subsets: [random, easy, ambiguous, hard]
+      random_draws: 3
+    - model: electra_base
+      task: qa
+      fractions: [0.50, 0.75]
+      subsets: [random, easy, ambiguous, hard]
+      random_draws: 3
+    - model: electra_base
+      task: classification
+      fractions: [0.50, 0.75]
+      subsets: [random, easy, ambiguous, hard]
+      random_draws: 3
+  cartography_ablations:
+    - model: electra_small
+      task: qa
+      definitions: [joint_records, endpoint_epoch, neglogp_epoch, answer_only_joint_epoch]
+      subsets: [easy, ambiguous, hard]
+    - model: electra_small
+      task: classification
+      definitions: [confidence_records]
+      subsets: [easy, ambiguous, hard]

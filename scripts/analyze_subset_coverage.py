@@ -7,6 +7,7 @@ import argparse
 import json
 import math
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -15,7 +16,11 @@ import pandas as pd
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import wasserstein_distance
 
-from qa_metrics import normalize_answer
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from qa_metrics import normalize_answer  # noqa: E402
 
 TOKEN_PATTERN = re.compile(r"\w+")
 SUBSET_COLUMNS = {

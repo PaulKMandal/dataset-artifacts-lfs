@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from itertools import combinations
 from pathlib import Path
 
@@ -44,9 +45,12 @@ def jaccard(left: set[int], right: set[int]) -> float:
     return len(left & right) / len(union) if union else 1.0
 
 
-def correlation(left: pd.Series, right: pd.Series, method: str) -> float:
+def correlation(left: pd.Series, right: pd.Series, method: str) -> float | None:
+    if left.nunique(dropna=True) < 2 or right.nunique(dropna=True) < 2:
+        return None
     result = spearmanr(left, right) if method == "spearman" else kendalltau(left, right)
-    return float(result.statistic)
+    statistic = float(result.statistic)
+    return statistic if math.isfinite(statistic) else None
 
 
 def compare_maps(name_a: str, map_a: pd.DataFrame, name_b: str, map_b: pd.DataFrame, fractions):

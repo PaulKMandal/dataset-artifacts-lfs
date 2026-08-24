@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import pytest
 
-from scripts.analyze_map_stability import ambiguous_indices, compare_maps
+from scripts.analyze_map_stability import ambiguous_indices, compare_maps, correlation
 from scripts.combine_cartography_maps import consensus
 from scripts.hierarchical_bootstrap import run_contrast
 
@@ -28,6 +28,12 @@ def test_map_stability_reports_rank_and_selected_set_overlap():
     assert rows[0]["ambiguous_jaccard"] == 1.0
     assert rows[0]["n_common"] == 4
     assert -1.0 <= rows[0]["variability_spearman"] <= 1.0
+
+
+def test_map_stability_uses_json_null_for_constant_correlations():
+    constant = pd.Series([0.5, 0.5, 0.5])
+    varying = pd.Series([0.1, 0.2, 0.3])
+    assert correlation(constant, varying, "spearman") is None
 
 
 def test_consensus_uses_aligned_percentile_ranks(tmp_path):

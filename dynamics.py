@@ -16,6 +16,7 @@ The output cartography coordinates are one row per original example index.
 import argparse
 import csv
 import json
+import math
 import os
 import random
 from collections import defaultdict
@@ -122,11 +123,17 @@ def _aggregate_record_metrics(records, confidence_field, aggregation):
         for record, value in zip(records, values, strict=False):
             epoch = record.get("epoch")
             if epoch is None:
-                epoch = record.get("step")
-            by_epoch[epoch].append(value)
+                step = record.get("step")
+                epoch_key = ("step", int(step) if step is not None else 0)
+            else:
+                # TrainerState.epoch is fractional progress (for example,
+                # 0.42), not an epoch identifier. Bucket all feature records
+                # observed during the same pass through the data together.
+                epoch_key = ("epoch", math.floor(float(epoch)))
+            by_epoch[epoch_key].append(value)
         values = [
             (mean(v[0] for v in epoch_values), mean(v[1] for v in epoch_values))
-            for _, epoch_values in sorted(by_epoch.items(), key=lambda item: str(item[0]))
+            for _, epoch_values in sorted(by_epoch.items(), key=lambda item: item[0])
         ]
     return values
 

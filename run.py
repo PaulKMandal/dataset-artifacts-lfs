@@ -305,12 +305,14 @@ def main():
                 else:
                     for i, example in enumerate(eval_dataset):
                         example_with_prediction = dict(example)
-                        example_with_prediction["predicted_scores"] = eval_predictions.predictions[
-                            i
-                        ].tolist()
-                        example_with_prediction["predicted_label"] = int(
-                            eval_predictions.predictions[i].argmax()
-                        )
+                        scores = eval_predictions.predictions[i]
+                        predicted_label = int(scores.argmax())
+                        example_with_prediction["predicted_scores"] = scores.tolist()
+                        example_with_prediction["predicted_label"] = predicted_label
+                        if args.label_column in example:
+                            example_with_prediction["correct"] = float(
+                                predicted_label == int(example[args.label_column])
+                            )
                         f.write(json.dumps(example_with_prediction) + "\n")
 
 

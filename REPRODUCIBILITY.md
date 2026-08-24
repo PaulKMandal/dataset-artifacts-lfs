@@ -2,6 +2,10 @@
 
 This repository contains the code, configuration, and driver scripts for the EMNLP submission experiments. It does **not** include model weights, Hugging Face datasets, or generated result artifacts. The full run materializes the datasets, trains the source cartography model, creates cartography-based subsets, trains the experiment panel, evaluates each model on SQuAD dev/AddSent/AddOneSent, and writes aggregate tables from saved metric files.
 
+> For the expanded main-track two-V100 revision suite, use
+> [`MAINTRACK_EXPERIMENTS.md`](MAINTRACK_EXPERIMENTS.md). The sections below
+> preserve the earlier ELECTRA-small panel instructions.
+
 ## 1. Requirements
 
 Recommended environment:

@@ -27,6 +27,7 @@
             uv
             python311
             stdenv.cc.cc.lib
+            tmux
             zlib
           ];
           nativeLibraryPath = pkgs.lib.makeLibraryPath (with pkgs; [

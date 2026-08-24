@@ -14,10 +14,16 @@ import csv
 import json
 import math
 import re
+import sys
 from argparse import Namespace
 from pathlib import Path
 
-from qa_metrics import normalize_answer
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from qa_metrics import normalize_answer  # noqa: E402
+
 
 def parse_args() -> Namespace:
     parser = argparse.ArgumentParser()
@@ -27,6 +33,7 @@ def parse_args() -> Namespace:
     parser.add_argument("--out", required=True)
     return parser.parse_args()
 
+
 def read_jsonl(path: Path) -> list[dict]:
     rows = []
     with path.open("r", encoding="utf-8") as f:
@@ -35,8 +42,10 @@ def read_jsonl(path: Path) -> list[dict]:
                 rows.append(json.loads(line))
     return rows
 
+
 def word_set(text: str) -> set[str]:
     return set(normalize_answer(text).split())
+
 
 def overlap(a: str, b: str) -> float:
     aw = word_set(a)
@@ -44,6 +53,7 @@ def overlap(a: str, b: str) -> float:
     if not aw or not bw:
         return 0.0
     return len(aw & bw) / len(aw | bw)
+
 
 def sentences(text: str) -> list[tuple[int, int, str]]:
     spans = []
@@ -59,6 +69,7 @@ def sentences(text: str) -> list[tuple[int, int, str]]:
         spans.append((start, len(text), tail))
     return spans
 
+
 def answer_sentence(context: str, answer_start: int | None) -> str:
     if answer_start is None:
         return ""
@@ -67,13 +78,16 @@ def answer_sentence(context: str, answer_start: int | None) -> str:
             return sent
     return ""
 
+
 def added_sentences(clean_context: str, adv_context: str) -> list[str]:
     clean = {normalize_answer(sent) for _, _, sent in sentences(clean_context)}
     return [sent for _, _, sent in sentences(adv_context) if normalize_answer(sent) not in clean]
 
+
 def question_type(question: str) -> str:
     stripped = question.strip().lower()
     return stripped.split(maxsplit=1)[0].rstrip(":?") if stripped else ""
+
 
 def answer_info(row: dict) -> tuple[str, int | None]:
     answers = row.get("answers", {})
@@ -83,18 +97,28 @@ def answer_info(row: dict) -> tuple[str, int | None]:
     start = int(starts[0]) if starts else None
     return text, start
 
+
 def load_cartography_by_id(path: Path | None) -> dict[str, dict]:
     if path is None or not path.exists():
         return {}
     with path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        return {row.get("example_id", row.get("id", "")): row for row in reader if row.get("example_id", row.get("id", ""))}
+        return {
+            row.get("example_id", row.get("id", "")): row
+            for row in reader
+            if row.get("example_id", row.get("id", ""))
+        }
+
 
 def mechanism_row(clean: dict, adv: dict, evalset: str, cart: dict) -> dict:
     answer_text, answer_start = answer_info(clean)
     context_length = len(clean.get("context", "").split())
     answer_length = len(answer_text.split())
-    answer_position_normalized = answer_start / max(len(clean.get("context", "")), 1) if answer_start is not None else math.nan
+    answer_position_normalized = (
+        answer_start / max(len(clean.get("context", "")), 1)
+        if answer_start is not None
+        else math.nan
+    )
     ans_sent = answer_sentence(clean.get("context", ""), answer_start)
     added = added_sentences(clean.get("context", ""), adv.get("context", ""))
     q = clean.get("question", "")
@@ -118,6 +142,7 @@ def mechanism_row(clean: dict, adv: dict, evalset: str, cart: dict) -> dict:
         "num_added_sentences": len(added),
     }
 
+
 def build_rows(args: Namespace) -> list[dict]:
     clean_by_id = {row["id"]: row for row in read_jsonl(Path(args.clean_predictions))}
     cart_path = Path(args.cartography_scores) if args.cartography_scores else None
@@ -131,6 +156,7 @@ def build_rows(args: Namespace) -> list[dict]:
             if clean is not None:
                 out_rows.append(mechanism_row(clean, adv, evalset, cart_by_id.get(adv["id"], {})))
     return out_rows
+
 
 FIELDNAMES = [
     "example_id",
@@ -150,6 +176,7 @@ FIELDNAMES = [
     "num_added_sentences",
 ]
 
+
 def write_rows(rows: list[dict], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8", newline="") as f:
@@ -160,11 +187,13 @@ def write_rows(rows: list[dict], out_path: Path) -> None:
     if not rows:
         print(f"No aligned clean/adversarial rows; wrote empty diagnostic table to {out_path}")
 
+
 def main() -> None:
     args = parse_args()
     out_path = Path(args.out)
     write_rows(build_rows(args), out_path)
     print(f"Wrote {out_path}")
+
 
 if __name__ == "__main__":
     main()

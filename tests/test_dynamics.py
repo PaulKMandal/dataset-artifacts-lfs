@@ -111,6 +111,23 @@ def test_answer_only_epoch_aggregation_removes_overflow_weighting(tmp_path):
     assert metrics[4]["correctness"] == pytest.approx(1.0)
 
 
+def test_epoch_aggregation_buckets_fractional_trainer_progress(tmp_path):
+    rows = [
+        {"idx": 8, "epoch": 0.1, "confidence": 0.2, "correctness": 0.0},
+        {"idx": 8, "epoch": 0.8, "confidence": 0.8, "correctness": 1.0},
+        {"idx": 8, "epoch": 1.2, "confidence": 0.6, "correctness": 1.0},
+        {"idx": 8, "epoch": 1.9, "confidence": 1.0, "correctness": 1.0},
+    ]
+    write_jsonl(tmp_path / "training_dynamics.jsonl", rows)
+
+    metrics = compute_metrics(load_training_dynamics(tmp_path), aggregation="epoch_mean")
+
+    assert metrics[8]["n_records"] == 2
+    assert metrics[8]["avg_confidence"] == pytest.approx(0.65)
+    assert metrics[8]["variability"] == pytest.approx(0.15)
+    assert metrics[8]["correctness"] == pytest.approx(0.75)
+
+
 def test_answer_only_aggregation_requires_new_logger_field(tmp_path):
     write_jsonl(
         tmp_path / "training_dynamics.jsonl",

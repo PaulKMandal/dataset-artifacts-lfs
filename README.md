@@ -4,6 +4,18 @@ Project by Kaj Bostrom, Jifan Chen, and Greg Durrett. Code by Kaj Bostrom and Ji
 
 This package adds a reproducible Nix + uv environment and replaces the slow QA training-dynamics logger with a scalar logger suitable for dataset cartography.
 
+## Main-track revision suite
+
+The two-V100, fail-fast experiment suite for the main-track revision is defined
+in [`configs/maintrack.full.yaml`](configs/maintrack.full.yaml). Its scientific
+matrix, exact launch command, monitoring paths, and manual-resume semantics are
+documented in [`MAINTRACK_EXPERIMENTS.md`](MAINTRACK_EXPERIMENTS.md).
+
+```bash
+nix develop .#server
+scripts/launch_maintrack_tmux.sh configs/maintrack.full.yaml
+```
+
 ## What is `training_dynamics.jsonl`?
 
 `training_dynamics.jsonl` is the raw training-time log emitted when `run.py` is called with `--save_dynamics`. It is not the final cartography table. Each JSONL row records what the model did on one training feature at one training step/epoch.

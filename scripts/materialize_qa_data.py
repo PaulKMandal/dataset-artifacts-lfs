@@ -210,7 +210,7 @@ def materialize_adversarialqa(args: Namespace, out_dir: Path) -> dict:
             flatten_squad_json(Path(args.adversarialqa_json), with_idx=False),
             out_dir,
         )
-    dataset = datasets.load_dataset("UCLNLP/adversarial_qa")
+    dataset = datasets.load_dataset("UCLNLP/adversarial_qa", "adversarialQA")
     return materialize_one(
         "adversarialqa",
         dataset_records(dataset, "validation", with_idx=False),

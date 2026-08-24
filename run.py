@@ -4,6 +4,7 @@ from pathlib import Path
 
 import datasets
 import evaluate
+import pyarrow as pa
 from transformers import (
     AutoModelForQuestionAnswering,
     AutoModelForSequenceClassification,
@@ -12,6 +13,7 @@ from transformers import (
     TrainingArguments,
 )
 
+from dataset_cache import map_with_cache_recovery
 from helpers import (
     CustomQuestionAnsweringTrainer,
     CustomTrainer,
@@ -180,9 +182,18 @@ def main():
         # Preserve an existing stable original-example index in materialized
         # subset JSONL files. HF SQuAD has no idx column, so we add one there.
         if "idx" not in train_dataset.column_names:
-            train_dataset = train_dataset.map(lambda ex, idx: {"idx": idx}, with_indices=True)
-        train_dataset_featurized = train_dataset.map(
+            train_dataset = map_with_cache_recovery(
+                train_dataset,
+                lambda ex, idx: {"idx": idx},
+                cache_error_types=pa.ArrowInvalid,
+                description="training index materialization",
+                with_indices=True,
+            )
+        train_dataset_featurized = map_with_cache_recovery(
+            train_dataset,
             prepare_train_dataset,
+            cache_error_types=pa.ArrowInvalid,
+            description="training feature preprocessing",
             batched=True,
             num_proc=NUM_PREPROCESSING_WORKERS,
             remove_columns=train_dataset.column_names,
@@ -192,8 +203,11 @@ def main():
         eval_dataset = dataset[eval_split]
         if args.max_eval_samples:
             eval_dataset = eval_dataset.select(range(args.max_eval_samples))
-        eval_dataset_featurized = eval_dataset.map(
+        eval_dataset_featurized = map_with_cache_recovery(
+            eval_dataset,
             prepare_eval_dataset,
+            cache_error_types=pa.ArrowInvalid,
+            description="evaluation feature preprocessing",
             batched=True,
             num_proc=NUM_PREPROCESSING_WORKERS,
             remove_columns=eval_dataset.column_names,

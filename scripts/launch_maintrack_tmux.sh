@@ -44,11 +44,30 @@ case "$results_dir" in
 esac
 mkdir -p "$results_dir/logs" "$results_dir/status"
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+validation_log="$results_dir/logs/launch-validation-${timestamp}.log"
 tmux_log="$results_dir/logs/tmux-${timestamp}.log"
 pane_log="$results_dir/logs/tmux-pane-${timestamp}.log"
 runner_file="$results_dir/status/tmux_runner-${timestamp}.sh"
 supervisor_file="$results_dir/status/tmux_supervisor-${timestamp}.sh"
 supervisor_exit_file="$results_dir/status/tmux_supervisor_exit_code.txt"
+
+: > "$validation_log"
+printf '%s\n' "$validation_log" > "$results_dir/status/launch_validation_log_path.txt"
+echo "Running the complete data and end-to-end GPU smoke gate before tmux launch."
+set +e
+"$NIX_BIN" develop \
+  --no-update-lock-file \
+  --no-write-lock-file \
+  "$REPO_ROOT#server" \
+  --command scripts/validate_maintrack_launch.sh "$config_path" \
+  2>&1 | tee -a "$validation_log"
+validation_exit=${PIPESTATUS[0]}
+set -e
+if [ "$validation_exit" -ne 0 ]; then
+  echo "Launch validation failed; no tmux session or full batch was started." >&2
+  echo "Durable validation log: $validation_log" >&2
+  exit "$validation_exit"
+fi
 
 {
   printf '#!/usr/bin/env bash\n'
@@ -80,6 +99,7 @@ chmod +x "$supervisor_file"
 : > "$tmux_log"
 : > "$pane_log"
 tmux new-session -d -s "$SESSION" -n experiments -c "$REPO_ROOT" bash --noprofile --norc
+tmux set-option -w -t "$SESSION:experiments" remain-on-exit on
 tmux pipe-pane -o -t "$SESSION:experiments.0" "exec cat >> $(printf '%q' "$pane_log")"
 printf '%s\n' "$SESSION" > "$results_dir/status/tmux_session.txt"
 printf '%s\n' "$tmux_log" > "$results_dir/status/tmux_log_path.txt"
@@ -88,6 +108,7 @@ tmux send-keys -t "$SESSION:experiments.0" "bash $(printf '%q' "$supervisor_file
 
 echo "Started tmux session: $SESSION"
 echo "Attach: tmux attach -t $SESSION"
+echo "Foreground validation log: $validation_log"
 echo "Durable runner log: $tmux_log"
 echo "Raw pane log: $pane_log"
 echo "Status: uv run --no-sync python scripts/maintrack_status.py --config $config_path --watch 10"

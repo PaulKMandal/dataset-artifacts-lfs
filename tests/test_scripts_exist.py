@@ -13,6 +13,8 @@ def test_remote_scripts_exist_and_are_executable():
         "scripts/pull_review_results.sh",
         "scripts/tar_review_bundle.sh",
         "scripts/tar_code_bundle.sh",
+        "scripts/recover_adversarial_squad_sources.sh",
+        "scripts/validate_maintrack_launch.sh",
     ]:
         path = root / rel
         assert path.exists()
@@ -37,3 +39,14 @@ def test_maintrack_entrypoints_resolve_repo_imports(tmp_path):
             capture_output=True,
             text=True,
         )
+
+
+def test_tmux_launcher_runs_foreground_gate_before_creating_session():
+    root = Path(__file__).resolve().parents[1]
+    launcher = (root / "scripts" / "launch_maintrack_tmux.sh").read_text(encoding="utf-8")
+    gate = 'scripts/validate_maintrack_launch.sh "$config_path"'
+    create_session = 'tmux new-session -d -s "$SESSION"'
+    assert gate in launcher
+    assert create_session in launcher
+    assert launcher.index(gate) < launcher.index(create_session)
+    assert "Launch validation failed; no tmux session or full batch was started." in launcher

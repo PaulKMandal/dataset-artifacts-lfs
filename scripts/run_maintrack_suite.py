@@ -823,6 +823,8 @@ def ensure_data(
         "scripts/materialize_qa_data.py",
         "--out-dir",
         data["qa_dir"],
+        "--adversarial-source-dir",
+        data["adversarial_source_dir"],
         "--include-ood",
         "--mrqa-configs",
         *data["mrqa_configs"],

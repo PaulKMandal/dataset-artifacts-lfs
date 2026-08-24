@@ -34,14 +34,21 @@ nix develop .#server
 scripts/launch_maintrack_tmux.sh configs/maintrack.full.yaml
 ```
 
-The launcher creates the `cartography-maintrack` tmux session, enables a raw
-`pipe-pane` log before starting the runner, and then executes:
+The launcher first executes a blocking foreground gate and writes its complete
+output to `results/maintrack_week/logs/launch-validation-*.log`:
 
 1. frozen CUDA dependency synchronization;
-2. two-V100, PyTorch/CUDA, test, lint, compile, and dry-expansion preflight;
-3. data materialization and checksum validation;
-4. a smoke gate using the real max lengths and per-model batch profiles;
-5. source, core, capacity, budget, ablation, and analysis stages.
+2. recovery of a prior local AddSent/AddOneSent copy when available, otherwise
+   checksum-pinned acquisition from the official source;
+3. two-V100, PyTorch/CUDA, test, lint, compile, and dry-expansion preflight;
+4. complete data materialization and checksum validation;
+5. an end-to-end smoke matrix using the real max lengths and per-model batch profiles.
+
+Only after all five checks pass does the launcher create the
+`cartography-maintrack` tmux session, enable an absolute raw `pipe-pane` log,
+and start the source, core, capacity, budget, ablation, and analysis stages.
+Failure in data acquisition or smoke validation therefore leaves no detached
+batch to discover the problem later.
 
 The smoke gate trains every configured model/task pair for two optimizer steps,
 derives every cartography definition, materializes every selector schema, checks
@@ -62,6 +69,8 @@ scripts/launch_maintrack_tmux.sh configs/maintrack.full.yaml
 tmux attach -t cartography-maintrack
 
 tail -F "$(cat results/maintrack_week/status/tmux_log_path.txt)"
+
+tail -F "$(cat results/maintrack_week/status/launch_validation_log_path.txt)"
 
 scripts/maintrack_status.sh configs/maintrack.full.yaml --watch 10
 ```
@@ -86,8 +95,9 @@ Failure handling is deliberately strict:
 - child commands use checked exit codes;
 - the first GPU-worker failure stops further dequeueing;
 - the other GPU may finish only the atomic train/eval unit already running;
-- there are no automatic retries, fallback batch sizes, exception suppression,
-  or “continue on error” paths;
+- there are no automatic experiment retries, fallback batch sizes, exception
+  suppression, or “continue on error” paths; checksum-pinned source transfers
+  alone use bounded retries before failing the foreground gate;
 - the failing traceback is saved in structured status and the weekly runner
   writes a nonzero exit code.
 

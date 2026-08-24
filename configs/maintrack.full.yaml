@@ -10,6 +10,7 @@ data:
   qa_dir: data/qa_maintrack
   classification_dir: data/sentence_classification_maintrack
   subsets_dir: data/subsets_maintrack
+  adversarial_source_dir: data/sources/squad_adversarial
   mrqa_configs: [newsqa, triviaqa, searchqa]
   classification_seed: 1729
   squad_train_json: null

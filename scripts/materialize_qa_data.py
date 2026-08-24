@@ -5,7 +5,9 @@ The experiment panel consumes flat SQuAD-style JSONL so every train/eval file ha
 an auditable path, checksum, and example count. By default this script downloads:
 
 * SQuAD v1.1 train/validation via ``datasets.load_dataset("squad")``
-* AddSent/AddOneSent via ``stanfordnlp/squad_adversarial``
+* AddSent/AddOneSent from checksum-pinned official source files, preferring a
+  persistent local copy and using the legacy official endpoint only as a
+  bounded fallback
 
 You can also point it at local SQuAD-v1-style JSON files; this is useful when the
 server is expected to use a frozen private data mirror.
@@ -16,6 +18,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import shutil
+import tempfile
+import time
+import urllib.error
+import urllib.request
 from argparse import Namespace
 from collections.abc import Iterable
 from pathlib import Path
@@ -23,6 +31,20 @@ from pathlib import Path
 import datasets
 
 DEFAULT_MRQA_CONFIGS = ("newsqa", "triviaqa", "searchqa", "natural_questions")
+ADVERSARIAL_SQUAD_SOURCES = {
+    "addsent": {
+        "url": "https://worksheets.codalab.org/rest/bundles/0xb765680b60c64d088f5daccac08b3905/contents/blob/",
+        "sha256": "sha256:40e3602aa5195cdacd03904a9c301ceb17ccf730cc32bd3ab998b66b4401e660",
+        "num_bytes": 4_073_864,
+        "num_examples": 3_560,
+    },
+    "addonesent": {
+        "url": "https://worksheets.codalab.org/rest/bundles/0x3ac9349d16ba4e7bb9b5920e3b1af393/contents/blob/",
+        "sha256": "sha256:50420ac8d8b7547cd3715347c9a276802bc9466328ba0814adce4c20495e2889",
+        "num_bytes": 1_920_649,
+        "num_examples": 1_787,
+    },
+}
 
 
 def parse_args() -> Namespace:
@@ -33,6 +55,20 @@ def parse_args() -> Namespace:
     parser.add_argument("--addsent-json", default=None)
     parser.add_argument("--addonesent-json", default=None)
     parser.add_argument("--adversarialqa-json", default=None)
+    parser.add_argument(
+        "--adversarial-source-dir",
+        default=None,
+        help=(
+            "Persistent directory for checksum-pinned AddSent/AddOneSent source JSON. "
+            "Defaults to OUT_DIR/../sources/squad_adversarial."
+        ),
+    )
+    parser.add_argument(
+        "--download-retries",
+        type=int,
+        default=6,
+        help="Attempts for each checksum-pinned adversarial SQuAD download.",
+    )
     parser.add_argument(
         "--include-ood",
         action="store_true",
@@ -108,6 +144,20 @@ def flatten_squad_json(path: Path, *, with_idx: bool = False) -> Iterable[dict]:
                 idx += 1
 
 
+def read_jsonl(path: Path, *, with_idx: bool = False) -> Iterable[dict]:
+    with path.open("r", encoding="utf-8") as f:
+        for idx, line in enumerate(f):
+            if not line.strip():
+                continue
+            yield normalize_record(json.loads(line), idx if with_idx else None)
+
+
+def local_records(path: Path, *, with_idx: bool = False) -> Iterable[dict]:
+    if path.suffix.lower() == ".jsonl":
+        return read_jsonl(path, with_idx=with_idx)
+    return flatten_squad_json(path, with_idx=with_idx)
+
+
 def dataset_records(dataset, split: str, *, with_idx: bool = False) -> Iterable[dict]:
     for idx, record in enumerate(dataset[split]):
         yield normalize_record(record, idx if with_idx else None)
@@ -138,20 +188,148 @@ def mrqa_records(dataset, split: str) -> Iterable[dict]:
         }
 
 
-def write_jsonl(records: Iterable[dict], path: Path) -> int:
+def validate_record(record: dict, path: Path) -> None:
+    context = record["context"]
+    answers = record["answers"]
+    texts = answers["text"]
+    starts = answers["answer_start"]
+    if len(texts) != len(starts):
+        raise ValueError(f"Mismatched answer text/start lengths while writing {path}")
+    if not texts:
+        raise ValueError(f"Answerless record {record.get('id')!r} while writing {path}")
+    for text, start in zip(texts, starts, strict=True):
+        if start < 0 or context[start : start + len(text)] != text:
+            raise ValueError(
+                f"Invalid answer span for record {record.get('id')!r} while writing {path}"
+            )
+
+
+def write_jsonl(records: Iterable[dict], path: Path, *, expected_count: int | None = None) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     count = 0
-    with path.open("w", encoding="utf-8") as f:
-        for record in records:
-            f.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
-            count += 1
+    seen_ids: set[str] = set()
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".partial",
+            delete=False,
+        ) as f:
+            temp_path = Path(f.name)
+            for record in records:
+                validate_record(record, path)
+                identifier = str(record["id"])
+                if identifier in seen_ids:
+                    raise ValueError(f"Duplicate record id {identifier!r} while writing {path}")
+                seen_ids.add(identifier)
+                f.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+                count += 1
+            f.flush()
+            os.fsync(f.fileno())
+        if expected_count is not None and count != expected_count:
+            raise ValueError(f"{path.stem} contained {count} examples; expected {expected_count}")
+        os.replace(temp_path, path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
     return count
 
 
-def materialize_one(name: str, records: Iterable[dict], out_dir: Path) -> dict:
+def materialize_one(
+    name: str,
+    records: Iterable[dict],
+    out_dir: Path,
+    *,
+    expected_count: int | None = None,
+) -> dict:
     path = out_dir / f"{name}.jsonl"
-    count = write_jsonl(records, path)
+    count = write_jsonl(records, path, expected_count=expected_count)
     return {"name": name, "path": str(path), "num_examples": count, "sha256": sha256_file(path)}
+
+
+def validate_pinned_source(path: Path, source: dict) -> None:
+    actual_size = path.stat().st_size
+    actual_sha256 = sha256_file(path)
+    if actual_size != source["num_bytes"] or actual_sha256 != source["sha256"]:
+        raise ValueError(
+            f"Pinned source validation failed for {path}: "
+            f"size={actual_size}, sha256={actual_sha256}; "
+            f"expected size={source['num_bytes']}, sha256={source['sha256']}"
+        )
+
+
+def download_pinned_source(name: str, destination: Path, retries: int) -> Path:
+    source = ADVERSARIAL_SQUAD_SOURCES[name]
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        validate_pinned_source(destination, source)
+        return destination
+    if retries < 1:
+        raise ValueError("--download-retries must be at least 1")
+
+    errors = []
+    for attempt in range(1, retries + 1):
+        temp_path: Path | None = None
+        try:
+            request = urllib.request.Request(
+                source["url"], headers={"User-Agent": "dataset-cartography-repro/1.0"}
+            )
+            with (
+                urllib.request.urlopen(request, timeout=120) as response,
+                tempfile.NamedTemporaryFile(
+                    mode="wb",
+                    dir=destination.parent,
+                    prefix=f".{destination.name}.",
+                    suffix=".partial",
+                    delete=False,
+                ) as output,
+            ):
+                temp_path = Path(output.name)
+                shutil.copyfileobj(response, output)
+                output.flush()
+                os.fsync(output.fileno())
+            validate_pinned_source(temp_path, source)
+            os.replace(temp_path, destination)
+            return destination
+        except (OSError, ValueError, urllib.error.URLError) as exc:
+            errors.append(f"attempt {attempt}: {exc}")
+            if temp_path is not None and temp_path.exists():
+                temp_path.unlink()
+            if attempt < retries:
+                time.sleep(min(30, 2**attempt))
+
+    details = "; ".join(errors)
+    raise RuntimeError(
+        f"Unable to obtain checksum-pinned {name}. Place the official file at "
+        f"{destination} (expected {source['sha256']}) and rerun. {details}"
+    )
+
+
+def adversarial_source_path(args: Namespace, out_dir: Path, name: str) -> Path:
+    source_dir = (
+        Path(args.adversarial_source_dir)
+        if args.adversarial_source_dir
+        else out_dir.parent / "sources" / "squad_adversarial"
+    )
+    materialized_source = source_dir / f"{name}.jsonl"
+    if materialized_source.exists():
+        return materialized_source
+    return download_pinned_source(name, source_dir / f"{name}.json", args.download_retries)
+
+
+def materialize_adversarial_source(name: str, source_path: Path, out_dir: Path) -> dict:
+    result = materialize_one(
+        name,
+        local_records(source_path, with_idx=False),
+        out_dir,
+        expected_count=ADVERSARIAL_SQUAD_SOURCES[name]["num_examples"],
+    )
+    result["source_path"] = str(source_path)
+    result["source_sha256"] = sha256_file(source_path)
+    return result
 
 
 def materialize_squad(args: Namespace, out_dir: Path) -> dict[str, dict]:
@@ -159,11 +337,11 @@ def materialize_squad(args: Namespace, out_dir: Path) -> dict[str, dict]:
         return {
             "squad_train": materialize_one(
                 "squad_train",
-                flatten_squad_json(Path(args.squad_train_json), with_idx=True),
+                local_records(Path(args.squad_train_json), with_idx=True),
                 out_dir,
             ),
             "squad_dev": materialize_one(
-                "squad_dev", flatten_squad_json(Path(args.squad_dev_json), with_idx=False), out_dir
+                "squad_dev", local_records(Path(args.squad_dev_json), with_idx=False), out_dir
             ),
         }
     squad = datasets.load_dataset("squad")
@@ -178,29 +356,21 @@ def materialize_squad(args: Namespace, out_dir: Path) -> dict[str, dict]:
 
 
 def materialize_addsent(args: Namespace, out_dir: Path) -> dict:
-    if args.addsent_json:
-        return materialize_one(
-            "addsent", flatten_squad_json(Path(args.addsent_json), with_idx=False), out_dir
-        )
-    addsent = datasets.load_dataset(
-        "stanfordnlp/squad_adversarial", "AddSent", trust_remote_code=args.trust_remote_code
+    source_path = (
+        Path(args.addsent_json)
+        if args.addsent_json
+        else adversarial_source_path(args, out_dir, "addsent")
     )
-    return materialize_one(
-        "addsent", dataset_records(addsent, "validation", with_idx=False), out_dir
-    )
+    return materialize_adversarial_source("addsent", source_path, out_dir)
 
 
 def materialize_addonesent(args: Namespace, out_dir: Path) -> dict:
-    if args.addonesent_json:
-        return materialize_one(
-            "addonesent", flatten_squad_json(Path(args.addonesent_json), with_idx=False), out_dir
-        )
-    addonesent = datasets.load_dataset(
-        "stanfordnlp/squad_adversarial", "AddOneSent", trust_remote_code=args.trust_remote_code
+    source_path = (
+        Path(args.addonesent_json)
+        if args.addonesent_json
+        else adversarial_source_path(args, out_dir, "addonesent")
     )
-    return materialize_one(
-        "addonesent", dataset_records(addonesent, "validation", with_idx=False), out_dir
-    )
+    return materialize_adversarial_source("addonesent", source_path, out_dir)
 
 
 def materialize_adversarialqa(args: Namespace, out_dir: Path) -> dict:

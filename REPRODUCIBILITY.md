@@ -104,10 +104,20 @@ The dynamics file should contain scalar fields such as `confidence`, `joint_conf
 
 ## 6. Dataset materialization
 
-By default, the panel materializes datasets through Hugging Face:
+By default, the panel materializes SQuAD through Hugging Face and obtains the
+official adversarial SQuAD source files through checksum-pinned local storage:
 
 - SQuAD v1.1 train and validation via `datasets.load_dataset("squad")`.
-- AddSent and AddOneSent via `datasets.load_dataset("stanfordnlp/squad_adversarial", ...)`.
+- AddSent: 4,073,864-byte source with SHA-256
+  `40e3602aa5195cdacd03904a9c301ceb17ccf730cc32bd3ab998b66b4401e660`.
+- AddOneSent: 1,920,649-byte source with SHA-256
+  `50420ac8d8b7547cd3715347c9a276802bc9466328ba0814adce4c20495e2889`.
+
+The source files live under `data/sources/squad_adversarial/`. The main-track
+foreground gate first searches the prior server checkout/cache for verified
+copies and only then attempts the official CodaLab endpoints. A source transfer,
+count mismatch, duplicate ID, or invalid answer span fails before the batch is
+started. Materialized output replacement is atomic.
 
 The materialized files and checksums are written under `data/qa/`:
 
@@ -129,7 +139,9 @@ data:
   addonesent_json: /path/to/addonesent.json
 ```
 
-The materializer will flatten those JSON files into the JSONL files consumed by `run.py` and will record hashes in `dataset_manifest.json`.
+The materializer accepts either SQuAD JSON or already flattened JSONL files. It
+records both source and materialized hashes in `dataset_manifest.json` for the
+adversarial sets.
 
 ## 7. Reproduce the minimum panel
 

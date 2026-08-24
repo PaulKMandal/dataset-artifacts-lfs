@@ -30,6 +30,21 @@ def test_full_design_expands_unique_expected_jobs():
         assert len({spec.run_id for spec in specs}) == expected
 
 
+def test_smoke_matrix_covers_every_task_and_model():
+    cfg = config()
+    specs = suite.configured_smoke_specs(cfg)
+    expected_models = set(cfg["design"]["core_models"] + cfg["design"]["pilot_models"])
+    assert {(spec.task, spec.model_key) for spec in specs} == {
+        (task, model) for task in cfg["design"]["tasks"] for model in expected_models
+    }
+    assert all(spec.max_steps == 2 for spec in specs)
+    proxy_specs = [spec for spec in specs if spec.model_key == cfg["design"]["proxy_source_model"]]
+    for spec in proxy_specs:
+        assert (
+            suite.smoke_evalsets(cfg, spec) == cfg["tasks"][spec.task]["eval_profiles"]["extended"]
+        )
+
+
 def test_equal_update_design_includes_ambiguous_for_every_core_cell():
     cfg = config()
     specs = suite.build_core_specs(cfg)

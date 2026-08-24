@@ -16,6 +16,10 @@ nix develop .#server
 scripts/launch_maintrack_tmux.sh configs/maintrack.full.yaml
 ```
 
+This command does not detach immediately. It first materializes and validates
+every dataset and completes the two-GPU end-to-end smoke matrix in the
+foreground. The tmux batch is created only after that gate succeeds.
+
 ## What is `training_dynamics.jsonl`?
 
 `training_dynamics.jsonl` is the raw training-time log emitted when `run.py` is called with `--save_dynamics`. It is not the final cartography table. Each JSONL row records what the model did on one training feature at one training step/epoch.

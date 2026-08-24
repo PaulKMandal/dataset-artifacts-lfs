@@ -1,4 +1,8 @@
-from scripts.materialize_qa_data import mrqa_records
+from pathlib import Path
+
+import pytest
+
+from scripts.materialize_qa_data import local_records, mrqa_records, write_jsonl
 from scripts.materialize_sentence_classification import build_eval, build_train
 from scripts.select_qa_subsets import (
     proportional_quotas,
@@ -75,6 +79,36 @@ def test_mrqa_records_find_all_answer_alias_spans():
     }
     output = list(mrqa_records(dataset, "validation"))
     assert output[0]["answers"] == {"text": ["cobalt"], "answer_start": [14]}
+
+
+def test_local_jsonl_source_is_normalized(tmp_path):
+    source = tmp_path / "source.jsonl"
+    source.write_text(
+        '{"id":"q0","title":"T","context":"The answer is cobalt.",'
+        '"question":"What is the answer?","answers":{"text":["cobalt"],'
+        '"answer_start":[14]}}\n',
+        encoding="utf-8",
+    )
+    assert list(local_records(source))[0]["answers"] == {
+        "text": ["cobalt"],
+        "answer_start": [14],
+    }
+
+
+def test_jsonl_write_is_atomic_when_validation_fails(tmp_path):
+    destination = tmp_path / "qa.jsonl"
+    destination.write_text("previous-good-data\n", encoding="utf-8")
+    invalid = {
+        "id": "q0",
+        "title": "T",
+        "context": "The answer is cobalt.",
+        "question": "What is the answer?",
+        "answers": {"text": ["cobalt"], "answer_start": [0]},
+    }
+    with pytest.raises(ValueError, match="Invalid answer span"):
+        write_jsonl([invalid], destination)
+    assert destination.read_text(encoding="utf-8") == "previous-good-data\n"
+    assert not list(Path(tmp_path).glob("*.partial"))
 
 
 def test_coverage_constrained_selection_uses_exact_proportional_quotas():

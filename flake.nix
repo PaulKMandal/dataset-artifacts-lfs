@@ -19,6 +19,7 @@
             direnv
             findutils
             git
+            git-lfs
             gnumake
             jq
             openssh

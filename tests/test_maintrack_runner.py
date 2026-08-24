@@ -307,3 +307,171 @@ def test_reclaim_cli_imports_when_executed_directly():
     )
     assert completed.returncode == 0, completed.stderr
     assert "--config" in completed.stdout
+
+
+def _legacy_train_hash(cfg, spec):
+    code = suite.code_hashes(*suite.TRAIN_CODE_PATHS)
+    assert code["run.py"] == suite.ARROW_CACHE_RECOVERY_RUN_PY_SHA256
+    code["run.py"] = suite.PRE_ARROW_CACHE_RUN_PY_SHA256
+    return suite.train_hash_with_code(cfg, spec, code)
+
+
+def test_pre_arrow_training_marker_is_resume_compatible(tmp_path):
+    cfg = config()
+    train_data = tmp_path / "train.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+        output_dir=str(tmp_path / "run"),
+    )
+    output = Path(spec.output_dir)
+    output.mkdir()
+    for name in [
+        "maintrack_train_spec.json",
+        "config.json",
+        "train_metrics.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "run_manifest.json",
+        "tokenizer_config.json",
+        "model.safetensors",
+        "tokenizer.json",
+        "training_dynamics.jsonl",
+    ]:
+        (output / name).write_text(name, encoding="utf-8")
+    artifacts = suite.train_artifact_paths(spec)
+    assert artifacts is not None
+    legacy_hash = _legacy_train_hash(cfg, spec)
+    suite.write_success_marker(
+        suite.train_success_path(spec),
+        {
+            "train_hash": legacy_hash,
+            "artifact_sizes": {path.name: path.stat().st_size for path in artifacts},
+        },
+    )
+    assert legacy_hash != suite.train_hash(cfg, spec)
+    assert legacy_hash in suite.compatible_train_hashes(cfg, spec)
+    assert suite.train_complete(cfg, spec)
+
+
+def test_pre_arrow_eval_marker_is_resume_compatible(tmp_path):
+    cfg = config()
+    cfg["suite"]["results_dir"] = str(tmp_path / "results")
+    train_data = tmp_path / "train.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    eval_path = tmp_path / "eval.jsonl"
+    eval_path.write_text('{"id":"q0"}\n', encoding="utf-8")
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+        output_dir=str(tmp_path / "run"),
+        eval_profile="core",
+    )
+    cfg["tasks"]["qa"]["evalsets"] = {"dev": str(eval_path)}
+    cfg["tasks"]["qa"]["eval_profiles"]["core"] = ["dev"]
+    results = Path(cfg["suite"]["results_dir"])
+    predictions = results / "predictions" / f"{spec.run_id}__dev.jsonl"
+    predictions.parent.mkdir(parents=True)
+    predictions.write_text('{"id":"q0"}\n', encoding="utf-8")
+    metrics = results / "metrics" / "raw" / f"{spec.run_id}__dev.json"
+    metrics.parent.mkdir(parents=True)
+    legacy_eval_hash = suite.eval_hash_for_train_hash(
+        cfg, spec, "dev", str(eval_path), _legacy_train_hash(cfg, spec)
+    )
+    suite.write_success_marker(
+        metrics,
+        {
+            "eval_hash": legacy_eval_hash,
+            "predictions_hash": suite.sha256_file(predictions),
+        },
+    )
+    assert legacy_eval_hash != suite.eval_hash(cfg, spec, "dev", str(eval_path))
+    assert suite.eval_complete(cfg, spec, "dev", str(eval_path))
+
+
+def test_future_run_py_change_does_not_inherit_cache_recovery_compatibility():
+    future = "sha256:" + "f" * 64
+    assert suite.compatible_run_py_hashes(future) == {future}
+
+
+def test_pruner_refuses_success_marker_with_modified_artifact(tmp_path):
+    cfg = config()
+    cfg["suite"]["results_dir"] = str(tmp_path / "results")
+    train_data = tmp_path / "train.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    eval_path = tmp_path / "eval.jsonl"
+    eval_path.write_text('{"id":"q0"}\n', encoding="utf-8")
+    cfg["tasks"]["qa"]["evalsets"] = {"dev": str(eval_path)}
+    cfg["tasks"]["qa"]["eval_profiles"]["core"] = ["dev"]
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+        output_dir=str(Path(cfg["suite"]["results_dir"]) / "runs" / "test"),
+        eval_profile="core",
+    )
+    output = Path(spec.output_dir)
+    output.mkdir(parents=True)
+    for name in [
+        "maintrack_train_spec.json",
+        "config.json",
+        "train_metrics.json",
+        "trainer_state.json",
+        "training_args.bin",
+        "run_manifest.json",
+        "tokenizer_config.json",
+        "tokenizer.json",
+        "training_dynamics.jsonl",
+        "model.safetensors",
+    ]:
+        (output / name).write_text(name, encoding="utf-8")
+    artifacts = suite.train_artifact_paths(spec)
+    assert artifacts is not None
+    suite.write_success_marker(
+        suite.train_success_path(spec),
+        {
+            "train_hash": suite.train_hash(cfg, spec),
+            "artifact_sizes": {path.name: path.stat().st_size for path in artifacts},
+        },
+    )
+    _write_complete_eval(cfg, spec, "dev", str(eval_path))
+    (output / "trainer_state.json").write_text("modified-after-success", encoding="utf-8")
+    assert suite.prune_model_weights(cfg, spec) == 0
+    assert (output / "model.safetensors").exists()
+
+
+def test_pre_arrow_cartography_hash_is_resume_compatible(tmp_path):
+    cfg = config()
+    train_data = tmp_path / "train.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+    )
+    definition_name, definition = suite.map_definitions_for_source(cfg, spec)[0]
+    assert definition_name
+    legacy_map_hash = suite.cartography_completion_hash_for_train_hash(
+        cfg, spec, definition, _legacy_train_hash(cfg, spec)
+    )
+    assert legacy_map_hash != suite.cartography_completion_hash(cfg, spec, definition)
+    assert legacy_map_hash in suite.compatible_cartography_completion_hashes(
+        cfg, spec, definition
+    )
+
+
+def test_pre_arrow_smoke_hash_is_resume_compatible(monkeypatch, tmp_path):
+    cfg = config()
+    data = tmp_path / "data.jsonl"
+    data.write_text('{"idx":0}\n', encoding="utf-8")
+
+    def fake_required_data_paths(_config):
+        return [data]
+
+    monkeypatch.setattr(suite, "required_data_paths", fake_required_data_paths)
+    legacy_code = suite.code_hashes(*suite.LEGACY_SMOKE_CODE_PATHS)
+    assert legacy_code["run.py"] == suite.ARROW_CACHE_RECOVERY_RUN_PY_SHA256
+    legacy_code["run.py"] = suite.PRE_ARROW_CACHE_RUN_PY_SHA256
+    legacy_code["scripts/run_maintrack_suite.py"] = suite.PRE_RESUME_COMPAT_SUITE_SHA256
+    legacy_hash = suite.legacy_smoke_completion_hash_with_code(cfg, legacy_code)
+    assert legacy_hash != suite.smoke_completion_hash(cfg)
+    assert legacy_hash in suite.compatible_smoke_completion_hashes(cfg)

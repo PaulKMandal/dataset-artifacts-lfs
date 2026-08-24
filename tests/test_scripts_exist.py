@@ -15,6 +15,7 @@ def test_remote_scripts_exist_and_are_executable():
         "scripts/tar_code_bundle.sh",
         "scripts/recover_adversarial_squad_sources.sh",
         "scripts/validate_maintrack_launch.sh",
+        "scripts/audit_maintrack_resume.py",
     ]:
         path = root / rel
         assert path.exists()
@@ -30,6 +31,7 @@ def test_maintrack_entrypoints_resolve_repo_imports(tmp_path):
         "scripts/build_mechanism_features.py",
         "scripts/analyze_subset_coverage.py",
         "scripts/combine_cartography_maps.py",
+        "scripts/audit_maintrack_resume.py",
     ]:
         subprocess.run(
             [sys.executable, str(root / rel), "--help"],

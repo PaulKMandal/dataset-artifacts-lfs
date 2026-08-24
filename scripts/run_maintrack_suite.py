@@ -92,6 +92,58 @@ def code_hashes(*relative_paths: str) -> dict[str, str | None]:
     }
 
 
+# The 2026-08-24 Arrow-cache repair changed only how Hugging Face Datasets
+# recovers from a corrupt derived Dataset.map cache.  It does not change the
+# authoritative input rows, tokenization parameters, model, optimizer, seed,
+# training schedule, or evaluation semantics.  Runs completed immediately
+# before that repair are therefore scientifically reusable.
+#
+# Keep this compatibility declaration deliberately narrow: it is enabled only
+# when the *current* run.py is the audited cache-recovery version below, and it
+# substitutes only the exact pre-repair run.py blob.  Any future change to
+# run.py, helpers.py, qa_metrics.py, pyproject.toml, uv.lock, the config, or the
+# dataset bytes will continue to invalidate prior completion markers by default.
+PRE_ARROW_CACHE_RUN_PY_SHA256 = (
+    "sha256:bfd9f316d616a52e4a57f7058307415c15b7ef6068cd7b70a20b6c691fe9e91c"
+)
+ARROW_CACHE_RECOVERY_RUN_PY_SHA256 = (
+    "sha256:0c0fb7eba903083bb957f8e93d3c8a7660636847199230614cfa59623eee78e0"
+)
+TRAIN_CODE_PATHS = ("run.py", "helpers.py", "qa_metrics.py", "pyproject.toml", "uv.lock")
+SMOKE_SEMANTICS_VERSION = 1
+SMOKE_SCIENTIFIC_CODE_PATHS = (
+    "run.py",
+    "helpers.py",
+    "dynamics.py",
+    "scripts/select_qa_subsets.py",
+)
+LEGACY_SMOKE_CODE_PATHS = (
+    *SMOKE_SCIENTIFIC_CODE_PATHS,
+    "scripts/run_maintrack_suite.py",
+)
+PRE_RESUME_COMPAT_SUITE_SHA256 = (
+    "sha256:a0fc2053c854ea6064dc1908532dfeb4c03992c080325847bbf2f5a3ba3403a0"
+)
+
+
+def compatible_run_py_hashes(current_hash: str | None) -> set[str | None]:
+    if current_hash == ARROW_CACHE_RECOVERY_RUN_PY_SHA256:
+        return {ARROW_CACHE_RECOVERY_RUN_PY_SHA256, PRE_ARROW_CACHE_RUN_PY_SHA256}
+    return {current_hash}
+
+
+def compatible_code_hashes(*relative_paths: str) -> list[dict[str, str | None]]:
+    current = code_hashes(*relative_paths)
+    if "run.py" not in current:
+        return [current]
+    variants = []
+    for run_hash in compatible_run_py_hashes(current["run.py"]):
+        variant = dict(current)
+        variant["run.py"] = run_hash
+        variants.append(variant)
+    return variants
+
+
 def fraction_label(fraction: float) -> str:
     return f"{fraction:.6f}".rstrip("0").rstrip(".").replace(".", "p")
 
@@ -310,7 +362,9 @@ def pilot_source_specs(config: dict[str, Any]) -> list[TrainSpec]:
     return specs
 
 
-def train_hash(config: dict[str, Any], spec: TrainSpec) -> str:
+def train_hash_with_code(
+    config: dict[str, Any], spec: TrainSpec, code: dict[str, str | None]
+) -> str:
     payload = {
         "task": spec.task,
         "model_key": spec.model_key,
@@ -327,9 +381,24 @@ def train_hash(config: dict[str, Any], spec: TrainSpec) -> str:
         "smoke": spec.smoke,
         "task_config": task_config(config, spec.task),
         "profile": model_profile(config, spec.model_key, spec.task),
-        "code": code_hashes("run.py", "helpers.py", "qa_metrics.py", "pyproject.toml", "uv.lock"),
+        "code": code,
     }
     return canonical_hash(payload)
+
+
+def train_hash(config: dict[str, Any], spec: TrainSpec) -> str:
+    return train_hash_with_code(config, spec, code_hashes(*TRAIN_CODE_PATHS))
+
+
+def compatible_train_hashes(config: dict[str, Any], spec: TrainSpec) -> set[str]:
+    return {
+        train_hash_with_code(config, spec, code)
+        for code in compatible_code_hashes(*TRAIN_CODE_PATHS)
+    }
+
+
+def train_hash_is_compatible(config: dict[str, Any], spec: TrainSpec, value: Any) -> bool:
+    return isinstance(value, str) and value in compatible_train_hashes(config, spec)
 
 
 def train_success_path(spec: TrainSpec) -> Path:
@@ -387,33 +456,46 @@ def train_artifact_paths(spec: TrainSpec) -> list[Path] | None:
     return retained + model_paths
 
 
+def train_artifacts_match_success_marker(spec: TrainSpec, payload: dict[str, Any]) -> bool:
+    expected_sizes = payload.get("artifact_sizes", {})
+    artifacts = train_artifact_paths(spec)
+    return artifacts is not None and all(
+        expected_sizes.get(path.name) == path.stat().st_size for path in artifacts
+    )
+
+
 def train_complete(config: dict[str, Any], spec: TrainSpec) -> bool:
     marker = train_success_path(spec)
     if not marker.exists():
         return False
-    payload = json.loads(marker.read_text(encoding="utf-8"))
-    if payload.get("train_hash") != train_hash(config, spec):
+    try:
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+    marker_train_hash = payload.get("train_hash")
+    if not train_hash_is_compatible(config, spec, marker_train_hash):
         return False
     expected_sizes = payload.get("artifact_sizes", {})
 
-    artifacts = train_artifact_paths(spec)
-    if artifacts is not None and all(
-        expected_sizes.get(path.name) == path.stat().st_size for path in artifacts
-    ):
+    if train_artifacts_match_success_marker(spec, payload):
         return True
 
     # Completed runs may deliberately discard heavyweight model weights after
     # every configured evaluation has been materialized.  The prune marker is
-    # tied to both the exact suite configuration and the original train hash so
-    # an unchanged interrupted run can resume without retraining old models.
+    # tied to both the exact suite configuration and the *same* original train
+    # hash recorded by _TRAIN_SUCCESS.json.  Compatible maintenance-only hashes
+    # are accepted without rewriting scientific provenance.
     prune_marker = train_pruned_path(spec)
     retained = train_retained_artifact_paths(spec)
     if not prune_marker.exists() or retained is None or model_weight_paths(Path(spec.output_dir)):
         return False
-    pruned = json.loads(prune_marker.read_text(encoding="utf-8"))
+    try:
+        pruned = json.loads(prune_marker.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
     return (
         pruned.get("config_hash") == config_hash(config)
-        and pruned.get("train_hash") == train_hash(config, spec)
+        and pruned.get("train_hash") == marker_train_hash
         and all(expected_sizes.get(path.name) == path.stat().st_size for path in retained)
     )
 
@@ -491,6 +573,22 @@ def write_success_marker(path: Path, payload: dict[str, Any]) -> None:
     os.replace(temporary, path)
 
 
+def archive_invalid_train_markers(spec: TrainSpec) -> list[Path]:
+    archived = []
+    timestamp = now_utc().replace(":", "").replace("-", "")
+    for marker in (train_success_path(spec), train_pruned_path(spec)):
+        if not marker.exists():
+            continue
+        destination = marker.with_name(f"{marker.name}.invalid-{timestamp}")
+        counter = 1
+        while destination.exists():
+            destination = marker.with_name(f"{marker.name}.invalid-{timestamp}-{counter}")
+            counter += 1
+        os.replace(marker, destination)
+        archived.append(destination)
+    return archived
+
+
 def run_train(
     config: dict[str, Any],
     spec: TrainSpec,
@@ -508,6 +606,12 @@ def run_train(
             print(f"[skip train] {spec.run_id}", flush=True)
         return
     output_dir = Path(spec.output_dir)
+    if not dry_run:
+        archived = archive_invalid_train_markers(spec)
+        if archived:
+            with PRINT_LOCK:
+                names = ", ".join(path.name for path in archived)
+                print(f"[archive invalid marker] {spec.run_id}: {names}", flush=True)
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
         (output_dir / "maintrack_train_spec.json").write_text(
@@ -548,16 +652,31 @@ def evalsets_for(config: dict[str, Any], spec: TrainSpec) -> list[tuple[str, str
     return [(name, task["evalsets"][name]) for name in names]
 
 
-def eval_hash(config: dict[str, Any], spec: TrainSpec, evalset: str, path: str) -> str:
+def eval_hash_for_train_hash(
+    config: dict[str, Any], spec: TrainSpec, evalset: str, path: str, source_train_hash: str
+) -> str:
     return canonical_hash(
         {
-            "train_hash": train_hash(config, spec),
+            "train_hash": source_train_hash,
             "evalset": evalset,
             "dataset": path,
             "dataset_sha256": sha256_if_exists(path),
             "profile": model_profile(config, spec.model_key, spec.task),
         }
     )
+
+
+def eval_hash(config: dict[str, Any], spec: TrainSpec, evalset: str, path: str) -> str:
+    return eval_hash_for_train_hash(config, spec, evalset, path, train_hash(config, spec))
+
+
+def compatible_eval_hashes(
+    config: dict[str, Any], spec: TrainSpec, evalset: str, path: str
+) -> set[str]:
+    return {
+        eval_hash_for_train_hash(config, spec, evalset, path, source_train_hash)
+        for source_train_hash in compatible_train_hashes(config, spec)
+    }
 
 
 def eval_args(config: dict[str, Any], spec: TrainSpec, eval_path: str, eval_out: Path) -> list[str]:
@@ -671,7 +790,7 @@ def eval_complete(config: dict[str, Any], spec: TrainSpec, evalset: str, eval_pa
     try:
         prior = json.loads(metrics_out.read_text(encoding="utf-8"))
         return (
-            prior.get("eval_hash") == eval_hash(config, spec, evalset, eval_path)
+            prior.get("eval_hash") in compatible_eval_hashes(config, spec, evalset, eval_path)
             and prior.get("predictions_hash") == sha256_file(predictions_dest)
         )
     except (OSError, ValueError, json.JSONDecodeError):
@@ -689,8 +808,17 @@ def prune_model_weights(config: dict[str, Any], spec: TrainSpec) -> int:
     """Discard model weights only after all canonical evaluation artifacts exist."""
     if not train_success_path(spec).exists() or not all_evals_complete(config, spec):
         return 0
-    success = json.loads(train_success_path(spec).read_text(encoding="utf-8"))
-    if success.get("train_hash") != train_hash(config, spec):
+    try:
+        success = json.loads(train_success_path(spec).read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return 0
+    marker_train_hash = success.get("train_hash")
+    if not train_hash_is_compatible(config, spec, marker_train_hash):
+        return 0
+    # Never prune a run whose retained/model artifacts no longer match the
+    # success marker.  A killed accidental restart can modify files underneath
+    # an old marker; those bytes must be treated as damaged, not completed.
+    if not train_artifacts_match_success_marker(spec, success):
         return 0
     output_dir = Path(spec.output_dir)
     weights = model_weight_paths(output_dir)
@@ -703,7 +831,7 @@ def prune_model_weights(config: dict[str, Any], spec: TrainSpec) -> int:
         {
             "run_id": spec.run_id,
             "config_hash": config_hash(config),
-            "train_hash": train_hash(config, spec),
+            "train_hash": marker_train_hash,
             "removed_model_files": removed,
             "bytes_freed": freed,
             "pruned_at_utc": now_utc(),
@@ -1058,16 +1186,36 @@ def map_definitions_for_source(
     return list(definitions.items())
 
 
-def cartography_completion_hash(
-    config: dict[str, Any], spec: TrainSpec, definition: dict[str, Any]
+def cartography_completion_hash_for_train_hash(
+    config: dict[str, Any],
+    spec: TrainSpec,
+    definition: dict[str, Any],
+    source_train_hash: str,
 ) -> str:
     return canonical_hash(
         {
-            "source_train_hash": train_hash(config, spec),
+            "source_train_hash": source_train_hash,
             "definition": definition,
             "code": code_hashes("dynamics.py"),
         }
     )
+
+
+def cartography_completion_hash(
+    config: dict[str, Any], spec: TrainSpec, definition: dict[str, Any]
+) -> str:
+    return cartography_completion_hash_for_train_hash(
+        config, spec, definition, train_hash(config, spec)
+    )
+
+
+def compatible_cartography_completion_hashes(
+    config: dict[str, Any], spec: TrainSpec, definition: dict[str, Any]
+) -> set[str]:
+    return {
+        cartography_completion_hash_for_train_hash(config, spec, definition, source_train_hash)
+        for source_train_hash in compatible_train_hashes(config, spec)
+    }
 
 
 def cartography_complete(
@@ -1082,7 +1230,7 @@ def cartography_complete(
     if not csv_path.exists() or not marker.exists():
         return False
     payload = json.loads(marker.read_text(encoding="utf-8"))
-    return payload.get("map_hash") == cartography_completion_hash(
+    return payload.get("map_hash") in compatible_cartography_completion_hashes(
         config, spec, definition
     ) and payload.get("scores_sha256") == sha256_file(csv_path)
 
@@ -1910,20 +2058,47 @@ def smoke_selected_spec(config: dict[str, Any], spec: TrainSpec) -> TrainSpec:
     )
 
 
-def smoke_completion_hash(config: dict[str, Any]) -> str:
+def smoke_completion_hash_with_code(
+    config: dict[str, Any], code: dict[str, str | None]
+) -> str:
     return canonical_hash(
         {
             "config_hash": config_hash(config),
             "data": {str(path): sha256_file(path) for path in required_data_paths(config)},
-            "code": code_hashes(
-                "run.py",
-                "helpers.py",
-                "dynamics.py",
-                "scripts/select_qa_subsets.py",
-                "scripts/run_maintrack_suite.py",
-            ),
+            "semantics_version": SMOKE_SEMANTICS_VERSION,
+            "code": code,
         }
     )
+
+
+def legacy_smoke_completion_hash_with_code(
+    config: dict[str, Any], code: dict[str, str | None]
+) -> str:
+    return canonical_hash(
+        {
+            "config_hash": config_hash(config),
+            "data": {str(path): sha256_file(path) for path in required_data_paths(config)},
+            "code": code,
+        }
+    )
+
+
+def smoke_completion_hash(config: dict[str, Any]) -> str:
+    return smoke_completion_hash_with_code(config, code_hashes(*SMOKE_SCIENTIFIC_CODE_PATHS))
+
+
+def compatible_smoke_completion_hashes(config: dict[str, Any]) -> set[str]:
+    hashes = {smoke_completion_hash(config)}
+    legacy_current = code_hashes(*LEGACY_SMOKE_CODE_PATHS)
+    # The old smoke hash accidentally included the entire scheduler.  Accept
+    # markers from the exact pre-resume scheduler while moving new markers to a
+    # versioned scientific hash that is not invalidated by orchestration fixes.
+    legacy_current["scripts/run_maintrack_suite.py"] = PRE_RESUME_COMPAT_SUITE_SHA256
+    for run_hash in compatible_run_py_hashes(legacy_current["run.py"]):
+        legacy_code = dict(legacy_current)
+        legacy_code["run.py"] = run_hash
+        hashes.add(legacy_smoke_completion_hash_with_code(config, legacy_code))
+    return hashes
 
 
 def smoke_auxiliary_paths(config: dict[str, Any], specs: list[TrainSpec]) -> list[Path]:
@@ -1949,7 +2124,7 @@ def smoke_complete(config: dict[str, Any], marker: Path) -> bool:
         return False
     specs = configured_smoke_specs(config)
     payload = json.loads(marker.read_text(encoding="utf-8"))
-    if payload.get("smoke_hash") != smoke_completion_hash(config):
+    if payload.get("smoke_hash") not in compatible_smoke_completion_hashes(config):
         return False
     for spec in specs:
         if not train_complete(config, spec):

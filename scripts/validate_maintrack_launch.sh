@@ -51,6 +51,11 @@ uv run --no-sync python scripts/run_maintrack_suite.py \
   --stage data \
   --gpu-ids "$MAINTRACK_GPU_IDS"
 
+echo "=== foreground launch validation: resume-integrity audit ==="
+uv run --no-sync python scripts/audit_maintrack_resume.py \
+  --config "$config_path" \
+  --max-damaged-prior-trains "${MAINTRACK_MAX_DAMAGED_PRIOR_TRAINS:-4}"
+
 echo "=== foreground launch validation: end-to-end GPU smoke matrix ==="
 uv run --no-sync python scripts/run_maintrack_suite.py \
   --config "$config_path" \

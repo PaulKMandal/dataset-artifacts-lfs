@@ -42,6 +42,7 @@ uv run --no-sync ruff check \
   run.py helpers.py dynamics.py \
   scripts/run_maintrack_suite.py \
   scripts/aggregate_maintrack_metrics.py \
+  scripts/audit_maintrack_resume.py \
   scripts/materialize_qa_data.py \
   scripts/materialize_sentence_classification.py \
   scripts/select_qa_subsets.py \

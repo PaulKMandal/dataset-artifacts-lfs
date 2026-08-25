@@ -8,7 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from scripts import reclaim_maintrack_space as reclaimer, run_maintrack_suite as suite
+from scripts import (
+    reclaim_maintrack_space as reclaimer,
+    run_maintrack_suite as suite,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 

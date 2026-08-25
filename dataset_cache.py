@@ -2,8 +2,21 @@
 
 from __future__ import annotations
 
+import os
+import re
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
+
+
+def _scratch_cache_file(description: str) -> str | None:
+    root = os.environ.get("DATASET_ARTIFACTS_MAP_CACHE_DIR")
+    if not root:
+        return None
+    directory = Path(root)
+    directory.mkdir(parents=True, exist_ok=True)
+    slug = re.sub(r"[^a-zA-Z0-9_.-]+", "-", description).strip("-") or "dataset-map"
+    return str(directory / f"{slug}.arrow")
 
 
 def map_with_cache_recovery(
@@ -27,6 +40,12 @@ def map_with_cache_recovery(
     If recomputation itself fails, the second exception is allowed to escape;
     this helper never hides a real preprocessing/data error.
     """
+
+    if "cache_file_name" not in map_kwargs:
+        scratch_file = _scratch_cache_file(description)
+        if scratch_file is not None:
+            map_kwargs = dict(map_kwargs)
+            map_kwargs["cache_file_name"] = scratch_file
 
     try:
         return dataset.map(function, **map_kwargs)

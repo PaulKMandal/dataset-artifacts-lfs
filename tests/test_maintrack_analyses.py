@@ -1,3 +1,4 @@
+import gzip
 import json
 
 import pandas as pd
@@ -5,7 +6,7 @@ import pytest
 
 from scripts.analyze_map_stability import ambiguous_indices, compare_maps, correlation
 from scripts.combine_cartography_maps import consensus
-from scripts.hierarchical_bootstrap import run_contrast
+from scripts.hierarchical_bootstrap import read_jsonl, run_contrast
 
 
 def map_frame(confidence, variability):
@@ -88,3 +89,11 @@ def test_hierarchical_bootstrap_preserves_direction(tmp_path):
     )
     assert result["mean_difference_points"] == pytest.approx(50.0, abs=6.0)
     assert result["probability_a_gt_b"] > 0.9
+
+
+def test_hierarchical_bootstrap_reads_gzip_predictions(tmp_path):
+    predictions = tmp_path / "predictions.jsonl.gz"
+    with gzip.open(predictions, "wt", encoding="utf-8") as handle:
+        handle.write(json.dumps({"id": "0", "exact_match": 1, "f1": 1}) + "\n")
+    rows = read_jsonl(predictions)
+    assert rows == [{"id": "0", "exact_match": 1, "f1": 1}]

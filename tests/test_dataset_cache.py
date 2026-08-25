@@ -115,3 +115,24 @@ def test_recovers_real_truncated_hf_arrow_cache(tmp_path):
 
     assert recovered["mapped"] == [2, 3, 4]
     assert cache_path.stat().st_size > 0
+
+
+def test_map_routes_derived_cache_to_ephemeral_scratch(monkeypatch, tmp_path):
+    dataset = FakeDataset(["mapped"])
+    monkeypatch.setenv("DATASET_ARTIFACTS_MAP_CACHE_DIR", str(tmp_path))
+
+    def transform(row):
+        return row
+
+    result = map_with_cache_recovery(
+        dataset,
+        transform,
+        cache_error_types=CacheReadError,
+        description="evaluation feature preprocessing",
+        batched=True,
+    )
+
+    assert result == "mapped"
+    cache_file = Path(dataset.calls[0][1]["cache_file_name"])
+    assert cache_file.parent == tmp_path
+    assert cache_file.name == "evaluation-feature-preprocessing.arrow"

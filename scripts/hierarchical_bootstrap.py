@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -12,6 +13,9 @@ import numpy as np
 
 
 def read_jsonl(path: Path) -> list[dict]:
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            return [json.loads(line) for line in handle if line.strip()]
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
 

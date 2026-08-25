@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import hashlib
 import json
 import os
@@ -20,6 +21,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import traceback
@@ -34,6 +36,8 @@ PRINT_LOCK = threading.Lock()
 HASH_LOCK = threading.Lock()
 FILE_HASH_CACHE: dict[tuple[str, int, int], str] = {}
 REPO_ROOT = Path(__file__).resolve().parents[1]
+HF_SCRATCH_ROOT_DEFAULT = Path("/tmp/dataset-artifacts-maintrack-hf")
+HF_SCRATCH_MIN_FREE_GIB_DEFAULT = 8.0
 
 
 @dataclass(frozen=True)
@@ -259,6 +263,46 @@ class StatusTracker:
             self._write_state()
 
 
+def hf_scratch_root() -> Path:
+    return Path(os.environ.get("MAINTRACK_HF_SCRATCH_ROOT", str(HF_SCRATCH_ROOT_DEFAULT)))
+
+
+def _is_model_runner_command(args: list[str]) -> bool:
+    return len(args) >= 2 and Path(args[1]).name == "run.py"
+
+
+def _make_hf_scratch_dir() -> Path:
+    root = hf_scratch_root()
+    root.mkdir(parents=True, exist_ok=True)
+    minimum_gib = float(
+        os.environ.get("MAINTRACK_HF_SCRATCH_MIN_FREE_GIB", HF_SCRATCH_MIN_FREE_GIB_DEFAULT)
+    )
+    free = shutil.disk_usage(root).free
+    minimum = int(minimum_gib * 1024**3)
+    if free < minimum:
+        raise RuntimeError(
+            f"HF preprocessing scratch at {root} has only {free / 1024**3:.2f} GiB free; "
+            f"need at least {minimum_gib:.2f} GiB"
+        )
+    return Path(tempfile.mkdtemp(prefix="job-", dir=root))
+
+
+def cleanup_stale_hf_scratch() -> tuple[int, int]:
+    """Remove only scratch directories owned by this suite from prior dead jobs."""
+    root = hf_scratch_root()
+    if not root.exists():
+        return 0, 0
+    removed_dirs = 0
+    removed_bytes = 0
+    for path in sorted(root.glob("job-*")):
+        if not path.is_dir():
+            continue
+        removed_bytes += sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
+        shutil.rmtree(path)
+        removed_dirs += 1
+    return removed_dirs, removed_bytes
+
+
 def run_cmd(
     args: list[str],
     *,
@@ -281,6 +325,14 @@ def run_cmd(
                 handle.write(f"\n[{now_utc()}] $ {display}\n")
     if dry_run:
         return
+
+    scratch_dir = None
+    if _is_model_runner_command(args):
+        scratch_dir = _make_hf_scratch_dir()
+        environment["DATASET_ARTIFACTS_MAP_CACHE_DIR"] = str(scratch_dir)
+        with PRINT_LOCK:
+            print(f"[map scratch] {scratch_dir}", flush=True)
+
     started = time.monotonic()
     try:
         subprocess.run(args, check=True, env=environment)
@@ -290,6 +342,9 @@ def run_cmd(
                 f"[{now_utc()}] FAILED exit={exc.returncode} elapsed={time.monotonic() - started:.1f}s\n"
             )
         raise
+    finally:
+        if scratch_dir is not None:
+            shutil.rmtree(scratch_dir, ignore_errors=True)
     with PRINT_LOCK, log_path.open("a", encoding="utf-8") as handle:
         handle.write(f"[{now_utc()}] completed elapsed={time.monotonic() - started:.1f}s\n")
 
@@ -730,6 +785,118 @@ def read_jsonl_count(path: Path) -> int:
         return sum(1 for line in handle if line.strip())
 
 
+def prediction_candidates(results_dir: Path, eval_id: str) -> list[Path]:
+    predictions_dir = results_dir / "predictions"
+    return [
+        predictions_dir / f"{eval_id}.jsonl.gz",
+        predictions_dir / f"{eval_id}.jsonl",
+    ]
+
+
+def matching_prediction_path(
+    results_dir: Path, eval_id: str, expected_hash: str | None
+) -> Path | None:
+    if not isinstance(expected_hash, str):
+        return None
+    for path in prediction_candidates(results_dir, eval_id):
+        if not path.exists() or not path.is_file():
+            continue
+        try:
+            if sha256_file(path) == expected_hash:
+                return path
+        except OSError:
+            continue
+    return None
+
+
+def gzip_copy_atomic(source: Path, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
+    try:
+        with source.open("rb") as source_handle, temporary.open("wb") as raw_handle:
+            with gzip.GzipFile(
+                filename="",
+                mode="wb",
+                fileobj=raw_handle,
+                compresslevel=1,
+                mtime=0,
+            ) as gzip_handle:
+                shutil.copyfileobj(source_handle, gzip_handle, length=1024 * 1024)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def compress_completed_predictions(results_dir: Path) -> dict[str, int]:
+    """Losslessly gzip legacy canonical JSONL predictions with integrity checks."""
+    predictions_dir = results_dir / "predictions"
+    metrics_dir = results_dir / "metrics" / "raw"
+    compressed_files = 0
+    bytes_before = 0
+    bytes_after = 0
+    skipped_invalid = 0
+    if not predictions_dir.exists() or not metrics_dir.exists():
+        return {
+            "compressed_prediction_files": 0,
+            "prediction_bytes_before": 0,
+            "prediction_bytes_after": 0,
+            "prediction_bytes_freed": 0,
+            "prediction_files_skipped_invalid": 0,
+        }
+
+    for source in sorted(predictions_dir.glob("*.jsonl")):
+        eval_id = source.name[: -len(".jsonl")]
+        metrics_path = metrics_dir / f"{eval_id}.json"
+        if not metrics_path.exists():
+            skipped_invalid += 1
+            continue
+        try:
+            payload = json.loads(metrics_path.read_text(encoding="utf-8"))
+            source_hash = sha256_file(source)
+        except (OSError, ValueError, json.JSONDecodeError):
+            skipped_invalid += 1
+            continue
+        destination = predictions_dir / f"{eval_id}.jsonl.gz"
+        if payload.get("predictions_hash") != source_hash:
+            # A crash after the metrics marker was migrated but before the
+            # legacy JSONL was unlinked can leave both files. If the marker
+            # authenticates the gzip file, the plain duplicate is safe to drop.
+            if destination.exists() and payload.get("predictions_hash") == sha256_file(
+                destination
+            ):
+                original_size = source.stat().st_size
+                source.unlink()
+                bytes_before += original_size
+                compressed_files += 1
+                continue
+            skipped_invalid += 1
+            continue
+
+        gzip_copy_atomic(source, destination)
+        destination_hash = sha256_file(destination)
+        original_size = source.stat().st_size
+        compressed_size = destination.stat().st_size
+
+        migrated = dict(payload)
+        migrated["predictions_path"] = str(destination)
+        migrated["predictions_hash"] = destination_hash
+        migrated["predictions_compression"] = "gzip"
+        write_success_marker(metrics_path, migrated)
+        source.unlink()
+
+        compressed_files += 1
+        bytes_before += original_size
+        bytes_after += compressed_size
+
+    return {
+        "compressed_prediction_files": compressed_files,
+        "prediction_bytes_before": bytes_before,
+        "prediction_bytes_after": bytes_after,
+        "prediction_bytes_freed": bytes_before - bytes_after,
+        "prediction_files_skipped_invalid": skipped_invalid,
+    }
+
+
 def normalize_eval_metrics(
     config: dict[str, Any],
     spec: TrainSpec,
@@ -784,14 +951,16 @@ def eval_complete(config: dict[str, Any], spec: TrainSpec, evalset: str, eval_pa
     results_dir = Path(config["suite"]["results_dir"])
     eval_id = f"{spec.run_id}__{evalset}"
     metrics_out = results_dir / "metrics" / "raw" / f"{eval_id}.json"
-    predictions_dest = results_dir / "predictions" / f"{eval_id}.jsonl"
-    if not metrics_out.exists() or not predictions_dest.exists():
+    if not metrics_out.exists():
         return False
     try:
         prior = json.loads(metrics_out.read_text(encoding="utf-8"))
+        predictions = matching_prediction_path(
+            results_dir, eval_id, prior.get("predictions_hash")
+        )
         return (
-            prior.get("eval_hash") in compatible_eval_hashes(config, spec, evalset, eval_path)
-            and prior.get("predictions_hash") == sha256_file(predictions_dest)
+            predictions is not None
+            and prior.get("eval_hash") in compatible_eval_hashes(config, spec, evalset, eval_path)
         )
     except (OSError, ValueError, json.JSONDecodeError):
         return False
@@ -878,17 +1047,26 @@ def reclaim_completed_run_space(config: dict[str, Any]) -> dict[str, int]:
     evals_dir = results_dir / "evals"
     if evals_dir.exists():
         metrics_dir = results_dir / "metrics" / "raw"
-        predictions_dir = results_dir / "predictions"
         for eval_dir in sorted(path for path in evals_dir.iterdir() if path.is_dir()):
             metrics = metrics_dir / f"{eval_dir.name}.json"
-            predictions = predictions_dir / f"{eval_dir.name}.jsonl"
-            if not metrics.exists() or not predictions.exists():
+            if not metrics.exists():
+                continue
+            try:
+                payload = json.loads(metrics.read_text(encoding="utf-8"))
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+            predictions = matching_prediction_path(
+                results_dir, eval_dir.name, payload.get("predictions_hash")
+            )
+            if predictions is None:
                 continue
             scratch_bytes += sum(
                 path.stat().st_size for path in eval_dir.rglob("*") if path.is_file()
             )
             shutil.rmtree(eval_dir)
             scratch_dirs += 1
+    prediction_report = compress_completed_predictions(results_dir)
+
     return {
         "pruned_runs": pruned_runs,
         "model_bytes": freed_models,
@@ -896,7 +1074,13 @@ def reclaim_completed_run_space(config: dict[str, Any]) -> dict[str, int]:
         "partial_weight_bytes": partial_bytes,
         "eval_scratch_dirs": scratch_dirs,
         "eval_scratch_bytes": scratch_bytes,
-        "total_bytes": freed_models + partial_bytes + scratch_bytes,
+        **prediction_report,
+        "total_bytes": (
+            freed_models
+            + partial_bytes
+            + scratch_bytes
+            + prediction_report["prediction_bytes_freed"]
+        ),
     }
 
 
@@ -916,7 +1100,7 @@ def run_eval(
     job_id = f"eval:{eval_id}"
     eval_out = results_dir / "evals" / eval_id
     metrics_out = results_dir / "metrics" / "raw" / f"{eval_id}.json"
-    predictions_dest = results_dir / "predictions" / f"{eval_id}.jsonl"
+    predictions_dest = results_dir / "predictions" / f"{eval_id}.jsonl.gz"
     tracker.register(job_id, kind="eval", stage=spec.stage, run_id=spec.run_id, evalset=evalset)
     if eval_complete(config, spec, evalset, eval_path):
         tracker.transition(job_id, "complete", resumed=True)
@@ -942,12 +1126,14 @@ def run_eval(
         if not (eval_out / "eval_metrics.json").exists() or not raw_predictions.exists():
             raise RuntimeError(f"Evaluation finished without metrics/predictions for {eval_id}")
         predictions_dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(raw_predictions, predictions_dest)
+        gzip_copy_atomic(raw_predictions, predictions_dest)
         normalized = normalize_eval_metrics(
             config, spec, evalset, eval_path, eval_out, predictions_dest
         )
         metrics_out.parent.mkdir(parents=True, exist_ok=True)
         write_success_marker(metrics_out, normalized)
+        legacy_predictions = results_dir / "predictions" / f"{eval_id}.jsonl"
+        legacy_predictions.unlink(missing_ok=True)
         # eval_out is only scratch: normalized metrics and predictions now live in
         # their canonical durable locations. Avoid retaining a duplicate copy.
         shutil.rmtree(eval_out)
@@ -2534,6 +2720,14 @@ def main() -> None:
     config = load_config(config_path)
     results_dir = Path(config["suite"]["results_dir"])
     results_dir.mkdir(parents=True, exist_ok=True)
+    if not args.dry_run:
+        stale_dirs, stale_bytes = cleanup_stale_hf_scratch()
+        if stale_dirs:
+            print(
+                f"[map scratch cleanup] removed {stale_dirs} stale dirs "
+                f"({stale_bytes / 1024**3:.2f} GiB)",
+                flush=True,
+            )
     (results_dir / "configs").mkdir(parents=True, exist_ok=True)
     shutil.copy2(config_path, results_dir / "configs" / config_path.name)
     tracker = StatusTracker(results_dir, config, dry_run=args.dry_run)

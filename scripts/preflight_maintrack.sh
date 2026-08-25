@@ -39,8 +39,9 @@ PY
 export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
 uv run --no-sync pytest -q
 uv run --no-sync ruff check \
-  run.py helpers.py dynamics.py \
+  run.py helpers.py dynamics.py dataset_cache.py \
   scripts/run_maintrack_suite.py \
+  scripts/reclaim_maintrack_space.py \
   scripts/aggregate_maintrack_metrics.py \
   scripts/audit_maintrack_resume.py \
   scripts/materialize_qa_data.py \
@@ -52,7 +53,7 @@ uv run --no-sync ruff check \
   scripts/hierarchical_bootstrap.py \
   scripts/maintrack_status.py \
   tests
-uv run --no-sync python -m py_compile run.py helpers.py dynamics.py compare_adversarial.py scripts/*.py tests/*.py
+uv run --no-sync python -m py_compile run.py helpers.py dynamics.py dataset_cache.py compare_adversarial.py scripts/*.py tests/*.py
 uv run --no-sync python scripts/run_maintrack_suite.py \
   --config "$CONFIG" \
   --stage all \

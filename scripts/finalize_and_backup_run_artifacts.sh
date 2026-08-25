@@ -244,7 +244,9 @@ rsync -a --prune-empty-dirs \
 
 if [ "$INCLUDE_PREDICTIONS" = "1" ]; then
   mkdir -p "$DEST_DIR/predictions"
-  find "$RESULTS_DIR/predictions" -type f -name '*.jsonl' -size -"${MAX_BACKUP_FILE_MB}"M -print0 2>/dev/null \
+  find "$RESULTS_DIR/predictions" -type f \
+    \( -name '*.jsonl' -o -name '*.jsonl.gz' \) \
+    -size -"${MAX_BACKUP_FILE_MB}"M -print0 2>/dev/null \
     | while IFS= read -r -d '' f; do cp "$f" "$DEST_DIR/predictions/"; done
 fi
 

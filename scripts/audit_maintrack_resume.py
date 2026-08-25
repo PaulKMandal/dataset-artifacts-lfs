@@ -86,10 +86,11 @@ def main() -> None:
         for evalset, eval_path in suite.evalsets_for(config, spec):
             eval_id = f"{spec.run_id}__{evalset}"
             metrics = results_dir / "metrics" / "raw" / f"{eval_id}.json"
-            predictions = results_dir / "predictions" / f"{eval_id}.jsonl"
-            if not metrics.exists() and not predictions.exists():
+            candidates = suite.prediction_candidates(results_dir, eval_id)
+            existing_predictions = [path for path in candidates if path.exists()]
+            if not metrics.exists() and not existing_predictions:
                 continue
-            if not metrics.exists() or not predictions.exists():
+            if not metrics.exists() or not existing_predictions:
                 damaged_eval_pairs.append(eval_id)
                 continue
             prior_eval_pairs += 1
@@ -103,13 +104,10 @@ def main() -> None:
             ):
                 incompatible_eval_pairs.append(eval_id)
                 continue
-            try:
-                valid_predictions = payload.get("predictions_hash") == suite.sha256_file(
-                    predictions
-                )
-            except OSError:
-                valid_predictions = False
-            if valid_predictions:
+            predictions = suite.matching_prediction_path(
+                results_dir, eval_id, payload.get("predictions_hash")
+            )
+            if predictions is not None:
                 reusable_eval_pairs += 1
             else:
                 damaged_eval_pairs.append(eval_id)

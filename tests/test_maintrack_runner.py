@@ -1,4 +1,6 @@
+import gzip
 import json
+import sys
 import threading
 import time
 from dataclasses import replace
@@ -6,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts import run_maintrack_suite as suite
+from scripts import reclaim_maintrack_space as reclaimer, run_maintrack_suite as suite
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -475,3 +477,120 @@ def test_pre_arrow_smoke_hash_is_resume_compatible(monkeypatch, tmp_path):
     legacy_hash = suite.legacy_smoke_completion_hash_with_code(cfg, legacy_code)
     assert legacy_hash != suite.smoke_completion_hash(cfg)
     assert legacy_hash in suite.compatible_smoke_completion_hashes(cfg)
+
+
+def test_run_cmd_uses_ephemeral_hf_datasets_cache(monkeypatch, tmp_path):
+    scratch_root = tmp_path / "scratch"
+    captured = {}
+
+    def fake_run(args, check, env):
+        captured["args"] = args
+        captured["cache"] = env.get("DATASET_ARTIFACTS_MAP_CACHE_DIR")
+        cache = Path(captured["cache"])
+        assert cache.parent == scratch_root
+        (cache / "sentinel").write_text("scratch", encoding="utf-8")
+
+    monkeypatch.setenv("MAINTRACK_HF_SCRATCH_ROOT", str(scratch_root))
+    monkeypatch.setenv("MAINTRACK_HF_SCRATCH_MIN_FREE_GIB", "0")
+    monkeypatch.setattr(suite.subprocess, "run", fake_run)
+
+    suite.run_cmd(
+        [sys.executable, "run.py", "--help"],
+        log_path=tmp_path / "commands.log",
+        dry_run=False,
+    )
+
+    assert captured["cache"] is not None
+    assert not Path(captured["cache"]).exists()
+    assert list(scratch_root.iterdir()) == []
+
+
+def test_completed_predictions_can_be_losslessly_gzipped(tmp_path):
+    results = tmp_path / "results"
+    predictions = results / "predictions" / "run__dev.jsonl"
+    metrics = results / "metrics" / "raw" / "run__dev.json"
+    predictions.parent.mkdir(parents=True)
+    metrics.parent.mkdir(parents=True)
+    original = ('{"id":"q0","context":"' + "repeat-me-" * 200 + '"}\n') * 20
+    predictions.write_text(original, encoding="utf-8")
+    suite.write_success_marker(
+        metrics,
+        {
+            "eval_hash": "unchanged-scientific-hash",
+            "predictions_path": str(predictions),
+            "predictions_hash": suite.sha256_file(predictions),
+        },
+    )
+
+    report = suite.compress_completed_predictions(results)
+
+    compressed = results / "predictions" / "run__dev.jsonl.gz"
+    assert report["compressed_prediction_files"] == 1
+    assert report["prediction_bytes_freed"] > 0
+    assert not predictions.exists()
+    assert compressed.exists()
+    with gzip.open(compressed, "rt", encoding="utf-8") as handle:
+        assert handle.read() == original
+    payload = json.loads(metrics.read_text(encoding="utf-8"))
+    assert payload["eval_hash"] == "unchanged-scientific-hash"
+    assert payload["predictions_path"] == str(compressed)
+    assert payload["predictions_hash"] == suite.sha256_file(compressed)
+    assert payload["predictions_compression"] == "gzip"
+
+
+def test_eval_complete_accepts_compressed_canonical_predictions(tmp_path):
+    cfg = config()
+    cfg["suite"]["results_dir"] = str(tmp_path / "results")
+    train_data = tmp_path / "train.jsonl"
+    eval_path = tmp_path / "eval.jsonl"
+    train_data.write_text('{"idx":0}\n', encoding="utf-8")
+    eval_path.write_text('{"id":"q0"}\n', encoding="utf-8")
+    cfg["tasks"]["qa"]["evalsets"] = {"dev": str(eval_path)}
+    cfg["tasks"]["qa"]["eval_profiles"]["core"] = ["dev"]
+    spec = replace(
+        suite.source_spec(cfg, "qa", "electra_small", 42),
+        train_data=str(train_data),
+        output_dir=str(tmp_path / "run"),
+        eval_profile="core",
+    )
+    results = Path(cfg["suite"]["results_dir"])
+    eval_id = f"{spec.run_id}__dev"
+    raw = tmp_path / "raw.jsonl"
+    raw.write_text('{"id":"q0","exact_match":1,"f1":1}\n', encoding="utf-8")
+    compressed = results / "predictions" / f"{eval_id}.jsonl.gz"
+    suite.gzip_copy_atomic(raw, compressed)
+    metrics = results / "metrics" / "raw" / f"{eval_id}.json"
+    metrics.parent.mkdir(parents=True)
+    suite.write_success_marker(
+        metrics,
+        {
+            "eval_hash": suite.eval_hash(cfg, spec, "dev", str(eval_path)),
+            "predictions_path": str(compressed),
+            "predictions_hash": suite.sha256_file(compressed),
+        },
+    )
+
+    assert suite.eval_complete(cfg, spec, "dev", str(eval_path))
+
+
+def test_reclaimer_removes_only_derived_transform_caches(monkeypatch, tmp_path):
+    datasets_cache = tmp_path / "datasets"
+    json_cache = datasets_cache / "json" / "generated"
+    mrqa_cache = datasets_cache / "tau___mrqa" / "newsqa"
+    json_cache.mkdir(parents=True)
+    mrqa_cache.mkdir(parents=True)
+    derived = json_cache / "cache-deadbeef.arrow"
+    base_json = json_cache / "json-train.arrow"
+    base_mrqa = mrqa_cache / "mrqa-train.arrow"
+    derived.write_bytes(b"x" * 4096)
+    base_json.write_bytes(b"z" * 2048)
+    base_mrqa.write_bytes(b"y" * 1024)
+    monkeypatch.setenv("HF_DATASETS_CACHE", str(datasets_cache))
+
+    removed_files, removed_bytes = reclaimer.reclaim_persistent_transform_cache()
+
+    assert removed_files == 1
+    assert removed_bytes == 4096
+    assert not derived.exists()
+    assert base_json.exists()
+    assert base_mrqa.exists()

@@ -1,0 +1,10 @@
+# Add-on panel to fill the only missing budget-curve point in the original
+# main-track design without changing configs/maintrack.full.yaml (and therefore
+# without invalidating any existing completion/prune markers).
+base_config: configs/maintrack.full.yaml
+model: electra_base
+tasks: [qa, classification]
+fraction: 0.20
+subsets: [random, easy, ambiguous, hard]
+random_draws: 3
+seed: 42

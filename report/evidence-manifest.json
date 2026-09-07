@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "snapshot_utc": "2026-09-07T15:47:54+00:00",
+  "sources": [
+    {
+      "id": "experiment-snapshot",
+      "kind": "verified_experiment_snapshot",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/experiment-snapshot.json",
+      "sha256": "70b133c19da6b873b83e9065e46482fa12b4e8f1e28011ad22a99b43b2b3dc53",
+      "size_bytes": 6007,
+      "snapshot_path": "evidence/0000-experiment-snapshot.json"
+    },
+    {
+      "id": "cell-0-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-0-output-0.json",
+      "sha256": "59b8746074dd1dc12049db2c3787f7f342603861dfd003af50ebd16d34bcfbdc",
+      "size_bytes": 21010,
+      "snapshot_path": "evidence/0001-cell-0-output-0.json"
+    },
+    {
+      "id": "cell-1-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-1-output-0.json",
+      "sha256": "0e5a1d128d16ef78ba6a36dd5f9e02eea119236bece41ec62b21328e292d0715",
+      "size_bytes": 20895,
+      "snapshot_path": "evidence/0002-cell-1-output-0.json"
+    },
+    {
+      "id": "cell-2-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-2-output-0.json",
+      "sha256": "423d13f6120e347f537ebea533873e6c09cac4b3c93f60a71dfaf60a3c7764b5",
+      "size_bytes": 19866,
+      "snapshot_path": "evidence/0003-cell-2-output-0.json"
+    },
+    {
+      "id": "cell-3-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-3-output-0.json",
+      "sha256": "f7a3a7d386a20a0c319dafa0607280782dc4698307d61f041b18338924a0a402",
+      "size_bytes": 19758,
+      "snapshot_path": "evidence/0004-cell-3-output-0.json"
+    },
+    {
+      "id": "cell-4-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-4-output-0.json",
+      "sha256": "caf2282e59e24e10ebaf5e2d2618d19eac98498f17a6951177950ae1a1ec7959",
+      "size_bytes": 19816,
+      "snapshot_path": "evidence/0005-cell-4-output-0.json"
+    },
+    {
+      "id": "cell-5-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-5-output-0.json",
+      "sha256": "af3820530205ec7ef12674d5fe449fc3e75f858cae063fdd8902dc4a41837ebd",
+      "size_bytes": 19706,
+      "snapshot_path": "evidence/0006-cell-5-output-0.json"
+    },
+    {
+      "id": "cell-6-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-6-output-0.json",
+      "sha256": "554ae461b29c6f30ce69d0437d438dff162c008492a6c2dd107362aaa1e7f9b0",
+      "size_bytes": 19926,
+      "snapshot_path": "evidence/0007-cell-6-output-0.json"
+    },
+    {
+      "id": "cell-7-output-0",
+      "kind": "verified_result_artifact",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/cell-7-output-0.json",
+      "sha256": "61f1a1fa30e5d6d43411363f27f196c8adf02c0c5a657e075ca0351c01d520b1",
+      "size_bytes": 19817,
+      "snapshot_path": "evidence/0008-cell-7-output-0.json"
+    },
+    {
+      "id": "workflow-chain",
+      "kind": "workflow_provenance",
+      "original_path": "/home/rhel/.local/state/researchd/autonomy/report-jobs/recovery-5584ea99293a4802b26da8bb-r2/frozen-input-ah0yiowc/workflow-chain.json",
+      "sha256": "394d9dfee9462c1622ecffc77f99c36ff848613b47fed2955a2c5ade47611c45",
+      "size_bytes": 2294,
+      "snapshot_path": "evidence/0009-workflow-chain.json"
+    }
+  ]
+}

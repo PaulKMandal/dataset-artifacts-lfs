@@ -1,0 +1,88 @@
+% House plot styles for print-first internal research reports.
+% Color preference: Statistical Adversaries palette. Quantitative bar grammar:
+% Dataset Cartography / ACL-style outlines, patterns, redundant encodings, and
+% light horizontal grids drawn behind the data.
+\usetikzlibrary{patterns}
+
+% Dataset Cartography / ACL neutral tones used for grayscale-first alternatives.
+\definecolor{CartGrid}{HTML}{E1E3E5}
+\definecolor{CartDark}{HTML}{2D3033}
+\definecolor{CartMid}{HTML}{686D72}
+\definecolor{CartLight}{HTML}{A3A7AB}
+
+% Statistical Adversaries palette. These are the preferred report colors when
+% color is useful: warm orange, clear blue, green, and purple, with pale fills.
+\definecolor{SAOrange}{HTML}{E58913}
+\definecolor{SAOrangeFill}{HTML}{F9D7A4}
+\definecolor{SABlue}{HTML}{1682C4}
+\definecolor{SABlueFill}{HTML}{D6E8F7}
+\definecolor{SAGreen}{HTML}{239B38}
+\definecolor{SAGreenFill}{HTML}{D6EED3}
+\definecolor{SAPurple}{HTML}{7A2CA6}
+\definecolor{SAPurpleFill}{HTML}{E8D3EF}
+
+% Preferred colored line cycle: Statistical Adversaries colors with redundant
+% line and marker encodings so a grayscale printout still works.
+\pgfplotscreateplotcyclelist{sa-lines}{%
+  {SAOrange,very thick,mark=*,mark options={solid,fill=SAOrange}},%
+  {SABlue,very thick,dashed,mark=square*,mark options={solid,fill=SABlue}},%
+  {SAGreen!90!black,very thick,densely dotted,mark=triangle*,mark options={solid,fill=SAGreen!90!black}},%
+  {SAPurple,very thick,dashdotted,mark=diamond*,mark options={solid,fill=SAPurple}}%
+}
+
+% Optional ACL / Dataset Cartography-style line cycle. This is deliberately
+% close to monochrome: use it when the goal is a paper-like/grayscale-first
+% quantitative figure rather than a colorful dashboard. A standalone Figure 1
+% comparison uses this style; it is not the default color instruction.
+\pgfplotscreateplotcyclelist{acl-cartography-lines}{%
+  {CartDark,very thick,mark=*,mark options={solid,fill=CartDark}},%
+  {CartMid,very thick,dashed,mark=square*,mark options={solid,fill=white,draw=CartMid}},%
+  {CartLight!70!black,very thick,densely dotted,mark=triangle*,mark options={solid,fill=CartLight!70!black}}%
+}
+
+\pgfplotsset{
+  report quantitative axis/.style={
+    axis line style={draw=CartDark!78,line width=0.55pt},
+    tick style={draw=CartDark!78,line width=0.45pt},
+    tick label style={font=\footnotesize,text=CartDark},
+    label style={font=\footnotesize,text=CartDark},
+    title style={font=\small,text=CartDark},
+    ymajorgrids=true,
+    xmajorgrids=false,
+    grid style={draw=CartGrid,line width=0.30pt},
+    axis on top=false,
+    legend style={font=\footnotesize,draw=none,fill=none,cells={anchor=west}},
+  },
+  report sa lines/.style={
+    report quantitative axis,
+    cycle list name=sa-lines,
+  },
+  report acl cartography lines/.style={
+    report quantitative axis,
+    cycle list name=acl-cartography-lines,
+  },
+  report cartography bars/.style={
+    report quantitative axis,
+    ybar,
+    axis on top=false,
+    legend image code/.code={\draw[##1] (0cm,-0.09cm) rectangle (0.34cm,0.09cm);},
+  },
+}
+
+% Dataset Cartography bar grammar + preferred Statistical Adversaries colors.
+% Fills are opaque, grids are behind bars, and patterns/outline differences keep
+% the comparison legible in grayscale.
+\tikzset{
+  cartography bar A/.style={draw=SAOrange!80!black,line width=0.70pt,fill=SAOrangeFill,pattern=north east lines,pattern color=SAOrange!80!black},
+  cartography bar B/.style={draw=SABlue!80!black,line width=0.70pt,fill=SABlueFill,pattern=dots,pattern color=SABlue!80!black},
+  cartography bar C/.style={draw=SAGreen!75!black,line width=0.70pt,fill=SAGreenFill,pattern=crosshatch,pattern color=SAGreen!75!black},
+  cartography bar D/.style={draw=SAPurple!80!black,line width=0.70pt,fill=SAPurpleFill,pattern=horizontal lines,pattern color=SAPurple!80!black},
+}
+
+% Statistical Adversaries semantic diagram nodes.
+\tikzset{
+  statadv construction/.style={draw=SAOrange,line width=0.70pt,fill=SAOrangeFill,rounded corners=5pt},
+  statadv application/.style={draw=SABlue,line width=0.70pt,fill=SABlueFill,rounded corners=5pt},
+  statadv control/.style={draw=SAGreen,line width=0.70pt,fill=SAGreenFill,rounded corners=5pt},
+  statadv evaluation/.style={draw=SAPurple,line width=0.70pt,fill=SAPurpleFill,rounded corners=5pt},
+}

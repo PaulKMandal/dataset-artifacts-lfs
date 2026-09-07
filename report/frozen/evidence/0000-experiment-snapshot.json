@@ -1,0 +1,163 @@
+{
+  "captured_at": "2026-09-07T15:47:54+00:00",
+  "cell_count": 8,
+  "cells": [
+    {
+      "cell_index": 0,
+      "finished_at": "2026-09-07T00:53:58+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "61ba2395960f0c0c0b7310d0ea1ee56ee8fc6c94683975cf7597a721a7b5cbb0",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "0",
+        "SLURM_JOB_ID": "263",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T00:26:21+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 1,
+      "finished_at": "2026-09-07T00:54:07+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "97bf4573c4f9254afc264f32f92acbb64ec2c3a380c673228b99f1cfdcde1610",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "1",
+        "SLURM_JOB_ID": "264",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T00:26:21+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 2,
+      "finished_at": "2026-09-07T01:30:18+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "847cf7a42e44cccf348180b113cdda5e37e1dd92628af4e7ebbe2466da6775b8",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "2",
+        "SLURM_JOB_ID": "265",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T00:53:59+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 3,
+      "finished_at": "2026-09-07T01:30:25+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "90f464b0a562b72895335b184279bf8b64422bc6ff9e119d405f3a71d83b3bfe",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "3",
+        "SLURM_JOB_ID": "266",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T00:54:08+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 4,
+      "finished_at": "2026-09-07T01:45:08+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "10be02845597c39095518e94367b3121911eaebf7387d034b280fc53abd707e4",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "4",
+        "SLURM_JOB_ID": "267",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T01:30:20+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 5,
+      "finished_at": "2026-09-07T01:45:11+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "7a736441b6c67d4651768ba1778cbe2e9156b5ab255a3a509345996493c13cf7",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "5",
+        "SLURM_JOB_ID": "268",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T01:30:26+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 6,
+      "finished_at": "2026-09-07T02:14:46+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "57e3542cd8a2d64f9970d89d7f8b0470e415f6289835bdf275b854b300957695",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "6",
+        "SLURM_JOB_ID": "269",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T01:45:09+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    },
+    {
+      "cell_index": 7,
+      "finished_at": "2026-09-07T02:14:51+00:00",
+      "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+      "receipt_sha256": "b0905b208654995032797f0d7bf72257fd503d848eb74087b65068839967b099",
+      "return_code": 0,
+      "slurm": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "SLURM_ARRAY_JOB_ID": "262",
+        "SLURM_ARRAY_TASK_ID": "7",
+        "SLURM_JOB_ID": "262",
+        "SLURM_JOB_PARTITION": "gpu",
+        "SLURM_JOB_QOS": "research_normal"
+      },
+      "started_at": "2026-09-07T01:45:12+00:00",
+      "status": "verified",
+      "used_resume_command": false
+    }
+  ],
+  "experiment_id": "exp-production-20260907-002620-a05deb",
+  "manifest_hash": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+  "name": "Classification collapse diagnostic eight-cell production",
+  "primary_git_state": {
+    "branch": "researchd/task-20260907-001410-bc67500d",
+    "commit": "1b3301b694d47660a12c69f6675f107862325108",
+    "feature_name": "Classification collapse diagnostic eight-cell production",
+    "repository": "/home/rhel/Projects/dataset-artifacts-maintrack",
+    "worktree_state": "clean"
+  },
+  "project": "dataset-artifacts-maintrack",
+  "source": "r4 read-only consistent SQLite transaction + hashed verified cell/results",
+  "status": "complete"
+}

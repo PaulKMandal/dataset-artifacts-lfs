@@ -1,0 +1,518 @@
+{
+  "appendix": [
+    {
+      "label": "audit-boundary",
+      "text": "Audit scope and evidentiary boundary",
+      "type": "heading"
+    },
+    {
+      "text": "This appendix audits only packet.json and the frozen evidence sources named by the report request. No current checkout state, live result directory, or external literature is used. The adapter will append the authoritative source-state and evidence-hash record from the frozen request. The evidence establishes orchestration state and artifact identity. It does not include the bytes of the result artifacts enumerated inside the cell records, so their scientific values are outside the available evidence boundary.",
+      "type": "paragraph"
+    },
+    {
+      "label": "cell-ledger",
+      "text": "Cell execution ledger",
+      "type": "heading"
+    },
+    {
+      "caption": "Complete execution ledger from the experiment snapshot. RC is the process return code. The resumed column reproduces the recorded used-resume-command flag.",
+      "headers": [
+        "Cell and condition",
+        "Status",
+        "RC",
+        "Resumed"
+      ],
+      "rows": [
+        [
+          "cell-0-output-0: selected, RoBERTa-base",
+          "verified",
+          "[[claim:rc0]]",
+          "false"
+        ],
+        [
+          "cell-1-output-0: random, RoBERTa-base",
+          "verified",
+          "[[claim:rc1]]",
+          "false"
+        ],
+        [
+          "cell-2-output-0: selected, ALBERT-base",
+          "verified",
+          "[[claim:rc2]]",
+          "false"
+        ],
+        [
+          "cell-3-output-0: random, ALBERT-base",
+          "verified",
+          "[[claim:rc3]]",
+          "false"
+        ],
+        [
+          "cell-4-output-0: selected, DistilBERT",
+          "verified",
+          "[[claim:rc4]]",
+          "false"
+        ],
+        [
+          "cell-5-output-0: random, DistilBERT",
+          "verified",
+          "[[claim:rc5]]",
+          "false"
+        ],
+        [
+          "cell-6-output-0: selected, ELECTRA-base",
+          "verified",
+          "[[claim:rc6]]",
+          "false"
+        ],
+        [
+          "cell-7-output-0: random, ELECTRA-base",
+          "verified",
+          "[[claim:rc7]]",
+          "false"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "The snapshot reports [[claim:count]] cells in total. The first column maps each row to its exact frozen evidence source. Each record names production mode, the same production experiment, the same source task and historical reference task, and the same manifest identity, while retaining distinct plan and content hashes. [[evidence:experiment-snapshot]] [[evidence:cell-7-output-0]]",
+      "type": "paragraph"
+    },
+    {
+      "label": "run-matrix",
+      "text": "Run-identity matrix",
+      "type": "heading"
+    },
+    {
+      "caption": "Literal condition and target names from the cell and run-id fields. The final column identifies the paired frozen cell sources.",
+      "headers": [
+        "Target and recorded comparison",
+        "Sources"
+      ],
+      "rows": [
+        [
+          "RoBERTa-base: selected-same-epochs versus random-same-epochs",
+          "cell-0 / cell-1"
+        ],
+        [
+          "ALBERT-base: selected-same-epochs versus random-same-epochs",
+          "cell-2 / cell-3"
+        ],
+        [
+          "DistilBERT: selected-same-epochs versus random-same-epochs",
+          "cell-4 / cell-5"
+        ],
+        [
+          "ELECTRA-base: selected-same-epochs versus random-same-epochs",
+          "cell-6 / cell-7"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "Every run-id string names source-albert-base and ends with the literal token seed13. The experiment title and run identifiers also contain the literal exact50. The packet supplies no definitions for selected, random, same-epochs, seed13, or exact50, because the readable run-plan contents are absent. These tokens are therefore treated as identity labels, not as verified methodological facts.",
+      "type": "paragraph"
+    },
+    {
+      "label": "artifact-inventory",
+      "text": "Artifact inventory and payload gap",
+      "type": "heading"
+    },
+    {
+      "caption": "Decision-relevant files enumerated by each cell record. Present means path, byte size, and hash metadata are frozen; payload means readable contents are frozen in this report packet.",
+      "headers": [
+        "Recorded artifact group",
+        "Metadata",
+        "Payload"
+      ],
+      "rows": [
+        [
+          "Final evaluation summary and aggregate result files",
+          "present",
+          "absent"
+        ],
+        [
+          "Train metrics, epoch logs, and step logs",
+          "present",
+          "absent"
+        ],
+        [
+          "Held-out and training evaluation telemetry",
+          "present",
+          "absent"
+        ],
+        [
+          "Numerical checks, gradient norms, and weight changes",
+          "present",
+          "absent"
+        ],
+        [
+          "Final, held-out, and training predictions",
+          "present",
+          "absent"
+        ],
+        [
+          "Run plan, resource calibration, and initial-state identity",
+          "present",
+          "absent"
+        ],
+        [
+          "Model state, checkpoints, tokenizer, and trainer state",
+          "present",
+          "absent"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "The inventory varies only where model families require different tokenizer assets: RoBERTa records merges and vocabulary JSON files, ALBERT records a sentence-piece model, and DistilBERT and ELECTRA record vocabulary text files. Each cell also lists final predictions for addonesent, addsent, adversarialqa, mrqa-newsqa, mrqa-searchqa, mrqa-triviaqa, and squad-dev; held-out and training predictions are listed for initial state and the epoch-labeled states. The decision-relevant diagnostic categories above appear in every cell inventory. Because only metadata is frozen, none can be inspected here for values, schema, row counts, numerical warnings, prediction distributions, or configuration choices. [[evidence:cell-0-output-0]] [[evidence:cell-2-output-0]] [[evidence:cell-4-output-0]] [[evidence:cell-6-output-0]]",
+      "type": "paragraph"
+    },
+    {
+      "label": "workflow-chain",
+      "text": "Failure and recovery chain",
+      "type": "heading"
+    },
+    {
+      "caption": "Exhaustive stage sequence in the workflow-provenance artifact. No unrecorded cause or repair mechanism is inferred.",
+      "headers": [
+        "Recorded event",
+        "Stage"
+      ],
+      "rows": [
+        [
+          "Initial implementation source registered",
+          "implementation"
+        ],
+        [
+          "Smoke experiment ended as failed",
+          "smoke-failed"
+        ],
+        [
+          "Replacement source task registered",
+          "repair"
+        ],
+        [
+          "Replacement smoke experiment qualified",
+          "smoke-qualified"
+        ],
+        [
+          "Production experiment and manifest verified",
+          "production-verified"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "The workflow chain gives identifiers and event order but no diagnostic record for the failed smoke run and no description of the repair. It therefore supports recovery of the orchestration path, not causal attribution. The final production source is the replacement source associated with the repair and qualified smoke stage. [[evidence:workflow-chain]]",
+      "type": "paragraph"
+    },
+    {
+      "label": "inference-audit",
+      "text": "Inference and uncertainty audit",
+      "type": "heading"
+    },
+    {
+      "caption": "Audit of inferential support. A negative finding here means the required value is absent from the frozen packet, not that the underlying experiment necessarily lacks it.",
+      "headers": [
+        "Claim or decision and evidentiary basis",
+        "Audit finding"
+      ],
+      "rows": [
+        [
+          "Production execution: snapshot status, per-cell status, return codes, receipts, and hashes",
+          "supported"
+        ],
+        [
+          "Collapse diagnosis: requires an operational criterion and inspectable outputs",
+          "unsupported"
+        ],
+        [
+          "Selected-versus-random effect: requires paired metric values and denominators",
+          "unsupported"
+        ],
+        [
+          "Cross-target comparison: requires a common reported metric and evaluation definition",
+          "unsupported"
+        ],
+        [
+          "Variability: requires repeat-run results or an evidence-backed interval method",
+          "unsupported"
+        ],
+        [
+          "Smoke-failure cause: requires the missing failure diagnostic or repair description",
+          "unresolved"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "No confidence interval, standard error, replicate ledger, or evaluation denominator is available. It would be incorrect to manufacture an interval from file sizes, execution times, or the matrix size. Likewise, a successful return code is not a proxy for accuracy. These are different layers of evidence: execution metadata answers whether a process completed, while model metrics answer how the resulting predictor behaved.",
+      "type": "paragraph"
+    },
+    {
+      "label": "claim-ledger",
+      "text": "Traceable numeric-claim ledger",
+      "type": "heading"
+    },
+    {
+      "caption": "All numeric claims used in the report, with exact JSON pointers into experiment-snapshot.",
+      "headers": [
+        "Meaning and pointer",
+        "Value"
+      ],
+      "rows": [
+        [
+          "Production cell count; /cell_count",
+          "[[claim:count]]"
+        ],
+        [
+          "Cell-0 return code; /cells/0/return_code",
+          "[[claim:rc0]]"
+        ],
+        [
+          "Cell-1 return code; /cells/1/return_code",
+          "[[claim:rc1]]"
+        ],
+        [
+          "Cell-2 return code; /cells/2/return_code",
+          "[[claim:rc2]]"
+        ],
+        [
+          "Cell-3 return code; /cells/3/return_code",
+          "[[claim:rc3]]"
+        ],
+        [
+          "Cell-4 return code; /cells/4/return_code",
+          "[[claim:rc4]]"
+        ],
+        [
+          "Cell-5 return code; /cells/5/return_code",
+          "[[claim:rc5]]"
+        ],
+        [
+          "Cell-6 return code; /cells/6/return_code",
+          "[[claim:rc6]]"
+        ],
+        [
+          "Cell-7 return code; /cells/7/return_code",
+          "[[claim:rc7]]"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "The claim pointers are reproduced exactly as declared in the brief claims array. No derived performance number is reported.",
+      "type": "paragraph"
+    },
+    {
+      "label": "acceptance-gate",
+      "text": "Acceptance gate for the next report",
+      "type": "heading"
+    },
+    {
+      "text": "A successor report should not advance beyond operational status until the evidence packet exposes the contents and schema of the final evaluation summaries and the run plans for every cell. It should state the collapse rule before inspecting comparative outcomes; show the metric, evaluation population, and denominator for each cell; pair selected and random only within the same target; report available variability without implying unobserved repetitions; surface numerical-check failures; and reconcile the failed smoke stage. If any required payload cannot be matched to its recorded hash, that loss should be reported and the affected comparison rerun from the frozen source state.",
+      "type": "paragraph"
+    }
+  ],
+  "claims": [
+    {
+      "id": "count",
+      "pointer": "/cell_count",
+      "source_id": "experiment-snapshot",
+      "value": 8
+    },
+    {
+      "id": "rc0",
+      "pointer": "/cells/0/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc1",
+      "pointer": "/cells/1/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc2",
+      "pointer": "/cells/2/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc3",
+      "pointer": "/cells/3/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc4",
+      "pointer": "/cells/4/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc5",
+      "pointer": "/cells/5/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc6",
+      "pointer": "/cells/6/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    },
+    {
+      "id": "rc7",
+      "pointer": "/cells/7/return_code",
+      "source_id": "experiment-snapshot",
+      "value": 0
+    }
+  ],
+  "main": [
+    {
+      "text": "Decision summary",
+      "type": "heading"
+    },
+    {
+      "text": "The frozen snapshot establishes an operational result, not a model-quality result. The production workflow is marked complete and contains [[claim:count]] verified cells. Every cell has the successful return-code value traceably listed in the execution table, and no cell is marked as resumed. This is evidence that the scheduled jobs finished and their result records passed the workflow's verification step. It is not evidence that the models avoided degenerating into a narrow, uninformative output pattern\u2014[[term:classification collapse|inference-audit]]\u2014that one sampling condition beat another, or that any target architecture is suitable for use. The cell records list metric, prediction, and telemetry files only by path, size, and hash; their contents are not included in the frozen packet. The immediate decision is therefore to hold any scientific or deployment conclusion until metric payloads are captured and checked. [[evidence:experiment-snapshot]]",
+      "type": "paragraph"
+    },
+    {
+      "text": "What was tested",
+      "type": "heading"
+    },
+    {
+      "text": "The cell names form a paired matrix: selected and random conditions are each run against RoBERTa-base, ALBERT-base, DistilBERT, and ELECTRA-base targets. Their run identifiers also carry the literal labels source-albert-base, selected-same-epochs or random-same-epochs, and seed13. Those strings identify the recorded jobs; they do not, by themselves, prove how examples were selected, how epochs were matched, or what seed policy was used. The referenced run-plan files are not present as readable payloads, so the design cannot be reconstructed beyond these labels from this packet. [[evidence:cell-0-output-0]]",
+      "type": "paragraph"
+    },
+    {
+      "caption": "Production execution matrix. Each entry shows recorded status and return code; verified describes workflow integrity, not predictive quality. Full cell provenance appears in the audit appendix.",
+      "headers": [
+        "Target",
+        "Selected",
+        "Random"
+      ],
+      "rows": [
+        [
+          "RoBERTa-base",
+          "verified; RC [[claim:rc0]]",
+          "verified; RC [[claim:rc1]]"
+        ],
+        [
+          "ALBERT-base",
+          "verified; RC [[claim:rc2]]",
+          "verified; RC [[claim:rc3]]"
+        ],
+        [
+          "DistilBERT",
+          "verified; RC [[claim:rc4]]",
+          "verified; RC [[claim:rc5]]"
+        ],
+        [
+          "ELECTRA-base",
+          "verified; RC [[claim:rc6]]",
+          "verified; RC [[claim:rc7]]"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "This table answers a process question only. A return code reports how a program terminated; the verified label reports the workflow's acceptance state; hashes bind records to specific bytes. Together they make accidental substitution or an obvious crashed job easier to detect. None of them tests the semantic correctness of predictions. That requires reading the evaluation outputs and applying a stated decision rule. Keeping these layers separate is essential here because all process indicators are favorable while the values needed for the named diagnostic are unavailable.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Measured outcome",
+      "type": "heading"
+    },
+    {
+      "text": "The measurable outcome in this evidence package is execution integrity. All listed cells share the production experiment and manifest identity; each is marked verified, completed without a resume command, and has its own plan hash, content hash, and receipt hash. The per-cell artifacts enumerate final evaluation summaries, train metrics, held-out and training evaluations, numerical checks, gradients, weight changes, checkpoints, and prediction files. This coverage is encouraging because the diagnostic outputs appear to have been produced. However, the hashes establish file identity only. They do not expose the values inside those files and cannot substitute for accuracy, class-frequency, confidence, calibration, or stability measurements. The audit appendix maps this distinction to every frozen source. [[evidence:cell-2-output-0]]",
+      "type": "paragraph"
+    },
+    {
+      "text": "Critical evidence gap",
+      "type": "heading"
+    },
+    {
+      "text": "No collapse criterion, metric value, confusion or prediction distribution, sample count, variability estimate, or readable training configuration appears in the supplied JSON. Consequently, there is no supported effect size for selected versus random, no basis for ranking targets, and no way to tell whether an apparently successful job produced useful predictions. A plot would imply a measurement that the packet does not contain, so none is shown. This is a reportability failure in the frozen evidence boundary, not proof that training failed and not proof that collapse occurred. The distinction matters: rerunning computation may be unnecessary if the already hashed result files can instead be frozen with their contents. [[evidence:cell-6-output-0]]",
+      "type": "paragraph"
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "text": "Failure history and uncertainty",
+      "type": "heading"
+    },
+    {
+      "text": "The workflow provenance preserves a negative result before production: the first smoke experiment ended as failed. A later repair was recorded, followed by a qualified smoke experiment and then verified production. The chain supplies no failure cause, repair description, or smoke measurements. Production verification shows that the repaired workflow reached completion, but it does not establish that the original fault was irrelevant to model behavior. Any later interpretation should retain this history and either explain the initial failure from frozen diagnostics or explicitly mark it unresolved. [[evidence:workflow-chain]]",
+      "type": "paragraph"
+    },
+    {
+      "text": "The strongest supported interpretation is narrow: the repaired production path executed consistently enough for the orchestration layer to accept every cell record. The scientific interpretation remains open. In particular, the packet cannot distinguish a healthy trained classifier from a degenerate predictor, cannot test whether selected examples differ from random examples, and cannot determine whether behavior transfers across target families. It also contains no usable basis for sampling uncertainty or run-to-run variability. The absence of those values should not be read as zero uncertainty; it means uncertainty is not quantifiable from this evidence.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Decision consequences",
+      "type": "heading"
+    },
+    {
+      "caption": "Questions the current packet can and cannot answer. The distinction prevents workflow success from being mistaken for model success.",
+      "headers": [
+        "Decision question",
+        "Packet support"
+      ],
+      "rows": [
+        [
+          "Did the production jobs finish and pass recorded verification?",
+          "Supported"
+        ],
+        [
+          "Did any model avoid or exhibit collapse?",
+          "Not measurable"
+        ],
+        [
+          "Is selected better than random for any target?",
+          "Not measurable"
+        ],
+        [
+          "Can uncertainty or repeatability be quantified?",
+          "Not measurable"
+        ],
+        [
+          "Can the original smoke failure be explained?",
+          "Not from packet"
+        ]
+      ],
+      "type": "table"
+    },
+    {
+      "text": "Accordingly, the current evidence is sufficient to close an orchestration-completion check but insufficient to close the diagnostic question named by the experiment. Selecting a target or sampling condition now would convert missing evidence into an unsupported preference. The same applies to deciding that no effect exists: no reported difference is available for a null-effect assessment.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Minimum evidence needed",
+      "type": "heading"
+    },
+    {
+      "text": "A decision-ready packet needs more than a headline score. It should include the operational definition of collapse, the primary metric and its direction, the evaluation population and denominator, and the prediction or class distribution needed to recognize the failure mode. The selected and random conditions must be comparable within each target under the actual run-plan settings. Numerical checks and training telemetry are then useful for diagnosis if an output looks wrong, but they should not replace the primary evaluation. Finally, the packet must expose whatever repetition or interval method actually exists; if none exists, the report should say that variability was not measured.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Next decision",
+      "type": "heading"
+    },
+    {
+      "text": "Do not accept or reject any sampling condition or target architecture from this packet. First, create a new frozen evidence snapshot that includes the readable contents of each final-evaluation summary, train-metrics file, held-out evaluation log, numerical-check log, run plan, and initial-state identity record while preserving their recorded hashes and cell mapping. If the matching hashed files cannot be recovered, rerun the matrix from the recorded clean commit rather than substituting a current checkout. This action addresses the evidence gap without guessing whether computation itself was faulty.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Before comparing conditions, define the observable signature of collapse and the metric used for the decision. Then report per-cell values, selected-minus-random comparisons within each target, evaluation sample counts, and whatever repeat-run or interval information the design actually supplies. Reconcile the failed smoke stage with the repaired path, and verify that the run-plan contents support the labels encoded in the run identifiers. Release a scientific conclusion only after those checks; until then, record the production run as operationally verified but scientifically indeterminate.",
+      "type": "paragraph"
+    }
+  ],
+  "references": [],
+  "schema_version": 1
+}

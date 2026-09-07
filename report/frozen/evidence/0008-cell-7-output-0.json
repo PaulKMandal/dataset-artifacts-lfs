@@ -1,0 +1,227 @@
+{
+  "artifacts": {
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/all_results.json": {
+      "sha256": "sha256:9f05b52c1ed045cca8b478e197cd8c80e0137586e02e4b88d0bf3be39bab844d",
+      "size": 206
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/config.json": {
+      "sha256": "sha256:6be73237d5aad94388bfdc9a662a92249f2ad95c568323ddc847174eeb37e52e",
+      "size": 857
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/model.safetensors": {
+      "sha256": "sha256:fe1f90b8ff800b988530c3d411c72b478ee8653673d4b13d9a391a6093b554b8",
+      "size": 437959248
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/special_tokens_map.json": {
+      "sha256": "sha256:b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+      "size": 125
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/tokenizer.json": {
+      "sha256": "sha256:d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+      "size": 711396
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/tokenizer_config.json": {
+      "sha256": "sha256:6a2e73ced2eb6a1a8f5182eb431b47da8a52808fedcf20014cd3abdbbd5d5a8f",
+      "size": 1193
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_1/vocab.txt": {
+      "sha256": "sha256:07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+      "size": 231508
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/config.json": {
+      "sha256": "sha256:6be73237d5aad94388bfdc9a662a92249f2ad95c568323ddc847174eeb37e52e",
+      "size": 857
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/model.safetensors": {
+      "sha256": "sha256:34eb91c802fc0a0c97e1a3e7a2e38cd59836f4128bd4c406e0cbc1ce4840ae51",
+      "size": 437959248
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/special_tokens_map.json": {
+      "sha256": "sha256:b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+      "size": 125
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/tokenizer.json": {
+      "sha256": "sha256:d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+      "size": 711396
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/tokenizer_config.json": {
+      "sha256": "sha256:6a2e73ced2eb6a1a8f5182eb431b47da8a52808fedcf20014cd3abdbbd5d5a8f",
+      "size": 1193
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/bounded_checkpoints/epoch_2/vocab.txt": {
+      "sha256": "sha256:07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+      "size": 231508
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/config.json": {
+      "sha256": "sha256:6be73237d5aad94388bfdc9a662a92249f2ad95c568323ddc847174eeb37e52e",
+      "size": 857
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_evaluation_summary.json": {
+      "sha256": "sha256:d32c18d610cd3f9bbe41d8fd156939a1b7c175ce29603377034030d41f2aaf91",
+      "size": 23734
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/addonesent.jsonl.gz": {
+      "sha256": "sha256:820954fd487cd373e3f525414136a2c29047d7a622da5bca3b88efa0d00b3f48",
+      "size": 69680
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/addsent.jsonl.gz": {
+      "sha256": "sha256:d91d4b6743abb26c4cae66fee9579b831c15689e3bcafb108c2a27d6171fbf14",
+      "size": 115407
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/adversarialqa.jsonl.gz": {
+      "sha256": "sha256:c929c38786b1a010ac998cbffbdea0da8085aaad756aeab6d015a17143995464",
+      "size": 202469
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/mrqa_newsqa.jsonl.gz": {
+      "sha256": "sha256:7610d095c749a04f706eca18b2068aa1ccc9cb416f75f821fc54b7bab3a8578e",
+      "size": 257049
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/mrqa_searchqa.jsonl.gz": {
+      "sha256": "sha256:c081c233d1e23f02bfc5694a9420700f7244cb35d89bdd13003dd28a83f3ed90",
+      "size": 1110028
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/mrqa_triviaqa.jsonl.gz": {
+      "sha256": "sha256:334530bbdaae48cb0e2d17245e01e1e1661af6b2dc3d3f9a3016102bbad91917",
+      "size": 486084
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/final_predictions/squad_dev.jsonl.gz": {
+      "sha256": "sha256:8ec39e94f4ce68164d88cb0100b37ed6a48e4b973d8469ac638a0120314d1372",
+      "size": 436445
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/heldout_predictions/epoch_1.jsonl.gz": {
+      "sha256": "sha256:ab340642a909d1708731bc4ce25dc3e66eeef1039f3ed1b46b8a21b3b42d5acb",
+      "size": 473855
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/heldout_predictions/epoch_2.jsonl.gz": {
+      "sha256": "sha256:2eb1540c69804e84fd40c7cd90336e27de896ff2e207a3540304c1851fd3ef56",
+      "size": 446371
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/heldout_predictions/epoch_3.jsonl.gz": {
+      "sha256": "sha256:8ec39e94f4ce68164d88cb0100b37ed6a48e4b973d8469ac638a0120314d1372",
+      "size": 436445
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/heldout_predictions/initial.jsonl.gz": {
+      "sha256": "sha256:d9c26c07d4decc1d15357597bb06ebc71407324531d6b8a04e9aa21411d7e9bd",
+      "size": 551544
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/initial_state_identity.json": {
+      "sha256": "sha256:7aef69c991ceaaa0f4db886dae9e701a0dda8b575baafb93586c4d716fe795d5",
+      "size": 5513
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/model.safetensors": {
+      "sha256": "sha256:5d099b42bdaaef70cc27807f84e0d328e7f7dacfc18eb7087f745cb8430da6b3",
+      "size": 437959248
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/resource_calibration.json": {
+      "sha256": "sha256:e2b7994629622d9308789842a96ac51a5b76636088f11bb388ead6de2fd97717",
+      "size": 766
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/run_plan.json": {
+      "sha256": "sha256:5c7cf7203da9e201130b457fa8852d6d9d1e060d28ad6aeb00e94e5854447fe1",
+      "size": 5239
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/special_tokens_map.json": {
+      "sha256": "sha256:b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+      "size": 125
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/state_snapshots/epoch_1_head.pt": {
+      "sha256": "sha256:e0f63f1663baf42b101e0dfea603aea33d89bfd1c6fb3b787fc0d3156ed7975e",
+      "size": 2370616
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/state_snapshots/epoch_2_head.pt": {
+      "sha256": "sha256:0fd364aa61db0cbf20d443f7412b1ac912186dfd4743c9af8235a86022e474e4",
+      "size": 2370616
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/state_snapshots/epoch_3_head.pt": {
+      "sha256": "sha256:b4e368a5f75ee802a12be5c6c41538f8f6623b43bdbf34ef3e6ffd220c47e6f1",
+      "size": 2370616
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/state_snapshots/initial_head.pt": {
+      "sha256": "sha256:3412b6bb0addd9c392a83f149f1b17c8c55c95e4ef2855e18f013ddef64d9f19",
+      "size": 2370616
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/gradient_norms.jsonl": {
+      "sha256": "sha256:f6a35f66561c720cac699416ab1b79574c1c13354261c5e8fd30d53eb3cd2448",
+      "size": 8977027
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/heldout_evaluations.jsonl": {
+      "sha256": "sha256:e5d76789432ca8ac1ede7896878e429362c824391880a36afb9808949faa75ee",
+      "size": 13007
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/numerical_checks.jsonl": {
+      "sha256": "sha256:2b8c19e7c5d731354a757221b370b70e243efb08f3ab8b247b1df2cc683ee36a",
+      "size": 265173
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/train_epochs.jsonl": {
+      "sha256": "sha256:ad7b71590e33f93746e9274b8bb7ca00e91241915c7397ae0736b91435140099",
+      "size": 522
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/train_evaluations.jsonl": {
+      "sha256": "sha256:1f083648fbaada927b41a78b4aa62995dd9cd09ed99f403d995cdd6a67d9b0c3",
+      "size": 13012
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/train_steps.jsonl": {
+      "sha256": "sha256:0ba30add247d21241f43d1aef9a3c9c4b3cb662fe52782c143b5f175709d6f46",
+      "size": 876500
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/telemetry/weight_deltas.jsonl": {
+      "sha256": "sha256:fef0d3d57f1354483199f69f042dcd43a2a8b86a31d58db4a514fae4c67e9065",
+      "size": 10917
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/tokenizer.json": {
+      "sha256": "sha256:d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+      "size": 711396
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/tokenizer_config.json": {
+      "sha256": "sha256:6a2e73ced2eb6a1a8f5182eb431b47da8a52808fedcf20014cd3abdbbd5d5a8f",
+      "size": 1193
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_metrics.json": {
+      "sha256": "sha256:d4c087937085ab9c9e1d3af28c1115107adb822d94cd57e26aa165e59d4f4d35",
+      "size": 195
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_predictions/epoch_1.jsonl.gz": {
+      "sha256": "sha256:d15adcae5ea8c64f507fa684997520ce38cd843610070b33cf36289ed82e8259",
+      "size": 716389
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_predictions/epoch_2.jsonl.gz": {
+      "sha256": "sha256:9acffcc5c07be3fde573a3f317477260a1ce55d5007435a6bbb565fddf314694",
+      "size": 665694
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_predictions/epoch_3.jsonl.gz": {
+      "sha256": "sha256:22cdddfb7011a92342caf6f0d0fc06b86d6c9181dd626c14f5f9e2081e1347bc",
+      "size": 643802
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_predictions/initial.jsonl.gz": {
+      "sha256": "sha256:1a3f732bc8d2cf38f4d2ab177f2ffd3a2d2cad6982b3dac1e14544382e97081a",
+      "size": 831200
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/train_results.json": {
+      "sha256": "sha256:9f05b52c1ed045cca8b478e197cd8c80e0137586e02e4b88d0bf3be39bab844d",
+      "size": 206
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/trainer_state.json": {
+      "sha256": "sha256:2d02548926728f0ae8056f8aebf75d37da5e13a8f5ce3240a06ccd2bb9d8b892",
+      "size": 1867
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/training_args.bin": {
+      "sha256": "sha256:817ea1783da910c1e5171810909d9fd1b84097f3ab2319d2fe9cc4c89bb176c4",
+      "size": 5432
+    },
+    "/home/rhel/Data/dataset-artifacts-maintrack/results/diagnostics/classification_exact50_instrumented/task-20260906-233100-b602609d/exp-production-20260907-002620-a05deb/production/random__electra_base/vocab.txt": {
+      "sha256": "sha256:07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+      "size": 231508
+    }
+  },
+  "cell": "random__electra_base",
+  "completed_at_unix": 1788747277.1969328,
+  "content_hash": "sha256:626f8d644518fdb4b16dd008de77f5f06febc61d16e263600cb27ff320ff74b7",
+  "historical_reference_task_id": "task-20260906-031231-c95446ed",
+  "mode": "production",
+  "plan_hash": "sha256:fc564aa6eacee912443415526316d1a8a9470f5ab7c8fff99c6741b0f36302b8",
+  "researchd_experiment_id": "exp-production-20260907-002620-a05deb",
+  "researchd_manifest_sha256": "e5f570053fc22d64bb459598100d9dcda15359c497c7486e74388cda46680342",
+  "run_id": "classification_exact50_diag__source-albert_base__target-electra_base__random_same_epochs__seed13",
+  "schema_version": 1,
+  "source_task_id": "task-20260906-233100-b602609d"
+}

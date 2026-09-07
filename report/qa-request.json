@@ -1,0 +1,64 @@
+{
+  "checks": {
+    "appendix_flow": null,
+    "caption_separation": null,
+    "claims_match_evidence": null,
+    "dense_not_cramped": null,
+    "grid_behind_marks": null,
+    "no_avoidable_blank_pages": null,
+    "no_clipping": null,
+    "no_overlap": null,
+    "palette_and_noncolor_encodings": null,
+    "plot_labels_readable_at_print_scale": null,
+    "references_at_boundary": null,
+    "tables_readable_at_print_scale": null
+  },
+  "decision": null,
+  "page_reviews": [],
+  "pages": [
+    {
+      "page": 1,
+      "sha256": "0e2b6ec72048bf23848aa49b8e3575284aebeecf389de8774257ac8b34bca9f2"
+    },
+    {
+      "page": 2,
+      "sha256": "08c689d7956d194f7cfbe2272c11558865a6d5478bcdb63d3aeb79532b460e32"
+    },
+    {
+      "page": 3,
+      "sha256": "6701ce0106b54f519956228708f1cfea2368a902ef2d64611a7d7ab37e7bce36"
+    },
+    {
+      "page": 4,
+      "sha256": "531cd3d367362e2db41868a0c894497bb4f05bd747fb6268d6da832c9319dd55"
+    },
+    {
+      "page": 5,
+      "sha256": "2df05ac894a4c66115c2e6f163ea2a82551bfcf38c5d6af707ea77fa63c0738e"
+    }
+  ],
+  "pdf_sha256": "5cdb50ecd413a7072ee6efdb16c8223bce8fd2eaff1c9a6b0a3dbdd722548029",
+  "report_id": "rpt-recovery-5584ea99293a4802b26da8bb-r2",
+  "request_sha256": "520cb6f10b9a649ee911a967b6385d7ff2fd6a5191c88bcfd506e34349d597b5",
+  "required_checks": [
+    "no_clipping",
+    "no_overlap",
+    "tables_readable_at_print_scale",
+    "plot_labels_readable_at_print_scale",
+    "grid_behind_marks",
+    "palette_and_noncolor_encodings",
+    "caption_separation",
+    "dense_not_cramped",
+    "no_avoidable_blank_pages",
+    "references_at_boundary",
+    "appendix_flow",
+    "claims_match_evidence"
+  ],
+  "reviewer": null,
+  "source_hashes": {
+    "cvpr_internal_report.sty": "92557c57b0895dd11b6f4c65ac963c1c64276587d8e5f6b13da7379f568d7047",
+    "main.tex": "53de91a4e7086aceeb1cc602fcef8b208ce6300187f0fd63e5bcc4c99513dbcc",
+    "plot_styles.tex": "73b81d35a235352b05c7817a6653ce7bd5c8eca7c9cf1210f2e6b201c05d171e"
+  },
+  "validation_sha256": "0140624cc624e6fb1530536c0994f49935ce0b39c1fab6e466405f8f8da51f88"
+}

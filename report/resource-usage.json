@@ -1,0 +1,22 @@
+{
+  "compilation": {
+    "cpu_affinity_count": 1,
+    "cpu_seconds": 2.2262319999999995,
+    "elapsed_seconds": 2.2348599169927184,
+    "gpus_requested": 0,
+    "inputs_read_only": true,
+    "network_syscalls_denied": true,
+    "peak_child_process_rss_bytes": 70770688,
+    "ram_scope": "maximum single descendant RSS, not aggregate cgroup RAM"
+  },
+  "validation_and_rendering": {
+    "cpu_affinity_count": 1,
+    "cpu_seconds": 3.09438,
+    "elapsed_seconds": 3.1032319699879736,
+    "gpus_requested": 0,
+    "inputs_read_only": true,
+    "network_syscalls_denied": true,
+    "peak_child_process_rss_bytes": 23908352,
+    "ram_scope": "maximum single descendant RSS, not aggregate cgroup RAM"
+  }
+}
